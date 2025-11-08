@@ -1,0 +1,195 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CUSTOMER
+  PROVIDER
+  ADMIN
+}
+
+enum ServiceRequestStatus {
+  PENDING
+  QUOTED
+  ACCEPTED
+  REJECTED
+  CANCELLED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum PriceRange {
+  LOW        // €
+  MEDIUM     // €€
+  HIGH       // €€€
+  PREMIUM    // €€€€
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String
+  password_hash String
+  role          UserRole @default(CUSTOMER)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  // Relations
+  provider         ServiceProvider?
+  service_requests ServiceRequest[]
+  bookings         Booking[]
+  reviews          Review[]
+  messages_sent    Message[]        @relation("SentMessages")
+  messages_received Message[]       @relation("ReceivedMessages")
+
+  @@map("users")
+}
+
+model ServiceProvider {
+  id             String     @id @default(cuid())
+  user_id        String     @unique
+  business_name  String
+  category       String
+  location       String
+  price_range    PriceRange @default(MEDIUM)
+  description    String?
+  services       String[]
+  images         String[]
+  availability   String?
+  min_guests     Int?
+  max_guests     Int?
+  response_time  String?
+  verified       Boolean    @default(false)
+  rating_avg     Float      @default(0)
+  review_count   Int        @default(0)
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+
+  // Relations
+  user             User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  service_requests ServiceRequest[]
+  quotes           Quote[]
+  bookings         Booking[]
+  reviews          Review[]
+
+  @@map("service_providers")
+}
+
+model ServiceRequest {
+  id                String               @id @default(cuid())
+  customer_id       String
+  provider_id       String?
+  category          String
+  event_type        String
+  event_date        DateTime
+  event_location    String
+  guest_count       Int
+  budget_range      PriceRange?
+  description       String
+  status            ServiceRequestStatus @default(PENDING)
+  customer_name     String
+  customer_email    String
+  customer_phone    String
+  preferred_contact String?
+  created_at        DateTime             @default(now())
+  updated_at        DateTime             @updatedAt
+
+  // Relations
+  customer User             @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  provider ServiceProvider? @relation(fields: [provider_id], references: [id], onDelete: SetNull)
+  quotes   Quote[]
+  booking  Booking?
+
+  @@map("service_requests")
+}
+
+model Quote {
+  id                String         @id @default(cuid())
+  request_id        String
+  provider_id       String
+  total_price       Float
+  included_services String[]
+  terms             String?
+  valid_until       DateTime
+  message           String?
+  accepted          Boolean        @default(false)
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+
+  // Relations
+  request  ServiceRequest  @relation(fields: [request_id], references: [id], onDelete: Cascade)
+  provider ServiceProvider @relation(fields: [provider_id], references: [id], onDelete: Cascade)
+
+  @@map("quotes")
+}
+
+model Booking {
+  id              String        @id @default(cuid())
+  request_id      String        @unique
+  customer_id     String
+  provider_id     String
+  event_date      DateTime
+  event_location  String
+  guest_count     Int
+  final_price     Float
+  status          BookingStatus @default(PENDING)
+  payment_status  String?
+  special_requests String?
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
+
+  // Relations
+  request  ServiceRequest  @relation(fields: [request_id], references: [id], onDelete: Cascade)
+  customer User            @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  provider ServiceProvider @relation(fields: [provider_id], references: [id], onDelete: Cascade)
+
+  @@map("bookings")
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  provider_id  String
+  customer_id  String
+  rating       Int
+  title        String
+  comment      String
+  event_type   String
+  event_date   DateTime
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  provider ServiceProvider @relation(fields: [provider_id], references: [id], onDelete: Cascade)
+  customer User            @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  sender_id   String
+  receiver_id String
+  subject     String?
+  content     String
+  read        Boolean  @default(false)
+  created_at  DateTime @default(now())
+
+  // Relations
+  sender   User @relation("SentMessages", fields: [sender_id], references: [id], onDelete: Cascade)
+  receiver User @relation("ReceivedMessages", fields: [receiver_id], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}

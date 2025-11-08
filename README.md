@@ -5,7 +5,40 @@ Download Source Code
 
 ---
 
-## 📌 Overzicht
+## � Quick Start
+
+### Database Setup
+
+**Optie 1: PostgreSQL via Docker (Aanbevolen)**
+```bash
+docker run --name eventify-postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres
+docker exec -it eventify-postgres psql -U postgres -c "CREATE DATABASE eventify;"
+```
+
+**Optie 2: Lokale PostgreSQL Installatie**
+1. Download PostgreSQL van https://www.postgresql.org/download/
+2. Installeer en start de service
+3. Maak een database aan: `CREATE DATABASE eventify;`
+4. Update `.env` met jouw credentials
+
+### Project Setup
+```bash
+# Installeer dependencies
+npm install
+
+# Setup database schema
+npx prisma migrate dev --name init
+
+# Seed database met demo data
+npx prisma db seed
+
+# Start development server
+npm run dev
+```
+
+---
+
+## �📌 Overzicht
 - **Tech Stack**
 - **Architectuur**
 - **Features**
