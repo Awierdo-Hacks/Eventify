@@ -1,20 +1,15 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Container, Section } from '@/components/layout';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, Calendar, CheckCircle, Star,ForkKnife, Music, Camera, Theater, Sparkle, Building } from 'lucide-react';
-
-const categories = [
-  { name: 'Catering', icon: ForkKnife, count: 120 },
-  { name: 'DJ & Muziek', icon: Music, count: 85 },
-  { name: 'Fotografie', icon: Camera, count: 95 },
-  { name: 'Decoratie', icon: Sparkle, count: 70 },
-  { name: 'Locaties', icon: Building, count: 45 },
-  { name: 'Entertainment', icon: Theater, count: 60 },
-];
+import { Search, Calendar, CheckCircle, Star } from 'lucide-react';
+import { categories } from '@/lib/mockData';
 
 const features = [
   {
@@ -40,6 +35,17 @@ const features = [
 ];
 
 export default function Home() {
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('q', searchQuery);
+    if (selectedCategory) params.set('category', selectedCategory);
+    router.push(`/browse?${params.toString()}`);
+  };
+
   return (
     <main className="min-h-screen">
       {/* Hero Section */}
@@ -68,14 +74,32 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <Card className="p-8 max-w-2xl mx-auto bg-white border-2 border-gray-100 rounded-3xl shadow-eventify-xl">
-                <div className="flex gap-4">
+              <Card className="p-8 max-w-3xl mx-auto bg-white border-2 border-gray-100 rounded-3xl shadow-eventify-xl">
+                <div className="flex flex-col md:flex-row gap-4">
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="rounded-xl border-2 border-gray-100 h-12 px-4 focus:border-purple-500 focus:outline-none"
+                  >
+                    <option value="">Alle categorieën</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.icon} {cat.name}
+                      </option>
+                    ))}
+                  </select>
                   <input
                     type="text"
-                    placeholder="Wat voor event organiseer je?"
+                    placeholder="Zoek op locatie of naam..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                     className="flex-1 rounded-xl border-2 border-gray-100 h-12 px-4 focus:border-purple-500 focus:outline-none"
                   />
-                  <Button className="gradient-brand hover:opacity-90 h-12 px-8 rounded-xl">
+                  <Button
+                    onClick={handleSearch}
+                    className="gradient-brand hover:opacity-90 h-12 px-8 rounded-xl"
+                  >
                     <Search className="w-5 h-5 mr-2" />
                     Zoeken
                   </Button>
@@ -100,13 +124,15 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
               >
-                <Card className="p-6 text-center hover:shadow-eventify-lg transition-all hover:-translate-y-1 cursor-pointer border-2 border-gray-100 rounded-3xl">
-                  <div className="text-4xl mb-3"><category.icon /></div>
-                  <h3 className="font-semibold text-gray-900 mb-2">{category.name}</h3>
-                  <Badge variant="secondary" className="bg-purple-100 text-purple-700">
-                    {category.count} providers
-                  </Badge>
-                </Card>
+                <Link href={`/browse?category=${category.id}`}>
+                  <Card className="p-6 text-center hover:shadow-eventify-lg transition-all hover:-translate-y-1 cursor-pointer border-2 border-gray-100 rounded-3xl">
+                    <div className="text-4xl mb-3">{category.icon}</div>
+                    <h3 className="font-semibold text-gray-900 mb-2">{category.name}</h3>
+                    <Badge variant="secondary" className="bg-purple-100 text-purple-700">
+                      {category.count} providers
+                    </Badge>
+                  </Card>
+                </Link>
               </motion.div>
             ))}
           </div>
@@ -158,13 +184,17 @@ export default function Home() {
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
               Maak vandaag nog een account en vind de perfecte dienstverleners voor jouw event
             </p>
-            <div className="flex gap-4 justify-center">
-              <Button size="lg" className="gradient-brand hover:opacity-90 rounded-xl">
-                Start Gratis
-              </Button>
-              <Button size="lg" variant="outline" className="rounded-xl">
-                Meer Informatie
-              </Button>
+            <div className="flex gap-4 justify-center flex-wrap">
+              <Link href="/browse">
+                <Button size="lg" className="gradient-brand hover:opacity-90 rounded-xl">
+                  Browse Providers
+                </Button>
+              </Link>
+              <Link href="/dashboard">
+                <Button size="lg" variant="outline" className="rounded-xl">
+                  Naar Dashboard
+                </Button>
+              </Link>
             </div>
           </motion.div>
         </Container>
