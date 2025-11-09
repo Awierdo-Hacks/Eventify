@@ -9,8 +9,22 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { mockProviders, categories, locations } from '@/lib/mockData';
-import { MapPin, Star, CheckCircle, Search } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { categories, locations } from '@/lib/mockData';
+import { MapPin, Star, CheckCircle, Search, Loader2 } from 'lucide-react';
+
+interface Provider {
+  id: string;
+  businessName: string;
+  category: string;
+  location: string;
+  priceRange: string;
+  description: string | null;
+  images: string[];
+  verified: boolean;
+  rating: number;
+  reviewCount: number;
+}
 
 export default function BrowsePage() {
   const searchParams = useSearchParams();
@@ -18,6 +32,9 @@ export default function BrowsePage() {
   const [selectedLocation, setSelectedLocation] = useState<string>('all');
   const [priceRange, setPriceRange] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [providers, setProviders] = useState<Provider[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Initialize from URL parameters
   useEffect(() => {
@@ -30,15 +47,48 @@ export default function BrowsePage() {
     if (query) setSearchQuery(query);
   }, [searchParams]);
 
-  const filteredProviders = mockProviders.filter((provider) => {
-    if (selectedCategory !== 'all' && provider.category !== selectedCategory) return false;
-    if (selectedLocation !== 'all' && provider.location !== selectedLocation) return false;
-    if (priceRange !== 'all' && provider.price_range !== priceRange) return false;
-    if (searchQuery && !provider.business_name.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
-    }
-    return true;
-  });
+  // Fetch providers from API
+  useEffect(() => {
+    const fetchProviders = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const params = new URLSearchParams();
+        if (selectedCategory !== 'all') params.append('category', selectedCategory);
+        if (selectedLocation !== 'all') params.append('location', selectedLocation);
+        if (priceRange !== 'all') params.append('priceRange', priceRange);
+        if (searchQuery) params.append('search', searchQuery);
+
+        const response = await fetch(`/api/providers?${params.toString()}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch providers');
+        }
+
+        const data = await response.json();
+        setProviders(data.providers);
+      } catch (err) {
+        console.error('Error fetching providers:', err);
+        setError('Er is iets misgegaan bij het laden van providers');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProviders();
+  }, [selectedCategory, selectedLocation, priceRange, searchQuery]);
+
+  // Map price range to display format
+  const getPriceRangeDisplay = (range: string) => {
+    const priceMap: Record<string, string> = {
+      LOW: '€',
+      MEDIUM: '€€',
+      HIGH: '€€€',
+      PREMIUM: '€€€€',
+    };
+    return priceMap[range] || range;
+  };
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -102,10 +152,10 @@ export default function BrowsePage() {
               className="rounded-xl border-2 border-gray-100 h-12 px-4 focus:border-purple-500 focus:outline-none"
             >
               <option value="all">Alle prijzen</option>
-              <option value="€">€ - Budget</option>
-              <option value="€€">€€ - Gemiddeld</option>
-              <option value="€€€">€€€ - Premium</option>
-              <option value="€€€€">€€€€ - Luxe</option>
+              <option value="LOW">€ - Budget</option>
+              <option value="MEDIUM">€€ - Gemiddeld</option>
+              <option value="HIGH">€€€ - Premium</option>
+              <option value="PREMIUM">€€€€ - Luxe</option>
             </select>
           </div>
 
@@ -145,17 +195,53 @@ export default function BrowsePage() {
         </Card>
 
         {/* Results Count */}
-        <div className="mb-6">
-          <p className="text-gray-600">
-            <span className="font-semibold text-gray-900">{filteredProviders.length}</span>{' '}
-            {filteredProviders.length === 1 ? 'resultaat' : 'resultaten'} gevonden
-          </p>
-        </div>
+        {!loading && !error && (
+          <div className="mb-6">
+            <p className="text-gray-600">
+              <span className="font-semibold text-gray-900">{providers.length}</span>{' '}
+              {providers.length === 1 ? 'resultaat' : 'resultaten'} gevonden
+            </p>
+          </div>
+        )}
+
+        {/* Loading State */}
+        {loading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Card key={i} className="overflow-hidden border-2 border-gray-100 rounded-3xl">
+                <Skeleton className="h-48 w-full" />
+                <div className="p-5 space-y-3">
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <Card className="p-12 text-center bg-white border-2 border-red-100 rounded-3xl">
+            <div className="text-6xl mb-4">⚠️</div>
+            <h3 className="text-2xl font-bold mb-2 text-gray-900">Er is iets misgegaan</h3>
+            <p className="text-gray-600 mb-6">{error}</p>
+            <Button
+              onClick={() => window.location.reload()}
+              variant="outline"
+              className="rounded-xl"
+            >
+              Probeer Opnieuw
+            </Button>
+          </Card>
+        )}
 
         {/* Provider Grid */}
-        {filteredProviders.length > 0 ? (
+        {!loading && !error && providers.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProviders.map((provider, index) => (
+            {providers.map((provider, index) => (
               <motion.div
                 key={provider.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -165,12 +251,18 @@ export default function BrowsePage() {
                 <Link href={`/providers/${provider.id}`}>
                   <Card className="overflow-hidden hover:shadow-eventify-xl transition-all hover:-translate-y-1 cursor-pointer border-2 border-gray-100 rounded-3xl h-full">
                     {/* Image */}
-                    <div className="relative h-48 overflow-hidden">
-                      <img
-                        src={provider.image}
-                        alt={provider.business_name}
-                        className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                      />
+                    <div className="relative h-48 overflow-hidden bg-gray-200">
+                      {provider.images && provider.images.length > 0 ? (
+                        <img
+                          src={provider.images[0]}
+                          alt={provider.businessName}
+                          className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          <MapPin className="w-12 h-12" />
+                        </div>
+                      )}
                       {provider.verified && (
                         <div className="absolute top-3 right-3">
                           <Badge className="bg-green-500 text-white flex items-center gap-1">
@@ -185,10 +277,10 @@ export default function BrowsePage() {
                     <div className="p-5">
                       <div className="flex items-start justify-between mb-2">
                         <h3 className="font-semibold text-lg text-gray-900">
-                          {provider.business_name}
+                          {provider.businessName}
                         </h3>
                         <Badge variant="secondary" className="bg-amber-100 text-amber-700">
-                          {provider.price_range}
+                          {getPriceRangeDisplay(provider.priceRange)}
                         </Badge>
                       </div>
 
@@ -200,15 +292,17 @@ export default function BrowsePage() {
                       <div className="flex items-center gap-2 mb-4">
                         <div className="flex items-center gap-1">
                           <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                          <span className="font-semibold text-gray-900">{provider.rating}</span>
+                          <span className="font-semibold text-gray-900">
+                            {provider.rating > 0 ? provider.rating.toFixed(1) : '—'}
+                          </span>
                         </div>
                         <span className="text-sm text-gray-500">
-                          ({provider.review_count} reviews)
+                          ({provider.reviewCount} review{provider.reviewCount !== 1 ? 's' : ''})
                         </span>
                       </div>
 
                       <p className="text-sm text-gray-600 line-clamp-2 mb-4">
-                        {provider.description}
+                        {provider.description || 'Geen beschrijving beschikbaar'}
                       </p>
 
                       <Button className="w-full gradient-brand hover:opacity-90 rounded-xl">
@@ -220,8 +314,10 @@ export default function BrowsePage() {
               </motion.div>
             ))}
           </div>
-        ) : (
-          // Empty State
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && providers.length === 0 && (
           <Card className="p-12 text-center bg-white border-2 border-gray-100 rounded-3xl">
             <div className="text-6xl mb-4">🔍</div>
             <h3 className="text-2xl font-bold mb-2 text-gray-900">Geen resultaten gevonden</h3>
