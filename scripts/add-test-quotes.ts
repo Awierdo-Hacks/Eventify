@@ -32,26 +32,34 @@ async function addTestQuotes() {
       console.log(`  Status: ${serviceRequest.status}`);
       console.log(`  Bestaande quotes: ${serviceRequest.quotes.length}`);
       
-      // Skip als er al een quote is
-      if (serviceRequest.quotes.length > 0) {
-        console.log(`  ⏭️  Heeft al een quote, skip\n`);
+      // Skip als er al 3 of meer quotes zijn
+      if (serviceRequest.quotes.length >= 3) {
+        console.log(`  ⏭️  Heeft al ${serviceRequest.quotes.length} quotes, skip\n`);
         continue;
       }
 
       // Zoek de provider
       let provider;
-      if (serviceRequest.provider_id) {
+      
+      // Zoek een provider die nog geen quote heeft gegeven voor deze request
+      const existingProviderIds = serviceRequest.quotes.map(q => q.provider_id);
+      
+      if (serviceRequest.provider_id && !existingProviderIds.includes(serviceRequest.provider_id)) {
         provider = await prisma.serviceProvider.findUnique({
           where: { id: serviceRequest.provider_id },
         });
       } else {
+        // Zoek een andere provider in dezelfde categorie
         provider = await prisma.serviceProvider.findFirst({
           where: {
             category: serviceRequest.category,
             verified: true,
+            id: {
+              notIn: existingProviderIds,
+            },
           },
         });
-        }
+      }
 
       if (!provider) {
         console.log(`  ❌ Geen geschikte provider gevonden\n`);

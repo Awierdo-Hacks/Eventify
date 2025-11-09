@@ -11,10 +11,13 @@ const navigation = [
   { name: 'Home', href: '/', icon: Home },
   { name: 'Browse', href: '/browse', icon: Search },
   { name: 'Documentatie', href: '/docs', icon: FileText },
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, protected: true },
-  { name: 'Berichten', href: '/messages', icon: MessageSquare, protected: true },
-  { name: 'Admin', href: '/admin', icon: Shield, adminOnly: true },
 ];
+
+const getDashboardLink = (role?: string) => {
+  if (role === 'ADMIN') return '/admin';
+  if (role === 'PROVIDER') return '/provider-dashboard';
+  return '/dashboard';
+};
 
 export function Navigation() {
   const pathname = usePathname();
@@ -34,11 +37,7 @@ export function Navigation() {
     }
   };
 
-  const filteredNavigation = navigation.filter(item => {
-    if (item.adminOnly && user?.role !== 'ADMIN') return false;
-    if (item.protected && !user) return false;
-    return true;
-  });
+  const filteredNavigation = navigation;
 
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-100">
@@ -79,6 +78,12 @@ export function Navigation() {
               <div className="w-20 h-9 bg-gray-200 animate-pulse rounded-xl"></div>
             ) : user ? (
               <>
+                <Link href={getDashboardLink(user.role)}>
+                  <Button variant="default" className="gradient-brand rounded-xl">
+                    <LayoutDashboard className="w-4 h-4 mr-2" />
+                    Dashboard
+                  </Button>
+                </Link>
                 <div className="hidden md:flex items-center space-x-2 text-sm">
                   <User className="w-4 h-4 text-gray-500" />
                   <span className="text-gray-700">{user.name}</span>

@@ -59,6 +59,19 @@ export async function GET(request: Request) {
             id: true,
             event_type: true,
             description: true,
+            quotes: {
+              where: {
+                accepted: true,
+              },
+              select: {
+                id: true,
+                total_price: true,
+                included_services: true,
+                terms: true,
+                message: true,
+              },
+              take: 1,
+            },
           },
         },
       },
@@ -94,6 +107,12 @@ export async function GET(request: Request) {
         eventType: booking.request.event_type,
         description: booking.request.description,
       },
+      quote: booking.request.quotes[0] ? {
+        id: booking.request.quotes[0].id,
+        packageName: booking.request.quotes[0].message || 'Pakket',
+        includedServices: booking.request.quotes[0].included_services,
+        terms: booking.request.quotes[0].terms,
+      } : null,
     }));
 
     return NextResponse.json({
