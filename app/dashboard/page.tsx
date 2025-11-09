@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from '@/components/providers/SessionProvider';
@@ -98,7 +98,7 @@ interface Booking {
   };
 }
 
-export default function DashboardPage() {
+function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, status } = useSession();
@@ -773,5 +773,25 @@ export default function DashboardPage() {
         )}
       </ConfirmationDialog>
     </main>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+        <Container className="py-12">
+          <Skeleton className="h-12 w-64 mb-8" />
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-32 w-full" />
+            ))}
+          </div>
+          <Skeleton className="h-96 w-full" />
+        </Container>
+      </main>
+    }>
+      <DashboardContent />
+    </Suspense>
   );
 }

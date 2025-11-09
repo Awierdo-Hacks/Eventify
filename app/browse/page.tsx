@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -26,7 +26,7 @@ interface Provider {
   reviewCount: number;
 }
 
-export default function BrowsePage() {
+function BrowseContent() {
   const searchParams = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedLocation, setSelectedLocation] = useState<string>('all');
@@ -78,7 +78,7 @@ export default function BrowsePage() {
 
     fetchProviders();
   }, [selectedCategory, selectedLocation, priceRange, searchQuery]);
-
+  
   // Map price range to display format
   const getPriceRangeDisplay = (range: string) => {
     const priceMap: Record<string, string> = {
@@ -340,5 +340,27 @@ export default function BrowsePage() {
         )}
       </Container>
     </main>
+  );
+}
+
+export default function BrowsePage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-8">
+        <Container>
+          <div className="mb-8">
+            <Skeleton className="h-12 w-64 mb-4" />
+            <Skeleton className="h-6 w-96" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Skeleton key={i} className="h-96 w-full" />
+            ))}
+          </div>
+        </Container>
+      </main>
+    }>
+      <BrowseContent />
+    </Suspense>
   );
 }
