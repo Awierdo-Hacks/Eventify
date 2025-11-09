@@ -1,6 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
-import { UserRole } from '@prisma/client';
+import { UserRole, UserStatus } from '@prisma/client';
 
 const SECRET_KEY = new TextEncoder().encode(
   process.env.NEXTAUTH_SECRET || 'your-secret-key-change-this-in-production'
@@ -11,6 +11,7 @@ export interface SessionUser {
   email: string;
   name: string;
   role: UserRole;
+  status: UserStatus;
   providerId: string | null;
 }
 

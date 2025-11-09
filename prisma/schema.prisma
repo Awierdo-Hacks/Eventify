@@ -16,6 +16,12 @@ enum UserRole {
   ADMIN
 }
 
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
 enum ServiceRequestStatus {
   PENDING
   QUOTED
@@ -39,13 +45,14 @@ enum PriceRange {
 }
 
 model User {
-  id            String   @id @default(cuid())
-  email         String   @unique
+  id            String     @id @default(cuid())
+  email         String     @unique
   name          String
   password_hash String
-  role          UserRole @default(CUSTOMER)
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
+  role          UserRole   @default(CUSTOMER)
+  status        UserStatus @default(ACTIVE)
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
 
   // Relations
   provider         ServiceProvider?

@@ -4,7 +4,13 @@ import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { setSession } from '@/lib/auth';
 
-export async function loginAction(email: string, password: string) {
+interface LoginResult {
+  success: boolean;
+  error?: string;
+  message?: string;
+}
+
+export async function loginAction(email: string, password: string): Promise<LoginResult> {
   try {
     // Validatie
     if (!email || !password) {
@@ -27,6 +33,23 @@ export async function loginAction(email: string, password: string) {
       return { success: false, error: 'Ongeldige inloggegevens' };
     }
 
+    // Check account status
+    if (user.status === 'SUSPENDED') {
+      return { 
+        success: false, 
+        error: 'Account Geschorst',
+        message: 'Je account is tijdelijk geschorst. Dit kan zijn vanwege een lopend onderzoek of verificatieproces. Neem contact op met support@eventify.nl voor meer informatie.'
+      };
+    }
+
+    if (user.status === 'BANNED') {
+      return { 
+        success: false, 
+        error: 'Account Verbannen',
+        message: 'Je account is permanent verbannen van het platform vanwege schending van de gebruiksvoorwaarden. Deze beslissing is definitief.'
+      };
+    }
+
     // Verify wachtwoord
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
 
@@ -40,6 +63,7 @@ export async function loginAction(email: string, password: string) {
       email: user.email,
       name: user.name,
       role: user.role,
+      status: user.status,
       providerId: user.provider?.id || null,
     });
 

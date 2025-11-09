@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { loginAction } from './actions';
 import { useSession } from '@/components/providers/SessionProvider';
+import { AlertTriangle, Ban, ShieldAlert } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -16,11 +17,13 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setErrorMessage('');
     setLoading(true);
 
     try {
@@ -28,6 +31,7 @@ export default function LoginPage() {
 
       if (!result.success) {
         setError(result.error || 'Inloggen mislukt');
+        setErrorMessage(result.message || '');
         setLoading(false);
       } else {
         await update(); // Refresh session
@@ -35,6 +39,7 @@ export default function LoginPage() {
       }
     } catch (err) {
       setError('Er is iets misgegaan. Probeer het opnieuw.');
+      setErrorMessage('');
       setLoading(false);
     }
   };
@@ -45,6 +50,7 @@ export default function LoginPage() {
     setPassword(demoPassword);
     setLoading(true);
     setError('');
+    setErrorMessage('');
     
     const result = await loginAction(demoEmail, demoPassword);
 
@@ -54,6 +60,7 @@ export default function LoginPage() {
     } else {
       setLoading(false);
       setError(result.error || 'Inloggen mislukt');
+      setErrorMessage(result.message || '');
     }
   };
 
@@ -70,8 +77,46 @@ export default function LoginPage() {
         <Card className="p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
-                {error}
+              <div className={`border rounded-xl p-4 ${
+                error.includes('Geschorst') 
+                  ? 'bg-amber-50 border-amber-300'
+                  : error.includes('Verbannen')
+                  ? 'bg-red-50 border-red-300'
+                  : 'bg-red-50 border-red-200'
+              }`}>
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-0.5">
+                    {error.includes('Geschorst') ? (
+                      <ShieldAlert className="w-5 h-5 text-amber-600" />
+                    ) : error.includes('Verbannen') ? (
+                      <Ban className="w-5 h-5 text-red-600" />
+                    ) : (
+                      <AlertTriangle className="w-5 h-5 text-red-600" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className={`font-semibold mb-1 ${
+                      error.includes('Geschorst')
+                        ? 'text-amber-900'
+                        : error.includes('Verbannen')
+                        ? 'text-red-900'
+                        : 'text-red-900'
+                    }`}>
+                      {error}
+                    </h4>
+                    {errorMessage && (
+                      <p className={`text-sm ${
+                        error.includes('Geschorst')
+                          ? 'text-amber-800'
+                          : error.includes('Verbannen')
+                          ? 'text-red-800'
+                          : 'text-red-700'
+                      }`}>
+                        {errorMessage}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 

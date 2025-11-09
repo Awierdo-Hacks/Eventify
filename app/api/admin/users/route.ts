@@ -53,6 +53,7 @@ export async function GET(request: Request) {
       name: user.name,
       email: user.email,
       role: user.role,
+      status: user.status,
       createdAt: user.created_at,
       provider: user.provider
         ? {

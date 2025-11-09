@@ -34,6 +34,29 @@ export async function POST(request: Request) {
       );
     }
 
+    // Check account status
+    if (user.status === 'SUSPENDED') {
+      return NextResponse.json(
+        { 
+          error: 'Account Geschorst',
+          message: 'Je account is tijdelijk geschorst. Dit kan zijn vanwege een lopend onderzoek of verificatieproces. Neem contact op met support@eventify.nl voor meer informatie.',
+          status: 'SUSPENDED'
+        },
+        { status: 403 }
+      );
+    }
+
+    if (user.status === 'BANNED') {
+      return NextResponse.json(
+        { 
+          error: 'Account Verbannen',
+          message: 'Je account is permanent verbannen van het platform vanwege schending van de gebruiksvoorwaarden. Deze beslissing is definitief.',
+          status: 'BANNED'
+        },
+        { status: 403 }
+      );
+    }
+
     // Verify wachtwoord
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
 
@@ -50,6 +73,7 @@ export async function POST(request: Request) {
       email: user.email,
       name: user.name,
       role: user.role,
+      status: user.status,
       providerId: user.provider?.id || null,
     });
 
@@ -60,6 +84,7 @@ export async function POST(request: Request) {
         name: user.name,
         email: user.email,
         role: user.role,
+        status: user.status,
         providerId: user.provider?.id || null,
       },
     });

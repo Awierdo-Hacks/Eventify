@@ -34,6 +34,7 @@ interface User {
   name: string;
   email: string;
   role: 'CUSTOMER' | 'PROVIDER' | 'ADMIN';
+  status: 'ACTIVE' | 'SUSPENDED' | 'BANNED';
   createdAt: string;
 }
 
@@ -87,6 +88,11 @@ export default function AdminPage() {
   // Verification dialog state
   const [verifyingProvider, setVerifyingProvider] = useState<Provider | null>(null);
   const [verifyingProviderId, setVerifyingProviderId] = useState<string | null>(null);
+
+  // User moderation state
+  const [moderatingUser, setModeratingUser] = useState<User | null>(null);
+  const [moderationAction, setModerationAction] = useState<'suspend' | 'ban' | 'activate' | 'delete' | null>(null);
+  const [moderatingUserId, setModeratingUserId] = useState<string | null>(null);
 
   // Redirect if not admin
   useEffect(() => {
@@ -178,6 +184,55 @@ export default function AdminPage() {
     }
   };
 
+  const handleModerateUser = async () => {
+    if (!moderatingUser || !moderationAction) return;
+
+    setModeratingUserId(moderatingUser.id);
+    setError(null);
+
+    try {
+      const isDelete = moderationAction === 'delete';
+      const response = await fetch(`/api/admin/users/${moderatingUser.id}`, {
+        method: isDelete ? 'DELETE' : 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: isDelete ? undefined : JSON.stringify({ action: moderationAction }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to moderate user');
+      }
+
+      // Refresh users
+      const usersRes = await fetch('/api/admin/users');
+      const usersData = await usersRes.json();
+      setUsers(usersData.users || []);
+
+      // Update stats if user was deleted
+      if (isDelete) {
+        setStats(prev => ({ ...prev, totalUsers: prev.totalUsers - 1 }));
+      }
+
+      const actionMessages = {
+        suspend: 'geschorst',
+        ban: 'verbannen',
+        activate: 'geactiveerd',
+        delete: 'verwijderd',
+      };
+
+      setModeratingUser(null);
+      setModerationAction(null);
+      setSuccessMessage(`User ${moderatingUser.name} is ${actionMessages[moderationAction]}!`);
+      setTimeout(() => setSuccessMessage(null), 5000);
+    } catch (err) {
+      console.error('Moderate user error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to moderate user');
+      setTimeout(() => setError(null), 5000);
+    } finally {
+      setModeratingUserId(null);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('nl-NL', {
       year: 'numeric',
@@ -195,6 +250,24 @@ export default function AdminPage() {
     return (
       <Badge className={styles[role as keyof typeof styles]}>
         {role}
+      </Badge>
+    );
+  };
+
+  const getStatusBadge = (status: string) => {
+    const styles = {
+      ACTIVE: 'bg-green-100 text-green-800',
+      SUSPENDED: 'bg-amber-100 text-amber-800',
+      BANNED: 'bg-red-100 text-red-800',
+    };
+    const labels = {
+      ACTIVE: 'Actief',
+      SUSPENDED: 'Geschorst',
+      BANNED: 'Verbannen',
+    };
+    return (
+      <Badge className={styles[status as keyof typeof styles]}>
+        {labels[status as keyof typeof labels]}
       </Badge>
     );
   };
@@ -435,7 +508,9 @@ export default function AdminPage() {
                         <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Naam</th>
                         <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Email</th>
                         <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Role</th>
+                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Status</th>
                         <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Aangemaakt</th>
+                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Acties</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -444,7 +519,60 @@ export default function AdminPage() {
                           <td className="px-6 py-4 text-sm font-medium text-gray-900">{user.name}</td>
                           <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
                           <td className="px-6 py-4">{getRoleBadge(user.role)}</td>
+                          <td className="px-6 py-4">{getStatusBadge(user.status)}</td>
                           <td className="px-6 py-4 text-sm text-gray-600">{formatDate(user.createdAt)}</td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              {user.status === 'ACTIVE' && (
+                                <>
+                                  <Button
+                                    onClick={() => {
+                                      setModeratingUser(user);
+                                      setModerationAction('suspend');
+                                    }}
+                                    variant="outline"
+                                    className="text-xs px-3 py-1 border-amber-300 text-amber-700 hover:bg-amber-50 rounded-lg"
+                                  >
+                                    Schorsen
+                                  </Button>
+                                  <Button
+                                    onClick={() => {
+                                      setModeratingUser(user);
+                                      setModerationAction('ban');
+                                    }}
+                                    variant="outline"
+                                    className="text-xs px-3 py-1 border-red-300 text-red-700 hover:bg-red-50 rounded-lg"
+                                  >
+                                    Verbannen
+                                  </Button>
+                                </>
+                              )}
+                              {(user.status === 'SUSPENDED' || user.status === 'BANNED') && (
+                                <Button
+                                  onClick={() => {
+                                    setModeratingUser(user);
+                                    setModerationAction('activate');
+                                  }}
+                                  variant="outline"
+                                  className="text-xs px-3 py-1 border-green-300 text-green-700 hover:bg-green-50 rounded-lg"
+                                >
+                                  Activeren
+                                </Button>
+                              )}
+                              {user.role !== 'ADMIN' && (
+                                <Button
+                                  onClick={() => {
+                                    setModeratingUser(user);
+                                    setModerationAction('delete');
+                                  }}
+                                  variant="outline"
+                                  className="text-xs px-3 py-1 border-red-300 text-red-700 hover:bg-red-50 rounded-lg"
+                                >
+                                  Verwijderen
+                                </Button>
+                              )}
+                            </div>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -500,6 +628,106 @@ export default function AdminPage() {
                 onClick={() => setVerifyingProvider(null)}
                 variant="outline"
                 disabled={!!verifyingProviderId}
+              >
+                Annuleren
+              </DialogButton>
+            </DialogActions>
+          </>
+        )}
+      </ConfirmationDialog>
+
+      {/* User Moderation Dialog */}
+      <ConfirmationDialog
+        open={!!moderatingUser && !!moderationAction}
+        onOpenChange={(open) => {
+          if (!open) {
+            setModeratingUser(null);
+            setModerationAction(null);
+          }
+        }}
+        title={
+          moderationAction === 'suspend' ? 'User Schorsen?' :
+          moderationAction === 'ban' ? 'User Verbannen?' :
+          moderationAction === 'activate' ? 'User Activeren?' :
+          'User Verwijderen?'
+        }
+        description={
+          moderationAction === 'suspend' ? 'Deze user wordt tijdelijk geschorst en kan niet inloggen tot activatie.' :
+          moderationAction === 'ban' ? 'Deze user wordt permanent verbannen van het platform.' :
+          moderationAction === 'activate' ? 'Deze user wordt weer geactiveerd en kan het platform gebruiken.' :
+          'Deze user en alle data worden permanent verwijderd. Deze actie kan niet ongedaan worden gemaakt!'
+        }
+      >
+        {moderatingUser && moderationAction && (
+          <>
+            <div className={`bg-gradient-to-br rounded-2xl p-6 border-2 ${
+              moderationAction === 'delete' || moderationAction === 'ban' 
+                ? 'from-red-50 to-pink-50 border-red-200' 
+                : moderationAction === 'suspend'
+                ? 'from-amber-50 to-orange-50 border-amber-200'
+                : 'from-green-50 to-emerald-50 border-green-200'
+            }`}>
+              <h4 className="text-2xl font-bold text-gray-900 mb-2">
+                {moderatingUser.name}
+              </h4>
+              <div className="space-y-2 text-sm text-gray-700">
+                <p>• Email: {moderatingUser.email}</p>
+                <p>• Role: {moderatingUser.role}</p>
+                <p>• Huidige Status: {
+                  moderatingUser.status === 'ACTIVE' ? 'Actief' :
+                  moderatingUser.status === 'SUSPENDED' ? 'Geschorst' :
+                  'Verbannen'
+                }</p>
+                <p>• Geregistreerd: {formatDate(moderatingUser.createdAt)}</p>
+              </div>
+            </div>
+
+            <DialogWarning
+              type={
+                moderationAction === 'delete' || moderationAction === 'ban' ? 'error' :
+                moderationAction === 'suspend' ? 'warning' :
+                'info'
+              }
+              title={
+                moderationAction === 'suspend' ? 'Tijdelijke Schorsing' :
+                moderationAction === 'ban' ? 'Permanente Ban' :
+                moderationAction === 'activate' ? 'Account Activatie' :
+                'Permanent Verwijderen'
+              }
+              message={
+                moderationAction === 'suspend' 
+                  ? 'De user kan niet inloggen tijdens de schorsing. Gebruik dit voor onderzoeken of bij twijfel. Je kunt de user later weer activeren.'
+                  : moderationAction === 'ban'
+                  ? 'De user wordt permanent verbannen en kan niet meer inloggen. Dit is onomkeerbaar zonder database wijziging.'
+                  : moderationAction === 'activate'
+                  ? 'De user krijgt weer volledige toegang tot het platform en kan normaal inloggen en het platform gebruiken.'
+                  : 'Alle data van deze user (bookings, reviews, requests) wordt permanent verwijderd. Deze actie kan NIET ongedaan worden gemaakt!'
+              }
+            />
+
+            <DialogActions>
+              <DialogButton
+                onClick={handleModerateUser}
+                variant={
+                  moderationAction === 'delete' || moderationAction === 'ban' ? 'danger' :
+                  moderationAction === 'activate' ? 'success' :
+                  'primary'
+                }
+                disabled={!!moderatingUserId}
+                loading={moderatingUserId === moderatingUser.id}
+              >
+                {moderationAction === 'suspend' && 'Ja, Schorsen'}
+                {moderationAction === 'ban' && 'Ja, Verbannen'}
+                {moderationAction === 'activate' && 'Ja, Activeren'}
+                {moderationAction === 'delete' && 'Ja, Permanent Verwijderen'}
+              </DialogButton>
+              <DialogButton
+                onClick={() => {
+                  setModeratingUser(null);
+                  setModerationAction(null);
+                }}
+                variant="outline"
+                disabled={!!moderatingUserId}
               >
                 Annuleren
               </DialogButton>
