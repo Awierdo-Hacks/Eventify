@@ -81,7 +81,6 @@ export async function PATCH(
       guestCount: serviceRequest.guest_count,
       budgetRange: serviceRequest.budget_range,
       description: serviceRequest.description,
-      additionalServices: serviceRequest.additional_services,
       status: serviceRequest.status,
       createdAt: serviceRequest.created_at,
       customer: {
@@ -101,13 +100,11 @@ export async function PATCH(
       quotes: serviceRequest.quotes.map((quote) => ({
         id: quote.id,
         totalPrice: quote.total_price,
-        packageName: quote.package_name,
-        packageDescription: quote.package_description,
+        packageName: quote.message || 'Offerte pakket',
+        packageDescription: quote.terms || '',
         includedServices: quote.included_services,
-        excludedServices: quote.excluded_services,
         validUntil: quote.valid_until,
-        status: quote.status,
-        notes: quote.notes,
+        accepted: quote.accepted,
         createdAt: quote.created_at,
         provider: {
           id: quote.provider.id,

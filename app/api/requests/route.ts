@@ -67,7 +67,7 @@ export async function GET(request: Request) {
           select: {
             id: true,
             total_price: true,
-            status: true,
+            accepted: true,
           },
         },
       },
@@ -159,8 +159,20 @@ export async function POST(request: Request) {
       preferredContact,
     } = body;
 
+    console.log('Received request body:', body);
+
     // Validatie
     if (!category || !eventType || !eventDate || !eventLocation || !guestCount || !customerName || !customerEmail || !customerPhone) {
+      console.log('Validation failed:', {
+        category: !!category,
+        eventType: !!eventType,
+        eventDate: !!eventDate,
+        eventLocation: !!eventLocation,
+        guestCount: !!guestCount,
+        customerName: !!customerName,
+        customerEmail: !!customerEmail,
+        customerPhone: !!customerPhone,
+      });
       return NextResponse.json(
         { error: 'Verplichte velden ontbreken' },
         { status: 400 }

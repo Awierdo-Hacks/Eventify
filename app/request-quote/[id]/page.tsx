@@ -1,52 +1,186 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { notFound } from 'next/navigation';
+import { useSession } from '@/components/providers/SessionProvider';
 import { Container } from '@/components/layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { mockProviders } from '@/lib/mockData';
-import { ArrowLeft, Calendar, Users, Euro, MessageSquare, CheckCircle } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ArrowLeft, Calendar, Users, Euro, MessageSquare, CheckCircle, AlertCircle } from 'lucide-react';
 
-export default function RequestQuotePage({ params }: { params: { id: string } }) {
+interface Provider {
+  id: string;
+  businessName: string;
+  category: string;
+  location: string;
+  priceRange: string;
+  images: string[];
+  verified: boolean;
+}
+
+export default function RequestQuotePage({ params }: { params: Promise<{ id: string }> | { id: string } }) {
   const router = useRouter();
-  const provider = mockProviders.find((p) => p.id === params.id);
+  const { user, status } = useSession();
+  const [providerId, setProviderId] = useState<string | null>(null);
+  const [provider, setProvider] = useState<Provider | null>(null);
+  const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    customer_email: '',
-    customer_name: '',
-    customer_phone: '',
     event_type: '',
     event_date: '',
     event_location: '',
     guest_count: '',
-    budget: '',
-    message: '',
+    budget_range: 'MEDIUM',
+    description: '',
   });
 
-  if (!provider) {
-    notFound();
-  }
+  // Handle async params
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolvedParams = await Promise.resolve(params);
+      setProviderId(resolvedParams.id);
+    };
+    resolveParams();
+  }, [params]);
+
+  // Fetch provider data
+  useEffect(() => {
+    if (!providerId) return;
+
+    const fetchProvider = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`/api/providers/${providerId}`);
+        
+        if (response.status === 404) {
+          router.push('/browse');
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch provider');
+        }
+
+        const data = await response.json();
+        setProvider(data);
+      } catch (err) {
+        console.error('Error fetching provider:', err);
+        setError('Provider niet gevonden');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProvider();
+  }, [providerId, router]);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push(`/login?redirect=/request-quote/${providerId}`);
+    }
+  }, [status, router, providerId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!user || !providerId || !provider) {
+      setError('Je moet ingelogd zijn om een offerte aan te vragen');
+      return;
+    }
+
     setIsSubmitting(true);
+    setError(null);
     
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    setIsSubmitting(false);
-    router.push('/dashboard?tab=requests&success=true');
+    try {
+      const requestBody = {
+        providerId: providerId,
+        category: provider.category,
+        eventType: formData.event_type,
+        eventDate: formData.event_date,
+        eventLocation: formData.event_location,
+        guestCount: parseInt(formData.guest_count),
+        budgetRange: formData.budget_range,
+        description: formData.description,
+        customerName: user.name,
+        customerEmail: user.email,
+        customerPhone: user.email, // Use email as phone for now
+        preferredContact: 'email',
+      };
+      
+      console.log('Sending request:', requestBody);
+      
+      const response = await fetch('/api/requests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        console.error('API Error Response:', data);
+        throw new Error(data.error || 'Er is iets misgegaan');
+      }
+
+      const result = await response.json();
+      console.log('Success response:', result);
+
+      // Success - redirect to dashboard
+      router.push('/dashboard?tab=requests&success=true');
+    } catch (err) {
+      console.error('Error submitting request:', err);
+      setError(err instanceof Error ? err.message : 'Er is iets misgegaan bij het versturen van de aanvraag');
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  // Loading state
+  if (loading || status === 'loading') {
+    return (
+      <main className="min-h-screen gradient-hero">
+        <Container className="py-8">
+          <Skeleton className="h-10 w-48 mb-6" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <Card className="p-8 border-2 border-gray-100 rounded-3xl bg-white">
+                <Skeleton className="h-8 w-3/4 mb-4" />
+                <Skeleton className="h-4 w-1/2 mb-8" />
+                <div className="space-y-6">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <Skeleton key={i} className="h-12 w-full" />
+                  ))}
+                </div>
+              </Card>
+            </div>
+            <div className="lg:col-span-1">
+              <Card className="p-6 border-2 border-gray-100 rounded-3xl bg-white sticky top-8">
+                <Skeleton className="h-48 w-full mb-4" />
+                <Skeleton className="h-6 w-3/4 mb-2" />
+                <Skeleton className="h-4 w-1/2" />
+              </Card>
+            </div>
+          </div>
+        </Container>
+      </main>
+    );
+  }
+
+  // Not authenticated or provider not found
+  if (!user || !provider) {
+    return null;
+  }
 
   return (
     <main className="min-h-screen gradient-hero">
@@ -75,57 +209,19 @@ export default function RequestQuotePage({ params }: { params: { id: string } })
                   Vul onderstaand formulier in en ontvang binnen 24 uur een offerte op maat
                 </p>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Personal Info */}
-                  <div>
-                    <h3 className="font-semibold text-lg mb-4 text-gray-900">Jouw Gegevens</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Volledige naam *
-                        </label>
-                        <Input
-                          name="customer_name"
-                          value={formData.customer_name}
-                          onChange={handleChange}
-                          placeholder="Bijv. Jan Jansen"
-                          required
-                          className="rounded-xl border-2 border-gray-100 h-12"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Email adres *
-                        </label>
-                        <Input
-                          type="email"
-                          name="customer_email"
-                          value={formData.customer_email}
-                          onChange={handleChange}
-                          placeholder="jan@voorbeeld.nl"
-                          required
-                          className="rounded-xl border-2 border-gray-100 h-12"
-                        />
-                      </div>
-                    </div>
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Telefoonnummer *
-                      </label>
-                      <Input
-                        type="tel"
-                        name="customer_phone"
-                        value={formData.customer_phone}
-                        onChange={handleChange}
-                        placeholder="06 12345678"
-                        required
-                        className="rounded-xl border-2 border-gray-100 h-12"
-                      />
+                {error && (
+                  <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-red-800">Fout bij versturen</p>
+                      <p className="text-sm text-red-600 mt-1">{error}</p>
                     </div>
                   </div>
+                )}
 
+                <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Event Details */}
-                  <div className="pt-6 border-t border-gray-200">
+                  <div>
                     <h3 className="font-semibold text-lg mb-4 text-gray-900">Event Details</h3>
                     <div className="space-y-4">
                       <div>
@@ -176,8 +272,7 @@ export default function RequestQuotePage({ params }: { params: { id: string } })
                             onChange={handleChange}
                             placeholder="Bijv. 50"
                             required
-                            min={provider.min_guests}
-                            max={provider.max_guests}
+                            min={1}
                             className="rounded-xl border-2 border-gray-100 h-12"
                           />
                         </div>
@@ -200,17 +295,20 @@ export default function RequestQuotePage({ params }: { params: { id: string } })
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           <Euro className="w-4 h-4 inline mr-1" />
-                          Budget indicatie
+                          Budget range *
                         </label>
-                        <Input
-                          type="number"
-                          name="budget"
-                          value={formData.budget}
+                        <select
+                          name="budget_range"
+                          value={formData.budget_range}
                           onChange={handleChange}
-                          placeholder="€ 0"
-                          className="rounded-xl border-2 border-gray-100 h-12"
-                        />
-                        <p className="text-sm text-gray-500 mt-1">Optioneel - helpt de provider een passende offerte te maken</p>
+                          required
+                          className="w-full rounded-xl border-2 border-gray-100 h-12 px-4 focus:border-purple-500 focus:outline-none"
+                        >
+                          <option value="LOW">€ - Budget vriendelijk</option>
+                          <option value="MEDIUM">€€ - Gemiddeld</option>
+                          <option value="HIGH">€€€ - Premium</option>
+                          <option value="PREMIUM">€€€€ - Luxe</option>
+                        </select>
                       </div>
                     </div>
                   </div>
@@ -222,8 +320,8 @@ export default function RequestQuotePage({ params }: { params: { id: string } })
                       Extra informatie of wensen
                     </label>
                     <textarea
-                      name="message"
-                      value={formData.message}
+                      name="description"
+                      value={formData.description}
                       onChange={handleChange}
                       rows={4}
                       placeholder="Vertel iets meer over je evenement of specifieke wensen..."
@@ -257,12 +355,18 @@ export default function RequestQuotePage({ params }: { params: { id: string } })
               <h3 className="font-semibold text-lg mb-4 text-gray-900">Je vraagt offerte aan bij:</h3>
               
               <div className="mb-4">
-                <img
-                  src={provider.image}
-                  alt={provider.business_name}
-                  className="w-full h-32 object-cover rounded-2xl mb-3"
-                />
-                <h4 className="font-semibold text-gray-900 mb-1">{provider.business_name}</h4>
+                {provider.images && provider.images.length > 0 ? (
+                  <img
+                    src={provider.images[0]}
+                    alt={provider.businessName}
+                    className="w-full h-32 object-cover rounded-2xl mb-3"
+                  />
+                ) : (
+                  <div className="w-full h-32 bg-gray-200 rounded-2xl mb-3 flex items-center justify-center">
+                    <CheckCircle className="w-12 h-12 text-gray-400" />
+                  </div>
+                )}
+                <h4 className="font-semibold text-gray-900 mb-1">{provider.businessName}</h4>
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <Badge variant="secondary" className="bg-purple-100 text-purple-700">
                     {provider.category}
@@ -278,16 +382,17 @@ export default function RequestQuotePage({ params }: { params: { id: string } })
 
               <div className="space-y-3 text-sm pt-4 border-t border-gray-200">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Reactietijd</span>
-                  <span className="font-semibold text-gray-900">{provider.response_time}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Rating</span>
-                  <span className="font-semibold text-gray-900">⭐ {provider.rating}</span>
+                  <span className="text-gray-600">Locatie</span>
+                  <span className="font-semibold text-gray-900">{provider.location}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Prijs indicatie</span>
-                  <span className="font-semibold text-gray-900">{provider.price_range}</span>
+                  <span className="font-semibold text-gray-900">
+                    {provider.priceRange === 'LOW' && '€'}
+                    {provider.priceRange === 'MEDIUM' && '€€'}
+                    {provider.priceRange === 'HIGH' && '€€€'}
+                    {provider.priceRange === 'PREMIUM' && '€€€€'}
+                  </span>
                 </div>
               </div>
 

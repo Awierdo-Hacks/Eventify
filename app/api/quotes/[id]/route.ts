@@ -86,15 +86,17 @@ export async function PATCH(
             event_location: quote.request.event_location,
             guest_count: quote.request.guest_count,
             final_price: quote.total_price,
-            status: 'PENDING',
+            status: 'CONFIRMED',
+            payment_status: 'UNPAID',
           },
         }),
-        // Update service request status
-        prisma.serviceRequest.update({
-          where: { id: quote.request_id },
-          data: { status: 'ACCEPTED' },
-        }),
       ]);
+
+      // Update service request status separately
+      await prisma.serviceRequest.update({
+        where: { id: quote.request_id },
+        data: { status: 'ACCEPTED' },
+      });
 
       return NextResponse.json({
         success: true,

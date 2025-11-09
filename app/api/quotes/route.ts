@@ -22,7 +22,7 @@ export async function GET(request: Request) {
 
     if (session.role === 'CUSTOMER') {
       // Customer ziet quotes voor eigen requests
-      where.service_request = {
+      where.request = {
         customer_id: session.id,
       };
     } else if (session.role === 'PROVIDER' && session.providerId) {
@@ -39,7 +39,7 @@ export async function GET(request: Request) {
     }
 
     if (status) {
-      where.status = status;
+      where.accepted = status === 'ACCEPTED';
     }
 
     const quotes = await prisma.quote.findMany({
@@ -53,7 +53,7 @@ export async function GET(request: Request) {
             location: true,
           },
         },
-        serviceRequest: {
+        request: {
           select: {
             id: true,
             event_type: true,
@@ -76,13 +76,11 @@ export async function GET(request: Request) {
     const formattedQuotes = quotes.map((quote) => ({
       id: quote.id,
       totalPrice: quote.total_price,
-      packageName: quote.package_name,
-      packageDescription: quote.package_description,
+      packageName: quote.message || 'Offerte pakket',
+      packageDescription: quote.terms || '',
       includedServices: quote.included_services,
-      excludedServices: quote.excluded_services,
       validUntil: quote.valid_until,
-      status: quote.status,
-      notes: quote.notes,
+      status: quote.accepted ? 'ACCEPTED' : 'PENDING',
       createdAt: quote.created_at,
       provider: {
         id: quote.provider.id,
@@ -91,13 +89,13 @@ export async function GET(request: Request) {
         location: quote.provider.location,
       },
       serviceRequest: {
-        id: quote.service_request.id,
-        eventType: quote.service_request.event_type,
-        eventDate: quote.service_request.event_date,
-        eventLocation: quote.service_request.event_location,
+        id: quote.request.id,
+        eventType: quote.request.event_type,
+        eventDate: quote.request.event_date,
+        eventLocation: quote.request.event_location,
         customer: {
-          id: quote.service_request.customer.id,
-          name: quote.service_request.customer.name,
+          id: quote.request.customer.id,
+          name: quote.request.customer.name,
         },
       },
     }));
@@ -110,141 +108,6 @@ export async function GET(request: Request) {
     console.error('Quotes API error:', error);
     return NextResponse.json(
       { error: 'Er is iets misgegaan bij het ophalen van offertes' },
-      { status: 500 }
-    );
-  }
-}
-
-// POST - Create new quote (providers only)
-export async function POST(request: Request) {
-  try {
-    const session = await getSession();
-
-    if (!session) {
-      return NextResponse.json(
-        { error: 'Unauthorized - login required' },
-        { status: 401 }
-      );
-    }
-
-    if (session.role !== 'PROVIDER' || !session.providerId) {
-      return NextResponse.json(
-        { error: 'Only providers can create quotes' },
-        { status: 403 }
-      );
-    }
-
-    const body = await request.json();
-    const {
-      requestId,
-      totalPrice,
-      packageName,
-      packageDescription,
-      includedServices,
-      excludedServices,
-      validUntil,
-      notes,
-    } = body;
-
-    // Validatie
-    if (!requestId || !totalPrice || !packageName) {
-      return NextResponse.json(
-        { error: 'Verplichte velden ontbreken' },
-        { status: 400 }
-      );
-    }
-
-    // Check if request exists and is not already quoted by this provider
-    const serviceRequest = await prisma.serviceRequest.findUnique({
-      where: { id: requestId },
-      include: {
-        quotes: {
-          where: {
-            provider_id: session.providerId,
-          },
-        },
-      },
-    });
-
-    if (!serviceRequest) {
-      return NextResponse.json(
-        { error: 'Aanvraag niet gevonden' },
-        { status: 404 }
-      );
-    }
-
-    if (serviceRequest.quotes.length > 0) {
-      return NextResponse.json(
-        { error: 'Je hebt al een offerte ingediend voor deze aanvraag' },
-        { status: 400 }
-      );
-    }
-
-    // Create quote
-    const quote = await prisma.quote.create({
-      data: {
-        request_id: requestId,
-        provider_id: session.providerId,
-        total_price: parseFloat(totalPrice),
-        package_name: packageName,
-        package_description: packageDescription || null,
-        included_services: includedServices || [],
-        excluded_services: excludedServices || [],
-        valid_until: validUntil ? new Date(validUntil) : null,
-        notes: notes || null,
-        status: 'PENDING',
-      },
-      include: {
-        provider: {
-          select: {
-            id: true,
-            business_name: true,
-          },
-        },
-        service_request: {
-          select: {
-            id: true,
-            event_type: true,
-            event_date: true,
-          },
-        },
-      },
-    });
-
-    // Update service request status to QUOTED
-    await prisma.serviceRequest.update({
-      where: { id: requestId },
-      data: { status: 'QUOTED' },
-    });
-
-    return NextResponse.json({
-      success: true,
-      quote: {
-        id: quote.id,
-        totalPrice: quote.total_price,
-        packageName: quote.package_name,
-        packageDescription: quote.package_description,
-        includedServices: quote.included_services,
-        excludedServices: quote.excluded_services,
-        validUntil: quote.valid_until,
-        status: quote.status,
-        notes: quote.notes,
-        createdAt: quote.created_at,
-        provider: {
-          id: quote.provider.id,
-          businessName: quote.provider.business_name,
-        },
-        serviceRequest: {
-          id: quote.service_request.id,
-          eventType: quote.service_request.event_type,
-          eventDate: quote.service_request.event_date,
-        },
-      },
-    });
-  } catch (error) {
-    console.error('Create quote error:', error);
-    return NextResponse.json(
-      { error: 'Er is iets misgegaan bij het aanmaken van de offerte' },
       { status: 500 }
     );
   }
