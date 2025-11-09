@@ -1,28 +1,49 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useSession } from '@/components/providers/SessionProvider';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Home, Search, FileText, LayoutDashboard, MessageSquare, Shield } from 'lucide-react';
+import { Home, Search, FileText, LayoutDashboard, MessageSquare, Shield, LogOut, User } from 'lucide-react';
 
 const navigation = [
   { name: 'Home', href: '/', icon: Home },
   { name: 'Browse', href: '/browse', icon: Search },
   { name: 'Documentatie', href: '/docs', icon: FileText },
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Berichten', href: '/messages', icon: MessageSquare },
-  { name: 'Admin', href: '/admin', icon: Shield },
+  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, protected: true },
+  { name: 'Berichten', href: '/messages', icon: MessageSquare, protected: true },
+  { name: 'Admin', href: '/admin', icon: Shield, adminOnly: true },
 ];
 
 export function Navigation() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, status, update } = useSession();
+  const isLoading = status === 'loading';
+
+  const handleLogout = async () => {
+    try {
+      const res = await fetch('/api/auth/logout', { method: 'POST' });
+      if (res.ok) {
+        await update();
+        router.push('/');
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  const filteredNavigation = navigation.filter(item => {
+    if (item.adminOnly && user?.role !== 'ADMIN') return false;
+    if (item.protected && !user) return false;
+    return true;
+  });
 
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <span className="text-2xl font-bold gradient-text">
@@ -31,9 +52,8 @@ export function Navigation() {
             </Link>
           </div>
 
-          {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-1">
-            {navigation.map((item) => {
+            {filteredNavigation.map((item) => {
               const isActive = pathname === item.href;
               const Icon = item.icon;
               
@@ -54,19 +74,48 @@ export function Navigation() {
             })}
           </div>
 
-          {/* User Menu */}
-          <div className="flex items-center">
-            <Button variant="outline" className="rounded-xl">
-              Inloggen
-            </Button>
+          <div className="flex items-center space-x-2">
+            {isLoading ? (
+              <div className="w-20 h-9 bg-gray-200 animate-pulse rounded-xl"></div>
+            ) : user ? (
+              <>
+                <div className="hidden md:flex items-center space-x-2 text-sm">
+                  <User className="w-4 h-4 text-gray-500" />
+                  <span className="text-gray-700">{user.name}</span>
+                  {user.role === 'ADMIN' && (
+                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">
+                      Admin
+                    </span>
+                  )}
+                  {user.role === 'PROVIDER' && (
+                    <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded">
+                      Provider
+                    </span>
+                  )}
+                </div>
+                <Button
+                  variant="outline"
+                  className="rounded-xl"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Uitloggen
+                </Button>
+              </>
+            ) : (
+              <Link href="/login">
+                <Button variant="outline" className="rounded-xl">
+                  Inloggen
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Mobile Navigation */}
       <div className="md:hidden border-t border-gray-100">
         <div className="flex justify-around py-2">
-          {navigation.slice(0, 5).map((item) => {
+          {filteredNavigation.slice(0, 5).map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
             

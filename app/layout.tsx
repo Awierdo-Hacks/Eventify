@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Navigation } from "@/components/layout";
+import { SessionProvider } from "@/components/providers/SessionProvider";
 
 export const metadata: Metadata = {
   title: "Eventify - Jouw Droomfeest Begint Hier",
@@ -15,8 +16,10 @@ export default function RootLayout({
   return (
     <html lang="nl">
       <body className="antialiased">
-        <Navigation />
-        {children}
+        <SessionProvider>
+          <Navigation />
+          {children}
+        </SessionProvider>
       </body>
     </html>
   );

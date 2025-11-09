@@ -114,7 +114,7 @@ export default function Home() {
       <Section>
         <Container>
           <h2 className="text-4xl font-bold text-center mb-12">
-            Ontdek Diensten
+            Ontdek onze diensten
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
             {categories.map((category, index) => (
