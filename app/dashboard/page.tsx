@@ -10,8 +10,14 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import {
+  ConfirmationDialog,
+  DialogQuoteInfo,
+  DialogTextField,
+  DialogActions,
+  DialogButton,
+} from '@/components/ui/confirmation-dialog';
 import {
   FileText,
   MessageSquare,
@@ -21,7 +27,6 @@ import {
   Users,
   AlertCircle,
   MapPin,
-  X,
 } from 'lucide-react';
 
 interface ServiceRequest {
@@ -65,6 +70,9 @@ interface Quote {
     eventType: string;
     eventDate: string;
     eventLocation: string;
+    customer: {
+      name: string;
+    };
   };
 }
 
@@ -709,143 +717,61 @@ export default function DashboardPage() {
         </Tabs>
       </Container>
 
-      {/* Rejection Confirmation Dialog */}
-      <Dialog open={!!rejectingQuote} onOpenChange={(open) => {
-        if (!open) {
-          setRejectingQuote(null);
-          setRejectionReason('');
-        }
-      }}>
-        <DialogContent className="max-w-2xl rounded-3xl shadow-eventify-lg bg-white">
-          <button
-            onClick={() => {
-              setRejectingQuote(null);
-              setRejectionReason('');
-            }}
-            className="absolute right-4 top-4 rounded-full p-2 hover:bg-gray-100 transition-colors z-10"
-          >
-            <X className="w-5 h-5 text-gray-500" />
-          </button>
+      {/* Rejection Confirmation Dialog - Using Reusable System */}
+      <ConfirmationDialog
+        open={!!rejectingQuote}
+        onOpenChange={(open) => {
+          if (!open) {
+            setRejectingQuote(null);
+            setRejectionReason('');
+          }
+        }}
+        title="Offerte afwijzen?"
+        description="Weet je zeker dat je deze offerte wilt afwijzen? Deze actie kan niet ongedaan worden gemaakt."
+      >
+        {rejectingQuote && (
+          <>
+            <DialogQuoteInfo
+              quote={{
+                totalPrice: rejectingQuote.totalPrice,
+                packageName: rejectingQuote.packageName,
+                includedServices: rejectingQuote.includedServices,
+                serviceRequest: rejectingQuote.serviceRequest,
+              }}
+              status="pending"
+            />
 
-          <DialogHeader className="bg-white">
-            <DialogTitle className="text-2xl font-bold text-gray-900">
-              Offerte afwijzen?
-            </DialogTitle>
-            <DialogDescription className="text-gray-600">
-              Weet je zeker dat je deze offerte wilt afwijzen? Deze actie kan niet ongedaan worden gemaakt.
-            </DialogDescription>
-          </DialogHeader>
+            <DialogTextField
+              label="Waarom wijs je deze offerte af?"
+              value={rejectionReason}
+              onChange={setRejectionReason}
+              placeholder="Bijv. 'Prijs te hoog', 'Andere provider gekozen', 'Evenement geannuleerd'..."
+              helperText="Je feedback helpt providers hun diensten te verbeteren (optioneel voor provider)"
+            />
 
-          {rejectingQuote && (
-            <div className="space-y-6 py-4 bg-white">
-              {/* Quote Details */}
-              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border-2 border-purple-100 shadow-sm">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h4 className="text-3xl font-bold text-gray-900 mb-2">
-                      €{rejectingQuote.totalPrice.toLocaleString()}
-                    </h4>
-                    <p className="text-lg font-semibold text-gray-700 mb-1">
-                      {rejectingQuote.packageName}
-                    </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Badge className="bg-purple-600 hover:bg-purple-700">
-                        {rejectingQuote.provider?.category || 'Provider'}
-                      </Badge>
-                      <span className="font-semibold text-gray-700">
-                        {rejectingQuote.provider?.businessName || 'Provider'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Event Details */}
-                <div className="grid grid-cols-2 gap-4 mb-4 p-4 bg-white/60 rounded-xl">
-                  <div>
-                    <p className="text-sm text-gray-600">Evenement</p>
-                    <p className="font-semibold text-gray-900">{rejectingQuote.serviceRequest?.eventType || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Datum</p>
-                    <p className="font-semibold text-gray-900">
-                      {rejectingQuote.serviceRequest?.eventDate 
-                        ? new Date(rejectingQuote.serviceRequest.eventDate).toLocaleDateString('nl-NL', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                          })
-                        : 'N/A'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Locatie</p>
-                    <p className="font-semibold text-gray-900">{rejectingQuote.serviceRequest?.eventLocation || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Gasten</p>
-                    <p className="font-semibold text-gray-900">N/A</p>
-                  </div>
-                </div>
-
-                {/* Included Services */}
-                {rejectingQuote.includedServices && rejectingQuote.includedServices.length > 0 && (
-                  <div className="p-4 bg-white/60 rounded-xl">
-                    <p className="text-sm font-semibold text-gray-700 mb-2">Inbegrepen services:</p>
-                    <ul className="space-y-1">
-                      {rejectingQuote.includedServices.map((service, idx) => (
-                        <li key={idx} className="flex items-center gap-2 text-sm text-gray-700">
-                          <CheckCircle className="w-4 h-4 text-green-600" />
-                          {service}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-
-              {/* Rejection Reason */}
-              <div className="bg-white p-4 rounded-xl">
-                <label htmlFor="rejection-reason" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Waarom wijs je deze offerte af? <span className="text-gray-500 font-normal">(optioneel voor provider)</span>
-                </label>
-                <textarea
-                  id="rejection-reason"
-                  value={rejectionReason}
-                  onChange={(e) => setRejectionReason(e.target.value)}
-                  placeholder="Bijv. 'Prijs te hoog', 'Andere provider gekozen', 'Evenement geannuleerd'..."
-                  className="w-full px-4 py-3 border-2 border-gray-200 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-                  rows={3}
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Je feedback helpt providers hun diensten te verbeteren
-                </p>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-2 bg-white">
-                <Button
-                  onClick={() => handleRejectQuote(rejectingQuote.id)}
-                  disabled={!!acceptingQuote}
-                  className="flex-1 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white font-semibold py-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
-                >
-                  {acceptingQuote === rejectingQuote.id ? 'Afwijzen...' : 'Toch afwijzen'}
-                </Button>
-                <Button
-                  onClick={() => {
-                    setRejectingQuote(null);
-                    setRejectionReason('');
-                  }}
-                  variant="outline"
-                  disabled={!!acceptingQuote}
-                  className="flex-1 border-2 border-gray-300 text-gray-700 font-semibold py-6 rounded-xl hover:bg-gray-50 transition-colors"
-                >
-                  Offerte behouden
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+            <DialogActions>
+              <DialogButton
+                onClick={() => handleRejectQuote(rejectingQuote.id)}
+                variant="danger"
+                disabled={!!acceptingQuote}
+                loading={acceptingQuote === rejectingQuote.id}
+              >
+                Toch afwijzen
+              </DialogButton>
+              <DialogButton
+                onClick={() => {
+                  setRejectingQuote(null);
+                  setRejectionReason('');
+                }}
+                variant="outline"
+                disabled={!!acceptingQuote}
+              >
+                Offerte behouden
+              </DialogButton>
+            </DialogActions>
+          </>
+        )}
+      </ConfirmationDialog>
     </main>
   );
 }

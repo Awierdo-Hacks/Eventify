@@ -12,6 +12,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
+  ConfirmationDialog,
+  DialogQuoteInfo,
+  DialogRejectionReason,
+  DialogWarning,
+  DialogActions,
+  DialogButton,
+} from '@/components/ui/confirmation-dialog';
+import {
   FileText,
   MessageSquare,
   CheckCircle,
@@ -166,6 +174,7 @@ export default function ProviderDashboardPage() {
     sentQuotes: quotes.length,
     activeBookings: bookings.filter((b) => b.status === 'CONFIRMED').length,
     totalRevenue: bookings.reduce((sum, b) => sum + b.finalPrice, 0),
+      quotesWithUpdate: quotes.filter(q => (q.status === 'ACCEPTED' || q.status === 'REJECTED')).length,
   };
 
   // Handle quote creation
@@ -317,6 +326,18 @@ export default function ProviderDashboardPage() {
       COMPLETED: 'Voltooid',
     };
 
+ 
+
+// In de TabsTrigger:
+<TabsTrigger value="quotes" className="rounded-xl">
+  Mijn Offertes
+  {stats.quotesWithUpdate > 0 && (
+    <Badge className="ml-2 bg-blue-500 text-white">
+      {stats.quotesWithUpdate}
+    </Badge>
+  )}
+</TabsTrigger>
+
     return (
       <Badge className={styles[status as keyof typeof styles] || 'bg-gray-100 text-gray-800'}>
         {labels[status as keyof typeof labels] || status}
@@ -429,7 +450,14 @@ export default function ProviderDashboardPage() {
                 <Badge className="ml-2 bg-amber-500 text-white">{stats.pendingRequests}</Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="quotes" className="rounded-xl">Mijn Offertes</TabsTrigger>
+            <TabsTrigger value="quotes" className="rounded-xl">
+                    Mijn Offertes
+                        {stats.quotesWithUpdate > 0 && (
+                            <Badge className="ml-2 bg-blue-500 text-white">
+                            {stats.quotesWithUpdate}
+                        </Badge>
+                             )}
+                                </TabsTrigger>
             <TabsTrigger value="bookings" className="rounded-xl">Boekingen</TabsTrigger>
           </TabsList>
 
@@ -704,125 +732,62 @@ export default function ProviderDashboardPage() {
         </Tabs>
       </Container>
 
-      {/* Cancel Quote Confirmation Dialog */}
-      <Dialog open={!!cancelingQuote} onOpenChange={(open) => {
-        if (!open) {
-          setCancelingQuote(null);
-        }
-      }}>
-        <DialogContent className="max-w-2xl rounded-3xl shadow-eventify-lg bg-white">
-          <button
-            onClick={() => setCancelingQuote(null)}
-            className="absolute right-4 top-4 rounded-full p-2 hover:bg-gray-100 transition-colors z-10"
-          >
-            <X className="w-5 h-5 text-gray-500" />
-          </button>
+      {/* Cancel Quote Confirmation Dialog - Using Reusable System */}
+      <ConfirmationDialog
+        open={!!cancelingQuote}
+        onOpenChange={(open) => {
+          if (!open) {
+            setCancelingQuote(null);
+          }
+        }}
+        title="Aanvraag Annuleren?"
+        description="Weet je zeker dat je deze aanvraag wilt annuleren? Deze actie kan niet ongedaan worden gemaakt."
+      >
+        {cancelingQuote && (
+          <>
+            <DialogQuoteInfo
+              quote={{
+                totalPrice: cancelingQuote.totalPrice,
+                packageName: cancelingQuote.packageName,
+                includedServices: cancelingQuote.includedServices,
+                serviceRequest: cancelingQuote.serviceRequest,
+              }}
+              status="rejected"
+            />
 
-          <DialogHeader className="bg-white">
-            <DialogTitle className="text-2xl font-bold text-gray-900">
-              Aanvraag Annuleren?
-            </DialogTitle>
-            <DialogDescription className="text-gray-600">
-              Weet je zeker dat je deze aanvraag wilt annuleren? Deze actie kan niet ongedaan worden gemaakt.
-            </DialogDescription>
-          </DialogHeader>
+            {cancelingQuote.rejectionReason && (
+              <DialogRejectionReason
+                reason={cancelingQuote.rejectionReason}
+                rejectedAt={cancelingQuote.rejectedAt}
+              />
+            )}
 
-          {cancelingQuote && (
-            <div className="space-y-6 py-4 bg-white">
-              {/* Quote Details */}
-              <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-2xl p-6 border-2 border-red-200 shadow-sm">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h4 className="text-3xl font-bold text-gray-900 mb-2">
-                      €{cancelingQuote.totalPrice.toLocaleString()}
-                    </h4>
-                    <p className="text-lg font-semibold text-gray-700 mb-1">
-                      {cancelingQuote.packageName}
-                    </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Badge className="bg-red-600 hover:bg-red-700">
-                        Afgewezen
-                      </Badge>
-                      <span className="text-sm text-gray-600">
-                        {cancelingQuote.serviceRequest.customer.name}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+            <DialogWarning
+              type="warning"
+              title="Let op!"
+              message="Door deze aanvraag te annuleren, verwijder je de offerte permanent uit het systeem. De klant kan geen nieuwe actie meer ondernemen op deze offerte en je kunt deze aanvraag niet meer beantwoorden."
+            />
 
-                {/* Rejection Reason */}
-                {cancelingQuote.rejectionReason && (
-                  <div className="mb-4 p-4 bg-white/60 rounded-xl">
-                    <p className="text-sm font-semibold text-red-800 mb-1">Reden van afwijzing:</p>
-                    <p className="text-sm text-red-700">{cancelingQuote.rejectionReason}</p>
-                  </div>
-                )}
-
-                {/* Event Details */}
-                <div className="p-4 bg-white/60 rounded-xl">
-                  <p className="text-sm font-semibold text-gray-700 mb-2">Evenement Details:</p>
-                  <div className="space-y-1 text-sm text-gray-700">
-                    <p>• Type: {cancelingQuote.serviceRequest.eventType}</p>
-                    <p>• Datum: {formatDate(cancelingQuote.serviceRequest.eventDate)}</p>
-                    <p>• Afgewezen op: {cancelingQuote.rejectedAt ? formatDate(cancelingQuote.rejectedAt) : 'N/A'}</p>
-                  </div>
-                </div>
-
-                {/* Included Services */}
-                {cancelingQuote.includedServices && cancelingQuote.includedServices.length > 0 && (
-                  <div className="mt-4 p-4 bg-white/60 rounded-xl">
-                    <p className="text-sm font-semibold text-gray-700 mb-2">Inbegrepen services:</p>
-                    <ul className="space-y-1">
-                      {cancelingQuote.includedServices.map((service, idx) => (
-                        <li key={idx} className="flex items-center gap-2 text-sm text-gray-700">
-                          <CheckCircle className="w-4 h-4 text-green-600" />
-                          {service}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-
-              {/* Warning Message */}
-              <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl">⚠️</span>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-amber-900 mb-1">Let op!</p>
-                    <p className="text-sm text-amber-800">
-                      Door deze aanvraag te annuleren, verwijder je de offerte permanent uit het systeem. 
-                      De klant kan geen nieuwe actie meer ondernemen op deze offerte en je kunt deze aanvraag 
-                      niet meer beantwoorden.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-2 bg-white">
-                <Button
-                  onClick={handleCancelQuote}
-                  disabled={!!cancelingQuoteId}
-                  className="flex-1 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white font-semibold py-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
-                >
-                  {cancelingQuoteId === cancelingQuote.id ? 'Annuleren...' : 'Ja, Aanvraag Annuleren'}
-                </Button>
-                <Button
-                  onClick={() => setCancelingQuote(null)}
-                  variant="outline"
-                  disabled={!!cancelingQuoteId}
-                  className="flex-1 border-2 border-gray-300 text-gray-700 font-semibold py-6 rounded-xl hover:bg-gray-50 transition-colors"
-                >
-                  Nee, Behouden
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+            <DialogActions>
+              <DialogButton
+                onClick={handleCancelQuote}
+                variant="danger"
+                disabled={!!cancelingQuoteId}
+                loading={cancelingQuoteId === cancelingQuote.id}
+              >
+                Ja, Aanvraag Annuleren
+              </DialogButton>
+              <DialogButton
+                onClick={() => setCancelingQuote(null)}
+                variant="outline"
+                disabled={!!cancelingQuoteId}
+              >
+                Nee, Behouden
+              </DialogButton>
+            </DialogActions>
+          </>
+        )}
+      </ConfirmationDialog>
 
       {/* Create Quote Dialog */}
       <Dialog open={!!creatingQuoteFor} onOpenChange={(open) => {
