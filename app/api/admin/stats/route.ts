@@ -12,72 +12,42 @@ export async function GET() {
     const [
       totalUsers,
       totalProviders,
-      totalRequests,
+      verifiedProviders,
       totalBookings,
-      totalReviews,
-      pendingProviders,
-      activeRequests,
-      recentBookings,
+      bookingsWithRevenue,
     ] = await Promise.all([
       prisma.user.count(),
       prisma.serviceProvider.count(),
-      prisma.serviceRequest.count(),
+      prisma.serviceProvider.count({ where: { verified: true } }),
       prisma.booking.count(),
-      prisma.review.count(),
-      prisma.serviceProvider.count({
-        where: { verified: false },
-      }),
-      prisma.serviceRequest.count({
-        where: {
-          status: {
-            in: ['PENDING', 'QUOTED'],
-          },
-        },
-      }),
       prisma.booking.findMany({
-        take: 10,
-        orderBy: { created_at: 'desc' },
-        include: {
-          customer: {
-            select: { name: true },
-          },
-          provider: {
-            select: { business_name: true },
-          },
+        select: {
+          final_price: true,
+          created_at: true,
         },
       }),
     ]);
 
-    // Calculate revenue (sum of completed bookings)
-    const revenue = await prisma.booking.aggregate({
-      where: {
-        status: 'COMPLETED',
-      },
-      _sum: {
-        final_price: true,
-      },
-    });
+    const pendingProviders = totalProviders - verifiedProviders;
+
+    // Calculate total revenue
+    const totalRevenue = bookingsWithRevenue.reduce((sum, booking) => sum + booking.final_price, 0);
+
+    // Calculate monthly revenue (current month)
+    const now = new Date();
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthlyRevenue = bookingsWithRevenue
+      .filter(booking => new Date(booking.created_at) >= firstDayOfMonth)
+      .reduce((sum, booking) => sum + booking.final_price, 0);
 
     return NextResponse.json({
-      stats: {
-        totalUsers,
-        totalProviders,
-        totalRequests,
-        totalBookings,
-        totalReviews,
-        pendingProviders,
-        activeRequests,
-        totalRevenue: revenue._sum.final_price || 0,
-      },
-      recentBookings: recentBookings.map((booking) => ({
-        id: booking.id,
-        customerName: booking.customer.name,
-        providerName: booking.provider.business_name,
-        eventDate: booking.event_date,
-        finalPrice: booking.final_price,
-        status: booking.status,
-        createdAt: booking.created_at,
-      })),
+      totalUsers,
+      totalProviders,
+      verifiedProviders,
+      pendingProviders,
+      totalBookings,
+      totalRevenue,
+      monthlyRevenue,
     });
   } catch (error) {
     console.error('Admin stats API error:', error);
