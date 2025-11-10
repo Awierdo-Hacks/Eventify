@@ -1,0 +1,11 @@
+# Public Assets
+
+Deze folder bevat publieke assets zoals:
+- Afbeeldingen
+- Fonts
+- Favicon
+- robots.txt
+- sitemap.xml
+
+Bestanden in deze folder zijn toegankelijk via de root URL.
+Bijvoorbeeld: `/public/logo.png` → `https://eventiphy.site/logo.png`

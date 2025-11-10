@@ -1,13 +1,14 @@
 # 📖 Eventify Documentatie
 
 Volledige technische documentatie en product blueprint  
-Download Source Code
+🌐 **Live:** [eventiphy.site](https://eventiphy.site)  
+🐳 **Docker Ready** | 🚀 **Render Deployment**
 
 ---
 
-## � Quick Start
+## 🚀 Quick Start
 
-### Database Setup
+### Lokale Development
 
 **Optie 1: PostgreSQL via Docker (Aanbevolen)**
 ```bash
@@ -35,6 +36,35 @@ npx prisma db seed
 # Start development server
 npm run dev
 ```
+
+### Docker Development
+```bash
+# Met Docker Compose (incl. PostgreSQL)
+docker-compose up
+
+# Of bouw image handmatig
+docker build -t eventify:latest .
+docker run -p 3000:3000 eventify:latest
+```
+
+---
+
+## 🐳 Production Deployment
+
+**Complete Docker setup voor Render + Neon PostgreSQL**
+
+📚 **Zie volledige handleiding:** [DEPLOYMENT.md](./DEPLOYMENT.md)
+
+**Snelle deploy:**
+1. Maak Neon database aan → [console.neon.tech](https://console.neon.tech)
+2. Push naar GitHub
+3. Connect Render → [dashboard.render.com](https://dashboard.render.com)
+4. Deploy! 🚀
+
+**Deployment docs:**
+- 📘 [DEPLOYMENT.md](./DEPLOYMENT.md) - Complete step-by-step guide
+- 📗 [QUICK_START.md](./QUICK_START.md) - Handige commando's
+- 📙 [DOCKER_SETUP_COMPLETE.md](./DOCKER_SETUP_COMPLETE.md) - Setup overzicht
 
 ---
 

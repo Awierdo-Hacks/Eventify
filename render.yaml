@@ -1,0 +1,58 @@
+# Render Blueprint voor Eventify
+# Dit bestand definieert de infrastructure voor deployment op Render
+
+services:
+  # Web Service - Next.js Application
+  - type: web
+    name: eventify
+    runtime: docker
+    region: frankfurt # of andere regio dichtbij Nederland
+    plan: starter # of free voor testing
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    
+    # Domein configuratie
+    domains:
+      - eventiphy.site
+      - www.eventiphy.site
+    
+    # Environment variables
+    envVars:
+      - key: NODE_ENV
+        value: production
+      
+      - key: NEXTAUTH_URL
+        value: https://eventiphy.site
+      
+      - key: NEXTAUTH_SECRET
+        generateValue: true # Render genereert automatisch een veilige waarde
+      
+      - key: DATABASE_URL
+        sync: false # Handmatig instellen via Render dashboard met Neon connection string
+      
+      - key: NEXT_TELEMETRY_DISABLED
+        value: 1
+      
+      - key: PORT
+        value: 3000
+    
+    # Health check endpoint
+    healthCheckPath: /api/health
+    
+    # Build command (optioneel, Docker gebruikt Dockerfile)
+    # buildCommand: npm run build
+    
+    # Start command (gedefinieerd in Dockerfile)
+    # startCommand: npm start
+    
+    # Auto-deploy from git
+    autoDeploy: true
+    
+    # Disk voor persistent storage (indien nodig)
+    # disk:
+    #   name: eventify-data
+    #   mountPath: /app/data
+    #   sizeGB: 1
+
+# Database is extern gehost op Neon
+# Voeg Neon connection string toe als environment variable in Render dashboard
