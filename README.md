@@ -1,314 +1,626 @@
-# 📖 Eventify Documentatie
+# 📖 Eventify# 📖 Eventify Documentatie
 
-Volledige technische documentatie en product blueprint  
+
+
+**Event Planning Platform** - Verbind organisatoren met dienstverlenersVolledige technische documentatie en product blueprint  
+
 🌐 **Live:** [eventiphy.site](https://eventiphy.site)  
-🐳 **Docker Ready** | 🚀 **Render Deployment**
+
+🌐 **Live:** [eventiphy.site](https://eventiphy.site)  🐳 **Docker Ready** | 🚀 **Render Deployment**
+
+🐳 **Docker Ready** | 🚀 **Production Deployment**
+
+---
 
 ---
 
 ## 🚀 Quick Start
 
+## 🚀 Quick Start
+
 ### Lokale Development
 
-**Optie 1: PostgreSQL via Docker (Aanbevolen)**
-```bash
-docker run --name eventify-postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres
+### Prerequisites
+
+- Node.js 20+ **Optie 1: PostgreSQL via Docker (Aanbevolen)**
+
+- PostgreSQL 16```bash
+
+- npm/pnpmdocker run --name eventify-postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres
+
 docker exec -it eventify-postgres psql -U postgres -c "CREATE DATABASE eventify;"
-```
 
-**Optie 2: Lokale PostgreSQL Installatie**
-1. Download PostgreSQL van https://www.postgresql.org/download/
-2. Installeer en start de service
+### Local Development```
+
+
+
+```bash**Optie 2: Lokale PostgreSQL Installatie**
+
+# 1. Install dependencies1. Download PostgreSQL van https://www.postgresql.org/download/
+
+npm install2. Installeer en start de service
+
 3. Maak een database aan: `CREATE DATABASE eventify;`
-4. Update `.env` met jouw credentials
 
-### Project Setup
+# 2. Setup environment variables4. Update `.env` met jouw credentials
+
+cp .env.example .env
+
+# Edit .env with your DATABASE_URL and secrets### Project Setup
+
 ```bash
-# Installeer dependencies
-npm install
 
-# Setup database schema
-npx prisma migrate dev --name init
+# 3. Initialize database# Installeer dependencies
 
-# Seed database met demo data
+npx prisma migrate devnpm install
+
 npx prisma db seed
 
-# Start development server
+# Setup database schema
+
+# 4. Start development servernpx prisma migrate dev --name init
+
 npm run dev
+
+```# Seed database met demo data
+
+npx prisma db seed
+
+Open [http://localhost:3000](http://localhost:3000)
+
+# Start development server
+
+---npm run dev
+
 ```
+
+## 🐳 Docker Development
 
 ### Docker Development
-```bash
-# Met Docker Compose (incl. PostgreSQL)
-docker-compose up
 
-# Of bouw image handmatig
-docker build -t eventify:latest .
-docker run -p 3000:3000 eventify:latest
-```
+```bash```bash
 
----
+# Start with Docker Compose (includes PostgreSQL)# Met Docker Compose (incl. PostgreSQL)
 
-## 🐳 Production Deployment
+docker-compose updocker-compose up
 
-**Complete Docker setup voor Render + Neon PostgreSQL**
 
-📚 **Zie volledige handleiding:** [DEPLOYMENT.md](./DEPLOYMENT.md)
 
-**Snelle deploy:**
-1. Maak Neon database aan → [console.neon.tech](https://console.neon.tech)
-2. Push naar GitHub
-3. Connect Render → [dashboard.render.com](https://dashboard.render.com)
-4. Deploy! 🚀
+# Or build manually# Of bouw image handmatig
 
-**Deployment docs:**
-- 📘 [DEPLOYMENT.md](./DEPLOYMENT.md) - Complete step-by-step guide
-- 📗 [QUICK_START.md](./QUICK_START.md) - Handige commando's
-- 📙 [DOCKER_SETUP_COMPLETE.md](./DOCKER_SETUP_COMPLETE.md) - Setup overzicht
+docker build -t eventify:latest .docker build -t eventify:latest .
 
----
+docker run -p 3000:3000 eventify:latestdocker run -p 3000:3000 eventify:latest
 
-## �📌 Overzicht
-- **Tech Stack**
-- **Architectuur**
-- **Features**
-- **User Flows**
-- **PRD**
+``````
 
----
 
-## ⚛️ Frontend
-- **React** – UI Framework voor component-based development  
-- **Next.js** – Full-stack React framework met ingebouwde routing, API routes en server-side rendering  
-- **TypeScript** – Type-safe development voor frontend en backend  
-- **Tailwind CSS** – Utility-first CSS framework voor styling  
-- **Framer Motion** – Animatie library voor smooth transitions  
-- **Shadcn/ui** – Herbruikbare UI componenten  
-- **Lucide React** – Icon library  
-- **React Router** – Client-side routing (alleen indien nodig naast Next.js routing)  
-- **React Query** – Data fetching en caching (voor client-side data management waar gewenst)  
 
----
+------
 
-## 🔧 Backend
+
+
+## 📁 Project Structure## 🐳 Production Deployment
+
+
+
+```**Complete Docker setup voor Render + Neon PostgreSQL**
+
+eventify/
+
+├── app/                      # Next.js App Router📚 **Zie volledige handleiding:** [DEPLOYMENT.md](./DEPLOYMENT.md)
+
+│   ├── api/                  # API routes
+
+│   ├── (pages)/              # Application pages**Snelle deploy:**
+
+│   └── globals.css           # Global styles1. Maak Neon database aan → [console.neon.tech](https://console.neon.tech)
+
+├── components/               # React components2. Push naar GitHub
+
+│   ├── layout/               # Layout components3. Connect Render → [dashboard.render.com](https://dashboard.render.com)
+
+│   ├── providers/            # Context providers4. Deploy! 🚀
+
+│   └── ui/                   # UI components (shadcn/ui)
+
+├── lib/                      # Utilities & configs**Deployment docs:**
+
+│   ├── auth.ts               # Authentication logic- 📘 [DEPLOYMENT.md](./DEPLOYMENT.md) - Complete step-by-step guide
+
+│   ├── prisma.ts             # Prisma client- 📗 [QUICK_START.md](./QUICK_START.md) - Handige commando's
+
+│   └── utils.ts              # Helper functions- 📙 [DOCKER_SETUP_COMPLETE.md](./DOCKER_SETUP_COMPLETE.md) - Setup overzicht
+
+├── prisma/                   # Database
+
+│   ├── schema.prisma         # Database schema---
+
+│   ├── seed.ts               # Seed data
+
+│   └── migrations/           # Database migrations## �📌 Overzicht
+
+├── scripts/                  # Utility scripts- **Tech Stack**
+
+│   ├── dev/                  # Development & testing scripts- **Architectuur**
+
+│   └── utils/                # Utility scripts- **Features**
+
+├── types/                    # TypeScript definitions- **User Flows**
+
+├── docs/                     # Documentation- **PRD**
+
+│   ├── DEPLOYMENT.md         # Deployment guide
+
+│   ├── QUICK_START.md        # Quick reference---
+
+│   └── DESIGN_GUIDE.md       # Design system
+
+├── public/                   # Static assets## ⚛️ Frontend
+
+├── .env                      # Local environment variables- **React** – UI Framework voor component-based development  
+
+├── .env.production           # Production environment template- **Next.js** – Full-stack React framework met ingebouwde routing, API routes en server-side rendering  
+
+├── docker-compose.yml        # Docker Compose config- **TypeScript** – Type-safe development voor frontend en backend  
+
+├── Dockerfile                # Docker build config- **Tailwind CSS** – Utility-first CSS framework voor styling  
+
+├── next.config.ts            # Next.js configuration- **Framer Motion** – Animatie library voor smooth transitions  
+
+├── tailwind.config.ts        # Tailwind CSS config- **Shadcn/ui** – Herbruikbare UI componenten  
+
+├── tsconfig.json             # TypeScript config- **Lucide React** – Icon library  
+
+└── package.json              # Dependencies & scripts- **React Router** – Client-side routing (alleen indien nodig naast Next.js routing)  
+
+```- **React Query** – Data fetching en caching (voor client-side data management waar gewenst)  
+
+
+
+------
+
+
+
+## ⚛️ Tech Stack## 🔧 Backend
+
 - **Next.js API Routes & Server Actions** – Ingebouwde backendlaag voor business logica en API endpoints  
-- **TypeScript** – End-to-end type safety  
-- **PostgreSQL** – Relationele database voor consistente en schaalbare data-opslag  
-- **Prisma** – ORM voor type-veilige database interacties en migrations  
-- **Auth.js (NextAuth)** – Authenticatie en sessiebeheer met ondersteuning voor meerdere providers  
-- **JWT / Secure Sessions** – Veilige authenticatie en autorisatie  
-- **Bestandsopslag (S3-compatibel, bv. Cloudflare R2 / Supabase Storage)** – Image & document hosting via eigen API-routes  
+
+### Frontend- **TypeScript** – End-to-end type safety  
+
+- **Next.js 16** - React framework met App Router- **PostgreSQL** – Relationele database voor consistente en schaalbare data-opslag  
+
+- **TypeScript** - Type-safe development- **Prisma** – ORM voor type-veilige database interacties en migrations  
+
+- **Tailwind CSS** - Utility-first styling- **Auth.js (NextAuth)** – Authenticatie en sessiebeheer met ondersteuning voor meerdere providers  
+
+- **Shadcn/ui** - Component library- **JWT / Secure Sessions** – Veilige authenticatie en autorisatie  
+
+- **Framer Motion** - Animations- **Bestandsopslag (S3-compatibel, bv. Cloudflare R2 / Supabase Storage)** – Image & document hosting via eigen API-routes  
+
 - **RESTful API** – API architectuur voor interne en externe integraties  
 
----
+### Backend
 
-## 🔗 Integrations
-- **Stripe Connect** – Betalingsverwerking (toekomstig)  
-- **Email Service** – Transactionele emails  
+- **Next.js API Routes** - Backend endpoints---
+
+- **Prisma** - ORM & database migrations
+
+- **PostgreSQL** - Relational database## 🔗 Integrations
+
+- **NextAuth.js** - Authentication- **Stripe Connect** – Betalingsverwerking (toekomstig)  
+
+- **JWT** - Secure sessions- **Email Service** – Transactionele emails  
+
 - **File Storage** – Image & document hosting  
-- **LLM Integration** – AI-powered features  
 
----
+### DevOps- **LLM Integration** – AI-powered features  
 
-## 🗂️ Data Model & Entities
+- **Docker** - Containerization
 
-### ServiceProvider
+- **GitHub Actions** - CI/CD---
+
+- **Render** - Hosting platform
+
+- **render** - PostgreSQL hosting## 🗂️ Data Model & Entities
+
+
+
+---### ServiceProvider
+
 - `business_name`  
-- `category`  
-- `location`  
-- `price_range`  
-- `images`  
-- `verified`  
 
-### ServiceRequest
-- `customer_email`  
-- `provider_id`  
-- `event_type`  
+## 🗄️ Database Schema- `category`  
+
+- `location`  
+
+### Core Entities- `price_range`  
+
+- **User** - Customers, Providers, Admins- `images`  
+
+- **ServiceProvider** - Business profiles- `verified`  
+
+- **ServiceRequest** - Event booking requests
+
+- **Quote** - Price offers from providers### ServiceRequest
+
+- **Booking** - Confirmed reservations- `customer_email`  
+
+- **Review** - Customer feedback- `provider_id`  
+
+- **Message** - Communication between parties- `event_type`  
+
 - `event_date`  
-- `guest_count`  
+
+---- `guest_count`  
+
 - `budget`  
 
+## 🔐 Authentication & Authorization
+
 ### Quote
-- `request_id`  
-- `provider_id`  
-- `amount`  
-- `description`  
+
+### User Roles- `request_id`  
+
+- **Customer** - Browse & book services- `provider_id`  
+
+- **Provider** - Offer services & manage bookings- `amount`  
+
+- **Admin** - Platform management- `description`  
+
 - `valid_until`  
 
-### Booking
-- `quote_id`  
-- `customer_email`  
-- `provider_id`  
-- `amount`  
-- `payment_status`  
+### Features
 
-### Review
+- Secure password hashing (bcrypt)### Booking
+
+- JWT-based sessions- `quote_id`  
+
+- Role-based access control (RBAC)- `customer_email`  
+
+- Protected API routes- `provider_id`  
+
+- `amount`  
+
+---- `payment_status`  
+
+
+
+## 📦 Available Scripts### Review
+
 - `provider_id`  
-- `customer_email`  
-- `rating`  
-- `title`  
+
+```bash- `customer_email`  
+
+# Development- `rating`  
+
+npm run dev          # Start dev server (localhost:3000)- `title`  
+
 - `comment`  
 
-### Message
-- `request_id`  
-- `from_email`  
-- `to_email`  
-- `message`  
+# Building
 
-### User
+npm run build        # Build for production### Message
+
+npm start            # Start production server- `request_id`  
+
+- `from_email`  
+
+# Database- `to_email`  
+
+npx prisma studio    # Open Prisma Studio (DB GUI)- `message`  
+
+npx prisma migrate dev    # Create & apply migration
+
+npx prisma db seed   # Seed database with demo data### User
+
 - `email`  
-- `full_name`  
-- `role`  
+
+# Code Quality- `full_name`  
+
+npm run lint         # Run ESLint- `role`  
+
 - `user_type`  
 
----
+# Utilities (see scripts/ folder)
+
+.\scripts\utils\generate-secret.ps1    # Generate NEXTAUTH_SECRET---
+
+```
 
 ## 👥 User Flows
 
+---
+
 ### Klant Flow
-1. Browse dienstverleners op categorie/locatie  
+
+## 🚀 Deployment1. Browse dienstverleners op categorie/locatie  
+
 2. Bekijk provider profielen en reviews  
-3. Vraag offerte aan met event details  
+
+### Production Deployment (Render + Neon)3. Vraag offerte aan met event details  
+
 4. Ontvang en vergelijk offertes  
-5. Accepteer offerte → Boeking  
+
+See detailed guide: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)5. Accepteer offerte → Boeking  
+
 6. Event vindt plaats  
-7. Schrijf review  
 
-### Provider Flow
-1. Registreer als dienstverlener  
-2. Maak bedrijfsprofiel aan  
-3. Wacht op admin verificatie  
+**Quick Steps:**7. Schrijf review  
+
+1. Create Neon PostgreSQL database
+
+2. Push code to GitHub### Provider Flow
+
+3. Connect Render to repository1. Registreer als dienstverlener  
+
+4. Configure environment variables2. Maak bedrijfsprofiel aan  
+
+5. Deploy!3. Wacht op admin verificatie  
+
 4. Ontvang aanvragen  
-5. Verstuur gepersonaliseerde offertes  
+
+### Environment Variables5. Verstuur gepersonaliseerde offertes  
+
 6. Beheer boekingen  
-7. Ontvang betaling & reviews  
 
-### Admin Flow
-1. Monitor platform statistieken  
-2. Verifieer nieuwe providers  
+Required environment variables:7. Ontvang betaling & reviews  
+
+
+
+```env### Admin Flow
+
+# Database1. Monitor platform statistieken  
+
+DATABASE_URL=postgresql://user:password@host:5432/dbname2. Verifieer nieuwe providers  
+
 3. Beheer gebruikers en content  
-4. Modereer reviews  
-5. Los geschillen op  
-6. Analyseer platform groei  
 
----
+# Auth4. Modereer reviews  
 
-## 🚀 Features
+NEXTAUTH_URL=https://yourdomain.com5. Los geschillen op  
+
+NEXTAUTH_SECRET=your-secret-key-here6. Analyseer platform groei  
+
+
+
+# App---
+
+NODE_ENV=production
+
+```## 🚀 Features
+
 - User authenticatie (customer, provider, admin)  
-- Provider zoeken en filteren  
+
+---- Provider zoeken en filteren  
+
 - Gedetailleerde provider profielen  
-- Offerte aanvraag systeem  
+
+## 🎯 Features- Offerte aanvraag systeem  
+
 - Quote management  
-- Booking systeem  
-- Review & rating systeem  
-- Dashboards voor klanten & providers  
-- Admin panel voor moderatie  
-- Realtime chat tussen klant en provider  
-- Email notificaties  
-- Stripe betalingsintegratie  
+
+### For Customers- Booking systeem  
+
+- ✅ Browse service providers by category- Review & rating systeem  
+
+- ✅ View detailed profiles & portfolios- Dashboards voor klanten & providers  
+
+- ✅ Request custom quotes- Admin panel voor moderatie  
+
+- ✅ Compare offers- Realtime chat tussen klant en provider  
+
+- ✅ Book services- Email notificaties  
+
+- ✅ Write reviews- Stripe betalingsintegratie  
+
 - Kalender synchronisatie  
-- Geavanceerde zoekfilters  
-- Favorieten systeem  
-- Portfolio galerij uitbreidingen  
-- AI-powered matching algoritme  
-- Meertalige ondersteuning (EN/NL)  
-- Mobile app (React Native)  
+
+### For Providers- Geavanceerde zoekfilters  
+
+- ✅ Create business profile- Favorieten systeem  
+
+- ✅ Receive booking requests- Portfolio galerij uitbreidingen  
+
+- ✅ Send personalized quotes- AI-powered matching algoritme  
+
+- ✅ Manage bookings- Meertalige ondersteuning (EN/NL)  
+
+- ✅ Build reputation via reviews- Mobile app (React Native)  
+
 - Premium provider subscripties  
-- Analytics dashboard  
-- Rapportage tools  
-- API voor third-party integraties  
 
----
+### For Admins- Analytics dashboard  
 
-## 📖 Project Overzicht
+- ✅ User management- Rapportage tools  
 
-### Wat is Eventify?
+- ✅ Provider verification- API voor third-party integraties  
+
+- ✅ Platform statistics
+
+- ✅ Content moderation---
+
+
+
+---## 📖 Project Overzicht
+
+
+
+## 📚 Documentation### Wat is Eventify?
+
 Eventify is een digitaal platform dat het organiseren van evenementen vereenvoudigt door gebruikers te verbinden met dienstverleners zoals cateraars, DJ's, decorateurs, fotografen en locaties. Gebruikers kunnen hun evenement plannen, leveranciers vergelijken, offertes aanvragen, en direct boeken — allemaal binnen één omgeving.
 
-### Voor Klanten
-- Vind binnen 5 minuten de perfecte dienstverleners voor jouw event  
+- [Deployment Guide](docs/DEPLOYMENT.md) - Complete deployment walkthrough
 
-### Voor Providers
+- [Quick Start](docs/QUICK_START.md) - Handy commands & troubleshooting### Voor Klanten
+
+- [Design Guide](docs/DESIGN_GUIDE.md) - UI/UX guidelines- Vind binnen 5 minuten de perfecte dienstverleners voor jouw event  
+
+
+
+---### Voor Providers
+
 - Bereik nieuwe klanten en beheer boekingen efficiënt  
 
+## 🛠️ Development Guidelines
+
 ### Veilig & Betrouwbaar
-- Geverifieerde professionals en transparante prijzen  
 
----
+### Code Style- Geverifieerde professionals en transparante prijzen  
 
-## 🛠️ Kernfunctionaliteit
+- Use TypeScript for all files
+
+- Follow ESLint & Prettier configurations---
+
+- Use functional components with hooks
+
+- Keep components small and focused## 🛠️ Kernfunctionaliteit
+
 - Geavanceerde zoek- en filteropties  
-- Provider profielen met portfolio's  
-- Offerte aanvraag systeem  
-- Quote & booking management  
-- Review & rating systeem  
-- Role-based dashboards  
+
+### Git Workflow- Provider profielen met portfolio's  
+
+- Create feature branches from `main`- Offerte aanvraag systeem  
+
+- Write descriptive commit messages- Quote & booking management  
+
+- Test before pushing- Review & rating systeem  
+
+- Create pull requests for review- Role-based dashboards  
+
 - Admin moderatie tools  
-- Responsive design  
 
----
+### Testing- Responsive design  
 
-## 📊 Project Status
+- Test locally before deployment
+
+- Verify Docker build works---
+
+- Check database migrations
+
+- Test on multiple devices## 📊 Project Status
+
 - **MVP Fase 1** – ✓ Voltooid  
-  Alle kernfunctionaliteit is geïmplementeerd en klaar voor gebruik  
+
+---  Alle kernfunctionaliteit is geïmplementeerd en klaar voor gebruik  
+
 - **Fase 2 - Optimalisatie** – Gepland  
-- **Fase 3 - Groei Features** – Gepland  
 
----
+## 🔧 Troubleshooting- **Fase 3 - Groei Features** – Gepland  
 
-## ❓ Waarom Deze Stack?
 
-### Modern & Schaalbaar
-Next.js met TypeScript en React zorgt voor een snelle, betrouwbare en schaalbare full-stack architectuur. Door frontend en backend in één framework te combineren, blijft de codebase compact en onderhoudbaar. PostgreSQL in combinatie met Prisma biedt een stabiele, futureproof basis voor relationele data zoals boekingen, offertes en reviews.
 
-### Developer Experience
-Tailwind CSS en Shadcn/ui maken het mogelijk om snel mooie, consistente UI's te bouwen. TypeScript end-to-end en Prisma zorgen voor sterke type safety en minder bugs. De integratie met Next.js API Routes en Auth.js geeft een duidelijke structuur voor authenticatie en business logica.
+### Common Issues---
+
+
+
+**Database Connection Issues**## ❓ Waarom Deze Stack?
+
+```bash
+
+# Check DATABASE_URL format### Modern & Schaalbaar
+
+echo $env:DATABASE_URLNext.js met TypeScript en React zorgt voor een snelle, betrouwbare en schaalbare full-stack architectuur. Door frontend en backend in één framework te combineren, blijft de codebase compact en onderhoudbaar. PostgreSQL in combinatie met Prisma biedt een stabiele, futureproof basis voor relationele data zoals boekingen, offertes en reviews.
+
+
+
+# Test connection### Developer Experience
+
+npx prisma db pushTailwind CSS en Shadcn/ui maken het mogelijk om snel mooie, consistente UI's te bouwen. TypeScript end-to-end en Prisma zorgen voor sterke type safety en minder bugs. De integratie met Next.js API Routes en Auth.js geeft een duidelijke structuur voor authenticatie en business logica.
+
+```
 
 ### Performance & SEO
-Server-side rendering en statische generatie via Next.js verbeteren performance en SEO voor de marketplace. Optimalisaties zoals caching, lazy loading en code splitting zijn first-class ondersteund.
 
----
+**Build Failures**Server-side rendering en statische generatie via Next.js verbeteren performance en SEO voor de marketplace. Optimalisaties zoals caching, lazy loading en code splitting zijn first-class ondersteund.
+
+```bash
+
+# Clear Next.js cache---
+
+Remove-Item -Recurse -Force .next
 
 ## 🏗️ Systeem Architectuur – 3-Tier
 
-1. **Presentation Layer (Frontend)**  
-   Next.js/React applicatie met Tailwind CSS en Shadcn/ui voor UI. Client communiceert met eigen Next.js API routes en server actions.  
+# Reinstall dependencies
+
+Remove-Item -Recurse -Force node_modules1. **Presentation Layer (Frontend)**  
+
+npm install   Next.js/React applicatie met Tailwind CSS en Shadcn/ui voor UI. Client communiceert met eigen Next.js API routes en server actions.  
+
+```
 
 2. **Business Logic Layer (Backend)**  
-   Next.js API Routes en server actions handelen authenticatie, autorisatie, data validatie en business rules (offertes, boekingen, reviews, provider-verificatie).  
 
-3. **Data Layer (Database)**  
-   PostgreSQL database voor gestructureerde en consistente opslag van gebruikers, providers, aanvragen, offertes, boekingen en reviews. Prisma verzorgt type-veilige queries en migrations. Bestanden (images/documenten) worden opgeslagen via S3-compatibele storage.  
+**Docker Issues**   Next.js API Routes en server actions handelen authenticatie, autorisatie, data validatie en business rules (offertes, boekingen, reviews, provider-verificatie).  
 
----
+```bash
+
+# Rebuild image3. **Data Layer (Database)**  
+
+docker-compose down   PostgreSQL database voor gestructureerde en consistente opslag van gebruikers, providers, aanvragen, offertes, boekingen en reviews. Prisma verzorgt type-veilige queries en migrations. Bestanden (images/documenten) worden opgeslagen via S3-compatibele storage.  
+
+docker-compose build --no-cache
+
+docker-compose up---
+
+```
 
 ## 🔒 Security Features
-- JWT-based authenticatie of secure sessions via Auth.js  
+
+---- JWT-based authenticatie of secure sessions via Auth.js  
+
 - Role-based access control (RBAC)  
-- HTTPS/TLS encryptie  
+
+## 📞 Support- HTTPS/TLS encryptie  
+
 - Input validatie & sanitization  
-- CORS policy (indien nodig voor externe integraties)  
-- Rate limiting  
-- XSS & CSRF protectie  
+
+- 📧 Email: support@eventiphy.site- CORS policy (indien nodig voor externe integraties)  
+
+- 📖 Docs: [docs/](docs/)- Rate limiting  
+
+- 🐛 Issues: [GitHub Issues](https://github.com/Awierdo-Hacks/Eventify/issues)- XSS & CSRF protectie  
+
 - Secure password hashing  
 
 ---
 
+---
+
+## 📄 License
+
 ## 📑 Product Requirements Document (PRD)
+
+ISC License - See LICENSE file for details
 
 **Versie 1.0 – 27 Oktober 2025**
 
-### 1. Productoverzicht
-Eventify is een digitaal platform (web + mobiel) dat het organiseren van evenementen vereenvoudigt door gebruikers te verbinden met dienstverleners zoals cateraars, DJ's, decorateurs, fotografen en locaties. Gebruikers kunnen hun evenement plannen, leveranciers vergelijken, offertes aanvragen, en direct boeken — allemaal binnen één omgeving.
+---
 
-### 2. Doelgroep
-- **Gebruikers (Consumenten)**  
-  Mensen (25-45 jaar) die bruiloften, verjaardagen of bedrijfsfeesten plannen.  
-  Doel: Snel betrouwbare leveranciers vinden, prijzen vergelijken, veilig boeken.  
+### 1. Productoverzicht
+
+## 🙏 AcknowledgmentsEventify is een digitaal platform (web + mobiel) dat het organiseren van evenementen vereenvoudigt door gebruikers te verbinden met dienstverleners zoals cateraars, DJ's, decorateurs, fotografen en locaties. Gebruikers kunnen hun evenement plannen, leveranciers vergelijken, offertes aanvragen, en direct boeken — allemaal binnen één omgeving.
+
+
+
+Built with:### 2. Doelgroep
+
+- [Next.js](https://nextjs.org/)- **Gebruikers (Consumenten)**  
+
+- [Prisma](https://www.prisma.io/)  Mensen (25-45 jaar) die bruiloften, verjaardagen of bedrijfsfeesten plannen.  
+
+- [Tailwind CSS](https://tailwindcss.com/)  Doel: Snel betrouwbare leveranciers vinden, prijzen vergelijken, veilig boeken.  
+
+- [Shadcn/ui](https://ui.shadcn.com/)
 
 - **Dienstverleners (Aanbieders)**  
-  DJ's, cateraars, decorateurs, fotografen, eventlocaties.  
+
+---  DJ's, cateraars, decorateurs, fotografen, eventlocaties.  
+
   Doel: Klantenwerving, reviews opbouwen, eenvoudig factureren.  
+
+**Made with ❤️ for the event planning community**
 
 - **Admin (Eventify-team)**  
   Beheerders van het platform.  
