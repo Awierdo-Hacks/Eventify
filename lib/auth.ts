@@ -3,8 +3,12 @@ import { cookies } from 'next/headers';
 import { UserRole, UserStatus } from '@prisma/client';
 
 const SECRET_KEY = new TextEncoder().encode(
-  process.env.NEXTAUTH_SECRET || 'your-secret-key-change-this-in-production'
+  process.env.NEXTAUTH_SECRET!
 );
+
+if (!process.env.NEXTAUTH_SECRET) {
+  throw new Error('NEXTAUTH_SECRET environment variable is not set');
+}
 
 export interface SessionUser {
   id: string;

@@ -1,7 +1,7 @@
 # Dockerfile voor Eventify Next.js applicatie
 # Multi-stage build voor optimale image grootte
 
-FROM node:20-alpine AS base
+FROM node:20-alpine3.20 AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -21,7 +21,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Generate Prisma Client (met dummy DATABASE_URL voor build)
-ENV DATABASE_URL="postgresql://neondb_owner:npg_QH8qh2dSxoUg@ep-sweet-recipe-agauxns2-pooler.c-2.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'"
+ENV DATABASE_URL="postgresql://awierdo:cYxAbubpCYWbIEJqsGXbba18G1xa8xUo@dpg-d48ir6c9c44c73b63ld0-a/eventify_postgres_dr2b"
 RUN npx prisma generate
 
 # Set environment variables voor build

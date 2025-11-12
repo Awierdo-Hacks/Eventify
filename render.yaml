@@ -25,7 +25,7 @@ services:
         value: https://eventiphy.site
       
       - key: NEXTAUTH_SECRET
-        generateValue: true # Render genereert automatisch een veilige waarde
+        value: iv1RyfLNvbkFV0UVBcrS7EJ6DxFmHbyTdtRMVwFYJSo=
       
       - key: DATABASE_URL
         sync: false # Handmatig instellen via Render dashboard met Neon connection string
@@ -54,5 +54,5 @@ services:
     #   mountPath: /app/data
     #   sizeGB: 1
 
-# Database is extern gehost op Neon
-# Voeg Neon connection string toe als environment variable in Render dashboard
+# Database is intern gehost op render
+
