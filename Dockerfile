@@ -1,13 +1,11 @@
 # Dockerfile voor Eventify Next.js applicatie
 # Multi-stage build voor optimale image grootte
 
-FROM node:lts-bookworm-slim AS base
+FROM node:20-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    openssl \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
@@ -23,21 +21,12 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Generate Prisma Client (met dummy DATABASE_URL voor build)
-ENV DATABASE_URL="postgresql://awierdo:cYxAbubpCYWbIEJqsGXbba18G1xa8xUo@dpg-d48ir6c9c44c73b63ld0-a/eventify_postgres_dr2b"
+ENV DATABASE_URL="postgresql://awierdo:cYxAbubpCYWbIEJqsGXbba18G1xa8xUo@dpg-d48ir6c9c44c73b63ld0-a.frankfurt-postgres.render.com/eventify_postgres_dr2b"
 RUN npx prisma generate
 
 # Set environment variables voor build
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
-ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
-ENV DATABASE_URL="postgresql://awierdo:cYxAbubpCYWbIEJqsGXbba18G1xa8xUo@dpg-d48ir6c9c44c73b63ld0-a/eventify_postgres_dr2b"
-ENV NEXTAUTH_URL="https://eventiphy.site"
-ENV NEXTAUTH_SECRET="iv1RyfLNvbkFV0UVBcrS7EJ6DxFmHbyTdtRMVwFYJSo="
-ENV NEXT_PUBLIC_APP_URL="https://eventiphy.site"
-# NEXTAUTH_SECRET should be passed at runtime via docker run -e or docker-compose
 
 # Build Next.js applicatie
 RUN npm run build
@@ -48,20 +37,13 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
-ENV DATABASE_URL="postgresql://awierdo:cYxAbubpCYWbIEJqsGXbba18G1xa8xUo@dpg-d48ir6c9c44c73b63ld0-a/eventify_postgres_dr2b"
-ENV NEXTAUTH_URL="https://eventiphy.site"
-ENV NEXTAUTH_SECRET="iv1RyfLNvbkFV0UVBcrS7EJ6DxFmHbyTdtRMVwFYJSo="
-ENV NEXT_PUBLIC_APP_URL="https://eventiphy.site"
+
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
 # Install runtime dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    openssl \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache openssl libc6-compat
 
 # Copy necessary files
 COPY --from=builder /app/public ./public
@@ -82,3 +64,9 @@ EXPOSE 3000
 
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+
+CMD ["node", "server.js"]
