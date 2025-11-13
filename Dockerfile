@@ -1,7 +1,7 @@
 # Dockerfile voor Eventify Next.js applicatie
 # Multi-stage build voor optimale image grootte
 
-FROM node:20-alpine3.20 AS base
+FROM node:lts-bookworm-slim AS base
 
 # Install dependencies only when needed
 FROM base AS deps
