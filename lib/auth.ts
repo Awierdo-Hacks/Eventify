@@ -2,12 +2,32 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { UserRole, UserStatus } from '@prisma/client';
 
-const SECRET_KEY = new TextEncoder().encode(
-  process.env.NEXTAUTH_SECRET!
-);
+let secretKeyCache: Uint8Array | null = null;
+let devSecretWarningShown = false;
 
-if (!process.env.NEXTAUTH_SECRET) {
-  throw new Error('NEXTAUTH_SECRET environment variable is not set');
+function getSecretKey(): Uint8Array {
+  if (secretKeyCache) {
+    return secretKeyCache;
+  }
+
+  const secret = process.env.NEXTAUTH_SECRET;
+
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('NEXTAUTH_SECRET environment variable is not set');
+    }
+
+    if (!devSecretWarningShown) {
+      console.warn('NEXTAUTH_SECRET is not set. Using a fallback development secret.');
+      devSecretWarningShown = true;
+    }
+
+    secretKeyCache = new TextEncoder().encode('development-secret');
+    return secretKeyCache;
+  }
+
+  secretKeyCache = new TextEncoder().encode(secret);
+  return secretKeyCache;
 }
 
 export interface SessionUser {
@@ -20,16 +40,18 @@ export interface SessionUser {
 }
 
 export async function createToken(user: SessionUser): Promise<string> {
+  const secretKey = getSecretKey();
   return await new SignJWT({ user })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
-    .sign(SECRET_KEY);
+    .sign(secretKey);
 }
 
 export async function verifyToken(token: string): Promise<SessionUser | null> {
   try {
-    const { payload } = await jwtVerify(token, SECRET_KEY);
+    const secretKey = getSecretKey();
+    const { payload } = await jwtVerify(token, secretKey);
     return payload.user as SessionUser;
   } catch (error) {
     return null;
