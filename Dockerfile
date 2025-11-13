@@ -27,6 +27,14 @@ RUN npx prisma generate
 # Set environment variables voor build
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+ENV DATABASE_URL="postgresql://awierdo:cYxAbubpCYWbIEJqsGXbba18G1xa8xUo@dpg-d48ir6c9c44c73b63ld0-a/eventify_postgres_dr2b"
+ENV NEXTAUTH_URL="https://eventiphy.site"
+ENV NEXTAUTH_SECRET="iv1RyfLNvbkFV0UVBcrS7EJ6DxFmHbyTdtRMVwFYJSo="
+ENV NEXT_PUBLIC_APP_URL="https://eventiphy.site"
 # NEXTAUTH_SECRET should be passed at runtime via docker run -e or docker-compose
 
 # Build Next.js applicatie
