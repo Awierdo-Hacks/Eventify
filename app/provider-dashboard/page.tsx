@@ -347,7 +347,7 @@ export default function ProviderDashboardPage() {
 
   if (status === 'loading' || (status === 'authenticated' && user?.role !== 'PROVIDER')) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+      <main className="min-h-screen bg-gray-50">
         <Container className="py-12">
           <Skeleton className="h-12 w-64 mb-8" />
           <div className="grid grid-cols-4 gap-6 mb-8">
@@ -361,7 +361,7 @@ export default function ProviderDashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+    <main className="min-h-screen bg-gray-50">
       <Container className="py-12">
         <PageHeader
           title="Provider Dashboard"
