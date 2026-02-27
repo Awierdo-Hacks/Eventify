@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useSession } from '@/components/providers/SessionProvider';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Home, Search, FileText, LayoutDashboard, MessageSquare, Shield, LogOut, User } from 'lucide-react';
+import { Home, Search, FileText, LayoutDashboard, MessageSquare, Shield, LogOut, User, Plus } from 'lucide-react';
 
 const navigation = [
   { name: 'Home', href: '/', icon: Home },
@@ -78,6 +78,15 @@ export function Navigation() {
               <div className="w-20 h-9 bg-gray-200 animate-pulse rounded-xl"></div>
             ) : user ? (
               <>
+                {/* + Nieuw Event knop - alleen voor customers */}
+                {user.role === 'CUSTOMER' && (
+                  <Link href="/events/new">
+                    <Button variant="outline" className="rounded-xl border-purple-200 text-purple-700 hover:bg-purple-50">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Nieuw Event
+                    </Button>
+                  </Link>
+                )}
                 <Link href={getDashboardLink(user.role)}>
                   <Button variant="default" className="gradient-brand rounded-xl">
                     <LayoutDashboard className="w-4 h-4 mr-2" />

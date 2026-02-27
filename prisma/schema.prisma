@@ -44,6 +44,47 @@ enum PriceRange {
   PREMIUM    // €€€€
 }
 
+enum EventType {
+  WEDDING
+  BIRTHDAY
+  CORPORATE
+  FESTIVAL
+  CUSTOM
+}
+
+enum EventStatus {
+  PLANNING
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum SlotStatus {
+  EMPTY
+  SEARCHING
+  QUOTES_REQUESTED
+  QUOTES_RECEIVED
+  BOOKED
+}
+
+enum ProviderCategory {
+  CATERING
+  MUSIC
+  PHOTOGRAPHY
+  DECORATION
+  VENUE
+  ENTERTAINMENT
+  VIDEOGRAPHY
+  TRANSPORT
+  ACCOMMODATION
+  SECURITY
+  SANITARY
+  CAKE
+  FLOWERS
+  MC
+  OTHER
+}
+
 model User {
   id            String     @id @default(cuid())
   email         String     @unique
@@ -61,6 +102,7 @@ model User {
   reviews          Review[]
   messages_sent    Message[]        @relation("SentMessages")
   messages_received Message[]       @relation("ReceivedMessages")
+  events           Event[]
 
   @@map("users")
 }
@@ -135,12 +177,15 @@ model Quote {
   accepted          Boolean        @default(false)
   rejected_at       DateTime?
   rejection_reason  String?
+  event_slot_id     String?
   created_at        DateTime       @default(now())
   updated_at        DateTime       @updatedAt
 
   // Relations
-  request  ServiceRequest  @relation(fields: [request_id], references: [id], onDelete: Cascade)
-  provider ServiceProvider @relation(fields: [provider_id], references: [id], onDelete: Cascade)
+  request         ServiceRequest  @relation(fields: [request_id], references: [id], onDelete: Cascade)
+  provider        ServiceProvider @relation(fields: [provider_id], references: [id], onDelete: Cascade)
+  event_slot      EventSlot?      @relation("SlotQuotes", fields: [event_slot_id], references: [id], onDelete: SetNull)
+  booked_for_slot EventSlot?      @relation("BookedQuote")
 
   @@map("quotes")
 }
@@ -201,4 +246,45 @@ model Message {
   receiver User @relation("ReceivedMessages", fields: [receiver_id], references: [id], onDelete: Cascade)
 
   @@map("messages")
+}
+
+model Event {
+  id              String       @id @default(cuid())
+  customer_id     String
+  name            String
+  event_type      EventType
+  event_date      DateTime?
+  location        String?
+  guest_count     Int?
+  budget_min      Float?
+  budget_max      Float?
+  status          EventStatus  @default(PLANNING)
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
+
+  // Relations
+  customer        User         @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  slots           EventSlot[]
+
+  @@map("events")
+}
+
+model EventSlot {
+  id               String           @id @default(cuid())
+  event_id         String
+  category         ProviderCategory
+  custom_name      String?
+  is_required      Boolean          @default(true)
+  display_order    Int              @default(0)
+  status           SlotStatus       @default(EMPTY)
+  booked_quote_id  String?          @unique
+  created_at       DateTime         @default(now())
+  updated_at       DateTime         @updatedAt
+
+  // Relations
+  event            Event            @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  quotes           Quote[]          @relation("SlotQuotes")
+  booked_quote     Quote?           @relation("BookedQuote", fields: [booked_quote_id], references: [id])
+
+  @@map("event_slots")
 }

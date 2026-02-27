@@ -18,6 +18,10 @@ import {
   DialogActions,
   DialogButton,
 } from '@/components/ui/confirmation-dialog';
+import { EventCard } from '@/components/events/EventCard';
+import { EventDetailView } from '@/components/events/EventDetailView';
+import { UnlinkedQuotes } from '@/components/events/UnlinkedQuotes';
+import { eventTypeIcons, calculateEventProgress } from '@/lib/eventHelpers';
 import {
   FileText,
   MessageSquare,
@@ -27,6 +31,8 @@ import {
   Users,
   AlertCircle,
   MapPin,
+  PartyPopper,
+  Plus,
 } from 'lucide-react';
 
 interface ServiceRequest {
@@ -60,6 +66,7 @@ interface Quote {
   validUntil: string;
   status: string;
   createdAt: string;
+  eventSlotId?: string | null; // Added for filtering linked quotes
   provider: {
     id: string;
     businessName: string;
@@ -98,6 +105,60 @@ interface Booking {
   };
 }
 
+interface EventSlotQuote {
+  id: string;
+  totalPrice: number;
+  accepted: boolean;
+  providerName: string;
+  message?: string;
+  includedServices?: string[];
+  validUntil?: string;
+  createdAt?: string;
+  provider?: {
+    id: string;
+    businessName: string;
+    category: string;
+    location: string;
+  };
+}
+
+interface EventSlot {
+  id: string;
+  category: string;
+  status: string;
+  isRequired?: boolean;
+  displayOrder?: number;
+  quotesCount?: number;
+  quotes?: EventSlotQuote[];
+  bookedQuote?: {
+    id: string;
+    totalPrice: number;
+    providerName?: string;
+    provider?: {
+      id: string;
+      businessName: string;
+      category: string;
+      location: string;
+    };
+  } | null;
+}
+
+interface Event {
+  id: string;
+  name: string;
+  eventType: string;
+  eventDate: string;
+  location: string;
+  guestCount: number;
+  status: string;
+  slots: EventSlot[];
+  createdAt: string;
+  updatedAt?: string;
+  budgetMin?: number | null;
+  budgetMax?: number | null;
+  description?: string | null;
+}
+
 function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -110,6 +171,8 @@ function DashboardContent() {
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [acceptingQuote, setAcceptingQuote] = useState<string | null>(null);
   const [rejectingQuote, setRejectingQuote] = useState<Quote | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
@@ -124,32 +187,43 @@ function DashboardContent() {
     if (tab) setActiveTab(tab);
   }, [searchParams]);
 
-  // Redirect if not authenticated
+  // Redirect based on user role
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/login?redirect=/dashboard');
+    } else if (status === 'authenticated') {
+      // Redirect providers and admins to their respective dashboards
+      if (user?.role === 'PROVIDER') {
+        router.push('/provider-dashboard');
+      } else if (user?.role === 'ADMIN') {
+        router.push('/admin');
+      }
     }
-  }, [status, router]);
+  }, [status, user, router]);
 
-  // Fetch all dashboard data
+  // Fetch all dashboard data (only for customers)
   useEffect(() => {
     if (status !== 'authenticated') return;
+    // Don't fetch if user is not a customer (will be redirected)
+    if (user?.role && user.role !== 'CUSTOMER') return;
 
     const fetchDashboardData = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        const [requestsRes, quotesRes, bookingsRes] = await Promise.all([
+        const [requestsRes, quotesRes, bookingsRes, eventsRes] = await Promise.all([
           fetch('/api/requests'),
           fetch('/api/quotes'),
           fetch('/api/bookings'),
+          fetch('/api/events'),
         ]);
 
         console.log('API responses:', {
           requests: { ok: requestsRes.ok, status: requestsRes.status },
           quotes: { ok: quotesRes.ok, status: quotesRes.status },
           bookings: { ok: bookingsRes.ok, status: bookingsRes.status },
+          events: { ok: eventsRes.ok, status: eventsRes.status },
         });
 
         if (!requestsRes.ok || !quotesRes.ok || !bookingsRes.ok) {
@@ -160,21 +234,24 @@ function DashboardContent() {
           throw new Error(`Failed to fetch: ${errors.join(', ')}`);
         }
 
-        const [requestsData, quotesData, bookingsData] = await Promise.all([
+        const [requestsData, quotesData, bookingsData, eventsData] = await Promise.all([
           requestsRes.json(),
           quotesRes.json(),
           bookingsRes.json(),
+          eventsRes.ok ? eventsRes.json() : { events: [] },
         ]);
 
         console.log('Fetched data:', {
           requests: requestsData.length || requestsData.requests?.length,
           quotes: quotesData.quotes?.length,
           bookings: bookingsData.bookings?.length,
+          events: eventsData.events?.length,
         });
 
         setRequests(Array.isArray(requestsData) ? requestsData : requestsData.requests || []);
         setQuotes(quotesData.quotes || []);
         setBookings(bookingsData.bookings || []);
+        setEvents(eventsData.events || []);
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
         setError('Er is iets misgegaan bij het laden van je dashboard');
@@ -184,7 +261,7 @@ function DashboardContent() {
     };
 
     fetchDashboardData();
-  }, [status]);
+  }, [status, user]);
 
   const handleAcceptQuote = async (quoteId: string) => {
     setAcceptingQuote(quoteId);
@@ -219,7 +296,8 @@ function DashboardContent() {
       setTimeout(() => setSuccessMessage(null), 5000);
     } catch (err) {
       console.error('Error accepting quote:', err);
-      alert(err instanceof Error ? err.message : 'Er is iets misgegaan bij het accepteren van de offerte');
+      setError(err instanceof Error ? err.message : 'Er is iets misgegaan bij het accepteren van de offerte');
+      setTimeout(() => setError(null), 5000);
     } finally {
       setAcceptingQuote(null);
     }
@@ -291,6 +369,13 @@ function DashboardContent() {
 
   const stats = [
     {
+      label: 'Mijn Events',
+      value: events.filter((e) => e.status === 'PLANNING' || e.status === 'ACTIVE').length,
+      icon: PartyPopper,
+      color: 'text-pink-600',
+      bgColor: 'bg-pink-100',
+    },
+    {
       label: 'Actieve Aanvragen',
       value: requests.filter((r) => r.status === 'PENDING').length,
       icon: FileText,
@@ -310,13 +395,6 @@ function DashboardContent() {
       icon: CheckCircle,
       color: 'text-green-600',
       bgColor: 'bg-green-100',
-    },
-    {
-      label: 'Totaal Uitgegeven',
-      value: `€${bookings.reduce((sum, b) => sum + b.finalPrice, 0).toLocaleString()}`,
-      icon: Euro,
-      color: 'text-amber-600',
-      bgColor: 'bg-amber-100',
     },
   ];
 
@@ -410,6 +488,10 @@ function DashboardContent() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-white border-2 border-gray-100 p-1 rounded-2xl">
             <TabsTrigger value="overview" className="rounded-xl">Overzicht</TabsTrigger>
+            <TabsTrigger value="events" className="rounded-xl">
+              <PartyPopper className="w-4 h-4 mr-1" />
+              Mijn Events
+            </TabsTrigger>
             <TabsTrigger value="requests" className="rounded-xl">Aanvragen</TabsTrigger>
             <TabsTrigger value="quotes" className="rounded-xl">Offertes</TabsTrigger>
             <TabsTrigger value="bookings" className="rounded-xl">Boekingen</TabsTrigger>
@@ -470,6 +552,196 @@ function DashboardContent() {
                 </div>
               )}
             </Card>
+          </TabsContent>
+
+          {/* Events Tab */}
+          <TabsContent value="events" className="space-y-6">
+            {selectedEvent ? (
+              <EventDetailView
+                event={{
+                  ...selectedEvent,
+                  eventType: selectedEvent.eventType as any,
+                  status: selectedEvent.status as any,
+                  slots: selectedEvent.slots.map((s) => ({
+                    ...s,
+                    category: s.category as any,
+                    status: s.status as any,
+                    isRequired: s.isRequired ?? true,
+                    displayOrder: s.displayOrder ?? 0,
+                    quotesCount: s.quotesCount ?? s.quotes?.length ?? 0,
+                    quotes: (s.quotes || []).map((q) => ({
+                      ...q,
+                      accepted: q.accepted ?? false,
+                      providerName: q.providerName || '',
+                    })),
+                  })),
+                }}
+                quotes={quotes.filter((q) => q.status === 'PENDING').map((q) => ({
+                  id: q.id,
+                  totalPrice: q.totalPrice,
+                  accepted: q.status === 'ACCEPTED',
+                  providerName: q.provider.businessName,
+                  includedServices: q.includedServices,
+                  validUntil: q.validUntil,
+                  provider: {
+                    ...q.provider,
+                    location: '', // Placeholder
+                  },
+                }))}
+                onBack={() => setSelectedEvent(null)}
+                onRefresh={async () => {
+                  // Refresh all events and quotes data
+                  const [eventsRes, quotesRes] = await Promise.all([
+                    fetch('/api/events'),
+                    fetch('/api/quotes'),
+                  ]);
+                  const [eventsData, quotesData] = await Promise.all([
+                    eventsRes.json(),
+                    quotesRes.json(),
+                  ]);
+                  setEvents(eventsData.events || []);
+                  setQuotes(quotesData.quotes || []);
+                  // Update the selected event with fresh data
+                  const updatedEvent = eventsData.events?.find((e: Event) => e.id === selectedEvent.id);
+                  if (updatedEvent) setSelectedEvent(updatedEvent);
+                }}
+                onRequestQuote={(category: string) => router.push(`/browse?category=${category}`)}
+                onLinkQuote={async (quoteId: string, slotId: string) => {
+                  try {
+                    const response = await fetch(`/api/quotes/${quoteId}/link`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ eventSlotId: slotId }),
+                    });
+                    if (!response.ok) throw new Error('Failed to link quote');
+                    // Refresh events and quotes
+                    const [eventsRes, quotesRes] = await Promise.all([
+                      fetch('/api/events'),
+                      fetch('/api/quotes'),
+                    ]);
+                    const [eventsData, quotesData] = await Promise.all([
+                      eventsRes.json(),
+                      quotesRes.json(),
+                    ]);
+                    setEvents(eventsData.events || []);
+                    setQuotes(quotesData.quotes || []);
+                    // Update selected event
+                    const updatedEvent = eventsData.events?.find((e: Event) => e.id === selectedEvent.id);
+                    if (updatedEvent) setSelectedEvent(updatedEvent);
+                    setSuccessMessage('Offerte gekoppeld aan event slot');
+                    setTimeout(() => setSuccessMessage(null), 3000);
+                  } catch (err) {
+                    console.error('Error linking quote:', err);
+                    setError('Kon offerte niet koppelen');
+                    setTimeout(() => setError(null), 3000);
+                  }
+                }}
+              />
+            ) : (
+              <>
+                {/* Events Header */}
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">Mijn Events</h2>
+                    <p className="text-gray-600">Beheer al je events op één plek</p>
+                  </div>
+                  <Button
+                    onClick={() => router.push('/events/new')}
+                    className="gradient-brand rounded-xl"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Nieuw Event
+                  </Button>
+                </div>
+
+                {events.length === 0 ? (
+                  <Card className="p-12 border-2 border-gray-100 rounded-3xl text-center">
+                    <PartyPopper className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Nog geen events</h3>
+                    <p className="text-gray-600 mb-6">
+                      Maak een event aan om je providers en offertes georganiseerd te houden
+                    </p>
+                    <Button
+                      onClick={() => router.push('/events/new')}
+                      className="gradient-brand rounded-xl"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Eerste Event Aanmaken
+                    </Button>
+                  </Card>
+                ) : (
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {events.map((event, index) => (
+                      <motion.div
+                        key={event.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <EventCard
+                          event={{
+                            ...event,
+                            eventType: event.eventType as any,
+                            status: event.status as any,
+                            slots: event.slots.map((s) => ({
+                              ...s,
+                              category: s.category as any,
+                              status: s.status as any,
+                            })),
+                          }}
+                          onClick={() => setSelectedEvent(event)}
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Unlinked Quotes Section */}
+                {quotes.filter((q) => q.status === 'PENDING' && !q.eventSlotId).length > 0 && (
+                  <div className="mt-8">
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">Ongekoppelde Offertes</h3>
+                    <UnlinkedQuotes
+                      quotes={quotes.filter((q) => q.status === 'PENDING' && !q.eventSlotId)}
+                      events={events.map((e) => ({
+                        ...e,
+                        eventType: e.eventType as any,
+                        slots: e.slots.map((s) => ({
+                          ...s,
+                          category: s.category as any,
+                        })),
+                      }))}
+                      onLinkQuote={async (quoteId, slotId) => {
+                        try {
+                          const response = await fetch(`/api/quotes/${quoteId}/link`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ eventSlotId: slotId }),
+                          });
+                          if (!response.ok) throw new Error('Failed to link quote');
+                          // Refresh events and quotes
+                          const [eventsRes, quotesRes] = await Promise.all([
+                            fetch('/api/events'),
+                            fetch('/api/quotes'),
+                          ]);
+                          const [eventsData, quotesData] = await Promise.all([
+                            eventsRes.json(),
+                            quotesRes.json(),
+                          ]);
+                          setEvents(eventsData.events || []);
+                          setQuotes(quotesData.quotes || []);
+                          setSuccessMessage('Offerte gekoppeld aan event slot');
+                          setTimeout(() => setSuccessMessage(null), 3000);
+                        } catch (err) {
+                          console.error('Error linking quote:', err);
+                          setError('Kon offerte niet koppelen');
+                          setTimeout(() => setError(null), 3000);
+                        }
+                      }}
+                    />
+                  </div>
+                )}
+              </>
+            )}
           </TabsContent>
 
           {/* Requests Tab */}

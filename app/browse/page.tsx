@@ -28,24 +28,33 @@ interface Provider {
 
 function BrowseContent() {
   const searchParams = useSearchParams();
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedLocation, setSelectedLocation] = useState<string>('all');
+  
+  // Initialize state directly from URL parameters to avoid race conditions
+  const [selectedCategory, setSelectedCategory] = useState<string>(() => 
+    searchParams.get('category') || 'all'
+  );
+  const [selectedLocation, setSelectedLocation] = useState<string>(() => 
+    searchParams.get('location') || 'all'
+  );
   const [priceRange, setPriceRange] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(() => 
+    searchParams.get('q') || ''
+  );
   const [providers, setProviders] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize from URL parameters
+  // Update state when URL parameters change (for navigation within the page)
   useEffect(() => {
     const category = searchParams.get('category');
     const location = searchParams.get('location');
     const query = searchParams.get('q');
     
-    if (category) setSelectedCategory(category);
-    if (location) setSelectedLocation(location);
-    if (query) setSearchQuery(query);
-  }, [searchParams]);
+    // Only update if URL params differ from current state
+    if (category && category !== selectedCategory) setSelectedCategory(category);
+    if (location && location !== selectedLocation) setSelectedLocation(location);
+    if (query !== null && query !== searchQuery) setSearchQuery(query);
+  }, [searchParams, selectedCategory, selectedLocation, searchQuery]);
 
   // Fetch providers from API
   useEffect(() => {

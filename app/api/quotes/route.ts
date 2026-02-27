@@ -85,6 +85,7 @@ export async function GET(request: Request) {
       createdAt: quote.created_at,
       rejectedAt: quote.rejected_at,
       rejectionReason: quote.rejection_reason,
+      eventSlotId: quote.event_slot_id, // Added for filtering linked quotes
       provider: {
         id: quote.provider.id,
         businessName: quote.provider.business_name,
