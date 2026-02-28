@@ -425,7 +425,7 @@ export default function ProviderDashboardPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <Card className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventify-md transition-all">
+              <Card className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md transition-all">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
@@ -512,7 +512,7 @@ export default function ProviderDashboardPage() {
             ) : (
               <div className="grid gap-6">
                 {requests.map((request) => (
-                  <Card key={request.id} className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventify-md transition-shadow">
+                  <Card key={request.id} className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md transition-shadow">
                     <div className="flex items-start justify-between mb-4">
                       <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">{request.eventType}</h3>
@@ -802,7 +802,7 @@ export default function ProviderDashboardPage() {
           });
         }
       }}>
-        <DialogContent className="max-w-2xl rounded-3xl shadow-eventify-lg bg-white max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl rounded-3xl shadow-eventiphy-lg bg-white max-h-[90vh] overflow-y-auto">
           <button
             onClick={() => setCreatingQuoteFor(null)}
             className="absolute right-4 top-4 rounded-full p-2 hover:bg-gray-100 transition-colors z-10"

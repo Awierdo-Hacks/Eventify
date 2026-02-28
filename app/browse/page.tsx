@@ -113,7 +113,7 @@ function BrowseContent() {
         </div>
 
         {/* Filters */}
-        <Card className="p-6 mb-8 bg-white border-2 border-gray-100 rounded-3xl shadow-eventify-lg">
+        <Card className="p-6 mb-8 bg-white border-2 border-gray-100 rounded-3xl shadow-eventiphy-lg">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Search */}
             <div className="relative">
@@ -258,7 +258,7 @@ function BrowseContent() {
                 transition={{ duration: 0.4, delay: index * 0.1 }}
               >
                 <Link href={`/providers/${provider.id}`}>
-                  <Card className="overflow-hidden hover:shadow-eventify-xl transition-all hover:-translate-y-1 cursor-pointer border-2 border-gray-100 rounded-3xl h-full">
+                  <Card className="overflow-hidden hover:shadow-eventiphy-xl transition-all hover:-translate-y-1 cursor-pointer border-2 border-gray-100 rounded-3xl h-full">
                     {/* Image */}
                     <div className="relative h-48 overflow-hidden bg-gray-200">
                       {provider.images && provider.images.length > 0 ? (

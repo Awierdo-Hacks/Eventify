@@ -46,7 +46,7 @@ export function Navigation() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <span className="text-2xl font-bold gradient-text">
-                Eventify
+                Eventiphy
               </span>
             </Link>
           </div>
@@ -88,8 +88,8 @@ export function Navigation() {
                   </Link>
                 )}
                 <Link href={getDashboardLink(user.role)}>
-                  <Button variant="default" className="gradient-brand rounded-xl">
-                    <LayoutDashboard className="w-4 h-4 mr-2" />
+                  <Button variant="outline" className="rounded-xl border-purple-200 text-purple-700 hover:bg-purple-50">
+                    <LayoutDashboard className="w-4 h-4 mr-2 " />
                     Dashboard
                   </Button>
                 </Link>

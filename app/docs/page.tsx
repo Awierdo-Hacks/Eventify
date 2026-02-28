@@ -9,7 +9,7 @@ export default function DocsPage() {
           <div className="text-6xl mb-4">📖</div>
           <h1 className="text-3xl font-bold mb-4 gradient-text">Documentatie</h1>
           <p className="text-gray-600">
-            Hier komt de volledige documentatie voor het gebruik van Eventify
+            Hier komt de volledige documentatie voor het gebruik van Eventiphy
           </p>
         </Card>
       </Container>

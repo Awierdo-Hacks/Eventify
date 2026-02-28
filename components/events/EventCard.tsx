@@ -72,7 +72,7 @@ export function EventCard({ event, onClick, onOpenEvent, index = 0 }: EventCardP
       transition={{ duration: 0.4, delay: index * 0.1 }}
     >
       <Card
-        className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventify-lg transition-all cursor-pointer group"
+        className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-lg transition-all cursor-pointer group"
         onClick={() => {
           if (onClick) onClick();
           else if (onOpenEvent) onOpenEvent(event.id);

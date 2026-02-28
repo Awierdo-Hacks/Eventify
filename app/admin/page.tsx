@@ -352,7 +352,7 @@ export default function AdminPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <Card className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventify-md transition-all">
+              <Card className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md transition-all">
                 <div className="flex items-center justify-between mb-3">
                   <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center`}>
                     <stat.icon className="w-7 h-7 text-white" />
@@ -427,7 +427,7 @@ export default function AdminPage() {
             ) : (
               <div className="grid gap-6">
                 {providers.map((provider) => (
-                  <Card key={provider.id} className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventify-md transition-shadow">
+                  <Card key={provider.id} className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md transition-shadow">
                     <div className="flex items-start justify-between mb-4">
                       <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">{provider.businessName}</h3>

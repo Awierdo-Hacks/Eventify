@@ -472,7 +472,7 @@ function DashboardContent() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
               >
-                <Card className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventify-md transition-shadow">
+                <Card className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md transition-shadow">
                   <div className={`w-12 h-12 ${stat.bgColor} rounded-2xl flex items-center justify-center mb-4`}>
                     <Icon className={`w-6 h-6 ${stat.color}`} />
                   </div>
@@ -761,7 +761,7 @@ function DashboardContent() {
             ) : (
               <div className="grid gap-6">
                 {requests.map((request) => (
-                  <Card key={request.id} className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventify-md transition-shadow">
+                  <Card key={request.id} className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md transition-shadow">
                     <div className="flex items-start justify-between mb-4">
                       <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">{request.eventType}</h3>
@@ -820,7 +820,7 @@ function DashboardContent() {
             ) : (
               <div className="grid gap-6">
                 {quotes.filter((q) => q.status !== 'ACCEPTED').map((quote) => (
-                  <Card key={quote.id} className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventify-md transition-shadow">
+                  <Card key={quote.id} className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md transition-shadow">
                     <div className="flex items-start justify-between mb-4">
                       <div>
                         <h3 className="text-2xl font-bold text-gray-900 mb-1">
@@ -914,7 +914,7 @@ function DashboardContent() {
             ) : (
               <div className="grid gap-6">
                 {bookings.map((booking) => (
-                  <Card key={booking.id} className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventify-md transition-shadow">
+                  <Card key={booking.id} className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md transition-shadow">
                     <div className="flex items-start justify-between mb-4">
                       <div className="w-full">
                         <div className="flex items-center gap-3 mb-2">

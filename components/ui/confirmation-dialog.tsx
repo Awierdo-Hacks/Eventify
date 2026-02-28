@@ -43,7 +43,7 @@ export function ConfirmationDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={cn(
         maxWidthClasses[maxWidth],
-        'rounded-3xl shadow-eventify-lg bg-white'
+        'rounded-3xl shadow-eventiphy-lg bg-white'
       )}>
         <button
           onClick={() => onOpenChange(false)}

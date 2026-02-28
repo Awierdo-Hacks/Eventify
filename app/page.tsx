@@ -74,7 +74,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <Card className="p-8 max-w-3xl mx-auto bg-white border-2 border-gray-100 rounded-3xl shadow-eventify-xl">
+              <Card className="p-8 max-w-3xl mx-auto bg-white border-2 border-gray-100 rounded-3xl shadow-eventiphy-xl">
                 <div className="flex flex-col md:flex-row gap-4">
                   <select
                     value={selectedCategory}
@@ -125,7 +125,7 @@ export default function Home() {
                 transition={{ duration: 0.4, delay: index * 0.1 }}
               >
                 <Link href={`/browse?category=${category.id}`}>
-                  <Card className="p-6 text-center hover:shadow-eventify-lg transition-all hover:-translate-y-1 cursor-pointer border-2 border-gray-100 rounded-3xl">
+                  <Card className="p-6 text-center hover:shadow-eventiphy-lg transition-all hover:-translate-y-1 cursor-pointer border-2 border-gray-100 rounded-3xl">
                     <div className="text-4xl mb-3">{category.icon}</div>
                     <h3 className="font-semibold text-gray-900 mb-2">{category.name}</h3>
                     <Badge variant="secondary" className="bg-purple-100 text-purple-700">
@@ -143,7 +143,7 @@ export default function Home() {
       <Section background="gradient-feature">
         <Container>
           <h2 className="text-4xl font-bold text-center mb-4">
-            Waarom <span className="gradient-text">Eventify</span>?
+            Waarom <span className="gradient-text">Eventiphy</span>?
           </h2>
           <p className="text-xl text-gray-600 text-center mb-12 max-w-2xl mx-auto">
             De slimste manier om jouw evenement te organiseren
@@ -156,7 +156,7 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
               >
-                <Card className="p-6 h-full bg-white border-2 border-gray-100 rounded-3xl hover:shadow-eventify-lg transition-all">
+                <Card className="p-6 h-full bg-white border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-lg transition-all">
                   <div className="w-12 h-12 rounded-xl gradient-brand flex items-center justify-center mb-4">
                     <feature.icon className="w-6 h-6 text-white" />
                   </div>

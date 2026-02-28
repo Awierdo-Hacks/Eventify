@@ -4,7 +4,7 @@ import { Navigation } from "@/components/layout";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 
 export const metadata: Metadata = {
-  title: "Eventify - Jouw Droomfeest Begint Hier",
+  title: "Eventiphy - Jouw Droomfeest Begint Hier",
   description: "Vind binnen 5 minuten de perfecte dienstverleners voor jouw event",
 };
 

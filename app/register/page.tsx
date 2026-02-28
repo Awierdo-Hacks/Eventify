@@ -69,7 +69,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-amber-500 bg-clip-text text-transparent">
-            Eventify
+            Eventiphy
           </h1>
           <p className="mt-2 text-gray-600">Maak een gratis account aan</p>
         </div>

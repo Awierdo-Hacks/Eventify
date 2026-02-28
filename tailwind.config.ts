@@ -60,11 +60,11 @@ const config: Config = {
         "3xl": "1.75rem",
       },
       boxShadow: {
-        'eventify-sm': '0 1px 3px 0 rgb(0 0 0 / 0.1)',
-        'eventify-md': '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-        'eventify-lg': '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-        'eventify-xl': '0 20px 25px -5px rgb(0 0 0 / 0.1)',
-        'eventify-2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+        'eventiphy-sm': '0 1px 3px 0 rgb(0 0 0 / 0.1)',
+        'eventiphy-md': '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+        'eventiphy-lg': '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+        'eventiphy-xl': '0 20px 25px -5px rgb(0 0 0 / 0.1)',
+        'eventiphy-2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],

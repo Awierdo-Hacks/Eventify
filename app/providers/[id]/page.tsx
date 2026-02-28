@@ -399,7 +399,7 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
               </Button>
 
               <div className="mt-6 pt-6 border-t border-gray-200">
-                <h4 className="font-semibold mb-3 text-gray-900">Waarom boeken via Eventify?</h4>
+                <h4 className="font-semibold mb-3 text-gray-900">Waarom boeken via Eventiphy?</h4>
                 <div className="space-y-3 text-sm">
                   <div className="flex items-start gap-2">
                     <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
