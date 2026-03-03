@@ -4,7 +4,7 @@
 
 | Item | Waarde |
 |------|--------|
-| **Project** | Eventify - Klanten Flow Verbetering |
+| **Project** | Eventiphy - Klanten Flow Verbetering |
 | **Versie** | 1.0 |
 | **Datum** | 27 januari 2026 |
 | **Doel** | Implementatie Event Shell systeem met offerte-groepering |

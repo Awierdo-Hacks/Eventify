@@ -1,10 +1,10 @@
 zorg dat deze markdown tekst correct ingelezen en gerender kan worden 
 
 
-# 🎨 Eventify Design Guide  
+# 🎨 Eventiphy Design Guide  
 **Versie 1.0 — 2025**
 
-Deze gids beschrijft de visuele en structurele richtlijnen van het Eventify-platform.  
+Deze gids beschrijft de visuele en structurele richtlijnen van het Eventiphy-platform.  
 Het doel: **één consistente, schaalbare en futureproof UI/UX**, zodat alle toekomstige pagina’s en functies automatisch coherent blijven.
 
 ---
@@ -210,7 +210,7 @@ Gebruik dit als **primaire identiteit**:
 
 ### Topbar
 
-* Links: Eventify-logo
+* Links: Eventiphy-logo
 * Midden: Hoofdlinks (Home, Browse, Dashboard)
 * Rechts: User avatar + dropdown
 * `bg-white shadow-sm sticky top-0 z-50`
@@ -358,10 +358,10 @@ moeten deze kernprincipes volgen:
 * Zelfde cardstructuur of tablelayout.
 * Zelfde motion presets.
 
-**Zo blijft Eventify visueel één merk — ongeacht hoeveel features worden toegevoegd.**
+**Zo blijft Eventiphy visueel één merk — ongeacht hoeveel features worden toegevoegd.**
 
 ---
 
-*© 2025 Eventify Design System — versie 1.0*
+*© 2025 Eventiphy Design System — versie 1.0*
 *Ontworpen met Next.js, Tailwind, Shadcn/UI & Framer Motion.*
 

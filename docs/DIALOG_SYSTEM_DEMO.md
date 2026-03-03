@@ -10,7 +10,7 @@
 
 // Customer Dashboard - 120+ regels handmatige JSX
 <Dialog open={!!rejectingQuote}>
-  <DialogContent className="max-w-2xl rounded-3xl shadow-eventify-lg bg-white">
+  <DialogContent className="max-w-2xl rounded-3xl shadow-eventiphy-lg bg-white">
     <button onClick={...} className="absolute right-4 top-4 rounded-full...">
       <X className="w-5 h-5 text-gray-500" />
     </button>
@@ -281,7 +281,7 @@ BESPARING:
 
 /*
 ✅ Rounded corners: rounded-3xl (dialogs), rounded-xl (sections)
-✅ Shadows: shadow-eventify-lg (dialogs), shadow-sm (sections)
+✅ Shadows: shadow-eventiphy-lg (dialogs), shadow-sm (sections)
 ✅ Gradients: Automatisch op DialogQuoteInfo (status-based)
 ✅ Colors: Consistent brand colors (purple, pink, red, green)
 ✅ Typography: Font weights (semibold, bold) en sizes (text-sm, text-lg)

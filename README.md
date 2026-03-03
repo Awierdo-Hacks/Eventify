@@ -1,4 +1,4 @@
-# 📖 Eventify# 📖 Eventify Documentatie
+# 📖 Eventiphy# 📖 Eventiphy Documentatie
 
 
 
@@ -26,9 +26,9 @@
 
 - PostgreSQL 16```bash
 
-- npm/pnpmdocker run --name eventify-postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres
+- npm/pnpmdocker run --name eventiphy-postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres
 
-docker exec -it eventify-postgres psql -U postgres -c "CREATE DATABASE eventify;"
+docker exec -it eventiphy-postgres psql -U postgres -c "CREATE DATABASE eventiphy;"
 
 ### Local Development```
 
@@ -40,7 +40,7 @@ docker exec -it eventify-postgres psql -U postgres -c "CREATE DATABASE eventify;
 
 npm install2. Installeer en start de service
 
-3. Maak een database aan: `CREATE DATABASE eventify;`
+3. Maak een database aan: `CREATE DATABASE eventiphy;`
 
 # 2. Setup environment variables4. Update `.env` met jouw credentials
 
@@ -88,9 +88,9 @@ docker-compose updocker-compose up
 
 # Or build manually# Of bouw image handmatig
 
-docker build -t eventify:latest .docker build -t eventify:latest .
+docker build -t eventiphy:latest .docker build -t eventiphy:latest .
 
-docker run -p 3000:3000 eventify:latestdocker run -p 3000:3000 eventify:latest
+docker run -p 3000:3000 eventiphy:latestdocker run -p 3000:3000 eventiphy:latest
 
 ``````
 
@@ -106,7 +106,7 @@ docker run -p 3000:3000 eventify:latestdocker run -p 3000:3000 eventify:latest
 
 ```**Complete Docker setup voor Render + Neon PostgreSQL**
 
-eventify/
+eventiphy/
 
 ├── app/                      # Next.js App Router📚 **Zie volledige handleiding:** [DEPLOYMENT.md](./DEPLOYMENT.md)
 
@@ -446,9 +446,9 @@ NODE_ENV=production
 
 
 
-## 📚 Documentation### Wat is Eventify?
+## 📚 Documentation### Wat is Eventiphy?
 
-Eventify is een digitaal platform dat het organiseren van evenementen vereenvoudigt door gebruikers te verbinden met dienstverleners zoals cateraars, DJ's, decorateurs, fotografen en locaties. Gebruikers kunnen hun evenement plannen, leveranciers vergelijken, offertes aanvragen, en direct boeken — allemaal binnen één omgeving.
+Eventiphy is een digitaal platform dat het organiseren van evenementen vereenvoudigt door gebruikers te verbinden met dienstverleners zoals cateraars, DJ's, decorateurs, fotografen en locaties. Gebruikers kunnen hun evenement plannen, leveranciers vergelijken, offertes aanvragen, en direct boeken — allemaal binnen één omgeving.
 
 - [Deployment Guide](docs/DEPLOYMENT.md) - Complete deployment walkthrough
 
@@ -580,7 +580,7 @@ docker-compose up---
 
 - 📖 Docs: [docs/](docs/)- Rate limiting  
 
-- 🐛 Issues: [GitHub Issues](https://github.com/Awierdo-Hacks/Eventify/issues)- XSS & CSRF protectie  
+- 🐛 Issues: [GitHub Issues](https://github.com/Awierdo-Hacks/Eventiphy/issues)- XSS & CSRF protectie  
 
 - Secure password hashing  
 
@@ -600,7 +600,7 @@ ISC License - See LICENSE file for details
 
 ### 1. Productoverzicht
 
-## 🙏 AcknowledgmentsEventify is een digitaal platform (web + mobiel) dat het organiseren van evenementen vereenvoudigt door gebruikers te verbinden met dienstverleners zoals cateraars, DJ's, decorateurs, fotografen en locaties. Gebruikers kunnen hun evenement plannen, leveranciers vergelijken, offertes aanvragen, en direct boeken — allemaal binnen één omgeving.
+## 🙏 AcknowledgmentsEventiphy is een digitaal platform (web + mobiel) dat het organiseren van evenementen vereenvoudigt door gebruikers te verbinden met dienstverleners zoals cateraars, DJ's, decorateurs, fotografen en locaties. Gebruikers kunnen hun evenement plannen, leveranciers vergelijken, offertes aanvragen, en direct boeken — allemaal binnen één omgeving.
 
 
 
@@ -622,7 +622,7 @@ Built with:### 2. Doelgroep
 
 **Made with ❤️ for the event planning community**
 
-- **Admin (Eventify-team)**  
+- **Admin (Eventiphy-team)**  
   Beheerders van het platform.  
   Doel: Overzicht, moderatie, betalingen beheren, support.  
 

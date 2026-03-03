@@ -1,4 +1,4 @@
-# 📖 Eventify Documentatie
+# 📖 Eventiphy Documentatie
 
 Volledige technische documentatie en product blueprint  
 🌐 **Live:** [eventiphy.site](https://eventiphy.site)  
@@ -12,14 +12,14 @@ Volledige technische documentatie en product blueprint
 
 **Optie 1: PostgreSQL via Docker (Aanbevolen)**
 ```bash
-docker run --name eventify-postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres
-docker exec -it eventify-postgres psql -U postgres -c "CREATE DATABASE eventify;"
+docker run --name Eventiphy-postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres
+docker exec -it Eventiphy-postgres psql -U postgres -c "CREATE DATABASE Eventiphy;"
 ```
 
 **Optie 2: Lokale PostgreSQL Installatie**
 1. Download PostgreSQL van https://www.postgresql.org/download/
 2. Installeer en start de service
-3. Maak een database aan: `CREATE DATABASE eventify;`
+3. Maak een database aan: `CREATE DATABASE Eventiphy;`
 4. Update `.env` met jouw credentials
 
 ### Project Setup
@@ -43,8 +43,8 @@ npm run dev
 docker-compose up
 
 # Of bouw image handmatig
-docker build -t eventify:latest .
-docker run -p 3000:3000 eventify:latest
+docker build -t Eventiphy:latest .
+docker run -p 3000:3000 Eventiphy:latest
 ```
 
 ---
@@ -222,8 +222,8 @@ docker run -p 3000:3000 eventify:latest
 
 ## 📖 Project Overzicht
 
-### Wat is Eventify?
-Eventify is een digitaal platform dat het organiseren van evenementen vereenvoudigt door gebruikers te verbinden met dienstverleners zoals cateraars, DJ's, decorateurs, fotografen en locaties. Gebruikers kunnen hun evenement plannen, leveranciers vergelijken, offertes aanvragen, en direct boeken — allemaal binnen één omgeving.
+### Wat is Eventiphy?
+Eventiphy is een digitaal platform dat het organiseren van evenementen vereenvoudigt door gebruikers te verbinden met dienstverleners zoals cateraars, DJ's, decorateurs, fotografen en locaties. Gebruikers kunnen hun evenement plannen, leveranciers vergelijken, offertes aanvragen, en direct boeken — allemaal binnen één omgeving.
 
 ### Voor Klanten
 - Vind binnen 5 minuten de perfecte dienstverleners voor jouw event  
@@ -299,7 +299,7 @@ Server-side rendering en statische generatie via Next.js verbeteren performance 
 **Versie 1.0 – 27 Oktober 2025**
 
 ### 1. Productoverzicht
-Eventify is een digitaal platform (web + mobiel) dat het organiseren van evenementen vereenvoudigt door gebruikers te verbinden met dienstverleners zoals cateraars, DJ's, decorateurs, fotografen en locaties. Gebruikers kunnen hun evenement plannen, leveranciers vergelijken, offertes aanvragen, en direct boeken — allemaal binnen één omgeving.
+Eventiphy is een digitaal platform (web + mobiel) dat het organiseren van evenementen vereenvoudigt door gebruikers te verbinden met dienstverleners zoals cateraars, DJ's, decorateurs, fotografen en locaties. Gebruikers kunnen hun evenement plannen, leveranciers vergelijken, offertes aanvragen, en direct boeken — allemaal binnen één omgeving.
 
 ### 2. Doelgroep
 - **Gebruikers (Consumenten)**  
@@ -310,7 +310,7 @@ Eventify is een digitaal platform (web + mobiel) dat het organiseren van eveneme
   DJ's, cateraars, decorateurs, fotografen, eventlocaties.  
   Doel: Klantenwerving, reviews opbouwen, eenvoudig factureren.  
 
-- **Admin (Eventify-team)**  
+- **Admin (Eventiphy-team)**  
   Beheerders van het platform.  
   Doel: Overzicht, moderatie, betalingen beheren, support.  
 

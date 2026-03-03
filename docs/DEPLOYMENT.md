@@ -1,12 +1,12 @@
-# 🚀 Eventify Deployment Guide - Render + Neon
+# 🚀 Eventiphy Deployment Guide - Render + Neon
 
-Complete handleiding voor het deployen van Eventify naar Render met Neon PostgreSQL.
+Complete handleiding voor het deployen van Eventiphy naar Render met Neon PostgreSQL.
 
 ---
 
 ## 📋 Voorvereisten
 
-- [x] GitHub account met Eventify repository
+- [x] GitHub account met Eventiphy repository
 - [x] Render account (https://render.com)
 - [x] Neon account (https://neon.tech)
 - [x] Domein: eventiphy.site (geregistreerd)
@@ -19,8 +19,8 @@ Complete handleiding voor het deployen van Eventify naar Render met Neon Postgre
 1. Ga naar https://console.neon.tech
 2. Klik op **"New Project"**
 3. Vul in:
-   - **Project Name**: `Eventify`
-   - **Database Name**: `eventify-postgress`
+   - **Project Name**: `Eventiphy`
+   - **Database Name**: `Eventiphy-postgress`
    - **Region**: Frankfurt (dichtst bij Nederland)
    - **Postgres Version**: 16
 4. Klik op **"Create Project"**
@@ -30,14 +30,14 @@ Complete handleiding voor het deployen van Eventify naar Render met Neon Postgre
 2. Selecteer **"Pooled connection"** (aanbevolen voor productie)
 3. Kopieer de connection string:
    ```
-   postgresql://[user]:[password]@[host]/eventify-postgress?sslmode=require
+   postgresql://[user]:[password]@[host]/Eventiphy-postgress?sslmode=require
    ```
 4. **Bewaar deze veilig!** Je hebt hem nodig voor Render.
 
 ### 1.3 Migreer Database Schema (vanaf lokaal)
 ```bash
 # Zet DATABASE_URL naar je Neon connection string
-$env:DATABASE_URL="postgresql://[user]:[password]@[host]/eventify-postgress?sslmode=require"
+$env:DATABASE_URL="postgresql://[user]:[password]@[host]/Eventiphy-postgress?sslmode=require"
 
 # Run Prisma migrations
 npx prisma migrate deploy
@@ -52,17 +52,17 @@ npx prisma db seed
 
 ### 2.1 Build Docker Image
 ```powershell
-docker build -t eventify:latest .
+docker build -t Eventiphy:latest .
 ```
 
 ### 2.2 Test Lokaal
 ```powershell
 # Met Neon database
 docker run -p 3000:3000 `
-  -e DATABASE_URL="postgresql://[user]:[password]@[host]/eventify-postgress?sslmode=require" `
+  -e DATABASE_URL="postgresql://[user]:[password]@[host]/Eventiphy-postgress?sslmode=require" `
   -e NEXTAUTH_URL="http://localhost:3000" `
   -e NEXTAUTH_SECRET="test-secret-change-in-production" `
-  eventify:latest
+  Eventiphy:latest
 
 # Of met docker-compose (lokale PostgreSQL)
 docker-compose up
@@ -80,12 +80,12 @@ docker-compose up
 1. Ga naar https://dashboard.render.com
 2. Klik op **"New +"** → **"Web Service"**
 3. Selecteer **"Connect a repository"**
-4. Autoriseer GitHub en selecteer **Eventify repository**
+4. Autoriseer GitHub en selecteer **Eventiphy repository**
 
 ### 3.2 Configureer Service
 
 **Basic Settings:**
-- **Name**: `eventify`
+- **Name**: `Eventiphy`
 - **Region**: Frankfurt (of dichtst bij jouw doelgroep)
 - **Branch**: `main`
 - **Runtime**: Docker
@@ -117,14 +117,14 @@ PORT=3000
 1. Klik op **"Create Web Service"**
 2. Render begint automatisch met bouwen
 3. Wacht tot status **"Live"** is (5-10 minuten eerste keer)
-4. Noteer je Render URL: `https://eventify-xxxxx.onrender.com`
+4. Noteer je Render URL: `https://Eventiphy-xxxxx.onrender.com`
 
 ---
 
 ## 🌍 Stap 4: Domein Configuratie (eventiphy.site)
 
 ### 4.1 In Render Dashboard
-1. Ga naar je Eventify service
+1. Ga naar je Eventiphy service
 2. Klik op **"Settings"** → **"Custom Domain"**
 3. Voeg toe:
    - `eventiphy.site`
@@ -142,13 +142,13 @@ Voeg deze DNS records toe:
 **Voor www subdomain:**
 - Type: `CNAME`
 - Name: `www`
-- Value: `eventify-xxxxx.onrender.com`
+- Value: `Eventiphy-xxxxx.onrender.com`
 - TTL: 3600
 
 **Of gebruik ALIAS/ANAME record:**
 - Type: `ALIAS` of `ANAME`
 - Name: `@`
-- Value: `eventify-xxxxx.onrender.com`
+- Value: `Eventiphy-xxxxx.onrender.com`
 - TTL: 3600
 
 ### 4.3 SSL Certificaat
@@ -224,7 +224,7 @@ In Render dashboard:
 Settings → Logs (real-time)
 
 # Of via CLI (installeer Render CLI)
-render logs -s eventify
+render logs -s Eventiphy
 ```
 
 ### Database Maintenance
@@ -393,5 +393,5 @@ Na succesvolle deployment:
 
 ---
 
-**Gemaakt door Eventify Team**  
+**Gemaakt door Eventiphy Team**  
 Laatste update: November 2025

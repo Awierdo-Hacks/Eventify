@@ -8,6 +8,7 @@ interface LoginResult {
   success: boolean;
   error?: string;
   message?: string;
+  role?: string;
 }
 
 export async function loginAction(email: string, password: string): Promise<LoginResult> {
@@ -38,7 +39,7 @@ export async function loginAction(email: string, password: string): Promise<Logi
       return { 
         success: false, 
         error: 'Account Geschorst',
-        message: 'Je account is tijdelijk geschorst. Dit kan zijn vanwege een lopend onderzoek of verificatieproces. Neem contact op met support@eventify.nl voor meer informatie.'
+        message: 'Je account is tijdelijk geschorst. Dit kan zijn vanwege een lopend onderzoek of verificatieproces. Neem contact op met support@eventiphy.nl voor meer informatie.'
       };
     }
 
@@ -67,7 +68,7 @@ export async function loginAction(email: string, password: string): Promise<Logi
       providerId: user.provider?.id || null,
     });
 
-    return { success: true };
+    return { success: true, role: user.role };
   } catch (error) {
     console.error('Login action error:', error);
     return { success: false, error: 'Er is iets misgegaan. Probeer het opnieuw.' };

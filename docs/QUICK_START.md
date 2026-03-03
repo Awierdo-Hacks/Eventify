@@ -1,19 +1,19 @@
-# Quick Start Commands voor Eventify Deployment
+# Quick Start Commands voor Eventiphy Deployment
 
 ## Lokaal Docker Testen
 
 ### Build Docker Image
 ```powershell
-docker build -t eventify:latest .
+docker build -t Eventiphy:latest .
 ```
 
 ### Run met Neon Database
 ```powershell
 docker run -p 3000:3000 `
-  -e DATABASE_URL="postgresql://[user]:[password]@[host]/eventify-postgress?sslmode=require" `
+  -e DATABASE_URL="postgresql://[user]:[password]@[host]/Eventiphy-postgress?sslmode=require" `
   -e NEXTAUTH_URL="http://localhost:3000" `
   -e NEXTAUTH_SECRET="local-dev-secret-change-in-prod" `
-  eventify:latest
+  Eventiphy:latest
 ```
 
 ### Run met Docker Compose (lokale PostgreSQL)
@@ -32,7 +32,7 @@ docker-compose down
 docker-compose down -v
 
 # Verwijder image
-docker rmi eventify:latest
+docker rmi Eventiphy:latest
 ```
 
 ## Database Migrations
@@ -40,7 +40,7 @@ docker rmi eventify:latest
 ### Deploy migrations naar Neon
 ```powershell
 # Set DATABASE_URL naar je Neon connection string
-$env:DATABASE_URL="postgresql://[user]:[password]@[host]/eventify-postgress?sslmode=require"
+$env:DATABASE_URL="postgresql://[user]:[password]@[host]/Eventiphy-postgress?sslmode=require"
 
 # Run migrations
 npx prisma migrate deploy
@@ -72,7 +72,7 @@ npm install -g @render-tools/render-cli
 render login
 
 # Deploy
-render deploy -s eventify
+render deploy -s Eventiphy
 ```
 
 ## Health Check
@@ -91,13 +91,13 @@ curl https://eventiphy.site/api/health
 
 ### Docker logs
 ```powershell
-docker logs eventify-app -f
+docker logs Eventiphy-app -f
 ```
 
 ### Render logs
 ```powershell
 # Via CLI
-render logs -s eventify -f
+render logs -s Eventiphy -f
 
 # Of in browser
 https://dashboard.render.com
@@ -118,7 +118,7 @@ https://generate-secret.vercel.app/32
 
 ```bash
 # Productie (Render)
-DATABASE_URL="postgresql://[user]:[password]@[host]/eventify-postgress?sslmode=require"
+DATABASE_URL="postgresql://[user]:[password]@[host]/Eventiphy-postgress?sslmode=require"
 NEXTAUTH_URL="https://eventiphy.site"
 NEXTAUTH_SECRET="[genereer-een-sterke-random-string]"
 NODE_ENV="production"
@@ -148,10 +148,10 @@ echo $env:DATABASE_URL
 ### Docker build issues
 ```powershell
 # Build zonder cache
-docker build --no-cache -t eventify:latest .
+docker build --no-cache -t Eventiphy:latest .
 
 # Check logs
-docker logs eventify-app
+docker logs Eventiphy-app
 ```
 
 ## Performance Testing
@@ -211,7 +211,7 @@ Proxy: Enabled (orange cloud)
 
 Type: CNAME
 Name: www
-Content: eventify-xxxxx.onrender.com
+Content: Eventiphy-xxxxx.onrender.com
 Proxy: Enabled
 ```
 
@@ -224,7 +224,7 @@ TTL: 3600
 
 Type: CNAME
 Name: www
-Content: eventify-xxxxx.onrender.com
+Content: Eventiphy-xxxxx.onrender.com
 TTL: 3600
 ```
 

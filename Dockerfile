@@ -1,4 +1,4 @@
-# Dockerfile voor Eventify Next.js applicatie
+# Dockerfile voor Eventiphy Next.js applicatie
 # Multi-stage build voor optimale image grootte
 
 FROM node:20-alpine AS base
@@ -21,7 +21,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Generate Prisma Client (met dummy DATABASE_URL voor build)
-ENV DATABASE_URL="postgresql://awierdo:cYxAbubpCYWbIEJqsGXbba18G1xa8xUo@dpg-d48ir6c9c44c73b63ld0-a.frankfurt-postgres.render.com/eventify_postgres_dr2b"
+ENV DATABASE_URL="postgresql://awierdo:cYxAbubpCYWbIEJqsGXbba18G1xa8xUo@dpg-d48ir6c9c44c73b63ld0-a.frankfurt-postgres.render.com/Eventiphy_postgres_dr2b"
 RUN npx prisma generate
 
 # Set environment variables voor build

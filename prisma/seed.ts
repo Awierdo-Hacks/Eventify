@@ -23,7 +23,7 @@ async function main() {
   // Create Admin User
   const admin = await prisma.user.create({
     data: {
-      email: 'admin@eventify.nl',
+      email: 'admin@eventiphy.nl',
       name: 'Admin User',
       password_hash: hashedPassword,
       role: UserRole.ADMIN,
@@ -371,7 +371,7 @@ async function main() {
   console.log(`- Reviews: ${await prisma.review.count()}`);
   console.log(`- Messages: ${await prisma.message.count()}`);
   console.log('\n🔐 Test Credentials:');
-  console.log('Admin: admin@eventify.nl / password123');
+  console.log('Admin: admin@eventiphy.nl / password123');
   console.log('Customer: sarah.jansen@example.com / password123');
   console.log('Provider: info@culinairecreatiesamsterdam.nl / password123');
 }

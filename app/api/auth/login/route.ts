@@ -39,7 +39,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { 
           error: 'Account Geschorst',
-          message: 'Je account is tijdelijk geschorst. Dit kan zijn vanwege een lopend onderzoek of verificatieproces. Neem contact op met support@eventify.nl voor meer informatie.',
+          message: 'Je account is tijdelijk geschorst. Dit kan zijn vanwege een lopend onderzoek of verificatieproces. Neem contact op met support@eventiphy.nl voor meer informatie.',
           status: 'SUSPENDED'
         },
         { status: 403 }

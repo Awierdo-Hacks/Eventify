@@ -92,6 +92,10 @@ model User {
   password_hash String
   role          UserRole   @default(CUSTOMER)
   status        UserStatus @default(ACTIVE)
+  first_name    String?
+  last_name     String?
+  date_of_birth DateTime?
+  phone         String?
   created_at    DateTime   @default(now())
   updated_at    DateTime   @updatedAt
 
@@ -117,22 +121,27 @@ model ServiceProvider {
   description    String?
   services       String[]
   images         String[]
+  portfolio_images String[]   @default([])
+  phone          String?
+  website        String?
   availability   String?
   min_guests     Int?
   max_guests     Int?
   response_time  String?
   verified       Boolean    @default(false)
+  is_active      Boolean    @default(true)
   rating_avg     Float      @default(0)
   review_count   Int        @default(0)
   created_at     DateTime   @default(now())
   updated_at     DateTime   @updatedAt
 
   // Relations
-  user             User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  service_requests ServiceRequest[]
-  quotes           Quote[]
-  bookings         Booking[]
-  reviews          Review[]
+  user              User              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  service_requests  ServiceRequest[]
+  quotes            Quote[]
+  bookings          Booking[]
+  reviews           Review[]
+  provider_services ProviderService[]
 
   @@map("service_providers")
 }
@@ -287,4 +296,19 @@ model EventSlot {
   booked_quote     Quote?           @relation("BookedQuote", fields: [booked_quote_id], references: [id])
 
   @@map("event_slots")
+}
+
+model ProviderService {
+  id          String   @id @default(cuid())
+  provider_id String
+  name        String
+  description String?
+  price_from  Float
+  price_to    Float?
+  created_at  DateTime @default(now())
+
+  // Relations
+  provider ServiceProvider @relation(fields: [provider_id], references: [id], onDelete: Cascade)
+
+  @@map("provider_services")
 }

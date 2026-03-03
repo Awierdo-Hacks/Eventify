@@ -1,5 +1,5 @@
 {
-  "name": "eventify",
+  "name": "eventiphy",
   "version": "1.0.0",
   "description": "Volledige technische documentatie en product blueprint  \r Download Source Code",
   "scripts": {
@@ -54,6 +54,7 @@
     "eslint-config-prettier": "^10.1.8",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
+    "supabase": "^2.76.15",
     "tailwindcss": "^4.1.17",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.6"
