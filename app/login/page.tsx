@@ -35,7 +35,14 @@ export default function LoginPage() {
         setLoading(false);
       } else {
         await update(); // Refresh session
-        router.push('/dashboard');
+        // Role-based redirect
+        if (result.role === 'PROVIDER') {
+          router.push('/provider-dashboard');
+        } else if (result.role === 'ADMIN') {
+          router.push('/admin');
+        } else {
+          router.push('/dashboard');
+        }
       }
     } catch (err) {
       setError('Er is iets misgegaan. Probeer het opnieuw.');
@@ -56,7 +63,14 @@ export default function LoginPage() {
 
     if (result.success) {
       await update(); // Refresh session
-      router.push('/dashboard');
+      // Role-based redirect
+      if (result.role === 'PROVIDER') {
+        router.push('/provider-dashboard');
+      } else if (result.role === 'ADMIN') {
+        router.push('/admin');
+      } else {
+        router.push('/dashboard');
+      }
     } else {
       setLoading(false);
       setError(result.error || 'Inloggen mislukt');
@@ -170,7 +184,7 @@ export default function LoginPage() {
                 type="button"
                 variant="outline"
                 className="w-full"
-                onClick={() => quickLogin('admin@eventify.nl', 'password123')}
+                onClick={() => quickLogin('admin@eventiphy.nl', 'password123')}
                 disabled={loading}
               >
                 👑 Login als Admin

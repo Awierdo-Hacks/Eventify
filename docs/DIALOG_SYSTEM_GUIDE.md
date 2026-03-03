@@ -2,7 +2,7 @@
 
 ## 📋 Overzicht
 
-Dit is een volledig modulair en herbruikbaar dialog systeem voor Eventify. Alle confirmatie dialogs gebruiken dezelfde **bouwstenen** (building blocks) voor consistente UI en makkelijk onderhoud.
+Dit is een volledig modulair en herbruikbaar dialog systeem voor Eventiphy. Alle confirmatie dialogs gebruiken dezelfde **bouwstenen** (building blocks) voor consistente UI en makkelijk onderhoud.
 
 ---
 
@@ -231,10 +231,10 @@ Actie knoppen met verschillende styles.
 
 ## 🎨 UI Design Rules
 
-Alle componenten volgen automatisch de Eventify design guidelines:
+Alle componenten volgen automatisch de Eventiphy design guidelines:
 
 ✅ **Rounded Corners**: `rounded-3xl` voor dialogs, `rounded-xl` voor sections  
-✅ **Shadows**: `shadow-eventify-lg` voor dialogs, `shadow-sm` voor sections  
+✅ **Shadows**: `shadow-eventiphy-lg` voor dialogs, `shadow-sm` voor sections  
 ✅ **Gradients**: Automatisch toegepast op quote info (status-afhankelijk)  
 ✅ **Colors**: Consistent gebruik van brand colors (purple, pink, red, etc.)  
 ✅ **Typography**: Font weights en sizes volgens design system  

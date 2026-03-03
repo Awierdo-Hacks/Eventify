@@ -5,11 +5,11 @@ services:
   # PostgreSQL Database (alleen voor lokale development)
   postgres:
     image: postgres:16-alpine
-    container_name: eventify-postgres
+    container_name: Eventiphy-postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: eventify
+      POSTGRES_DB: Eventiphy
     ports:
       - "5432:5432"
     volumes:
@@ -25,11 +25,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: eventify-app
+    container_name: Eventiphy-app
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/eventify
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/Eventiphy
       - NEXTAUTH_URL=http://localhost:3000
       - NEXTAUTH_SECRET=your-secret-key-change-this-in-production
       - NODE_ENV=production
