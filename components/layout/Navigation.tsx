@@ -45,6 +45,23 @@ export function Navigation() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" className="w-8 h-8">
+                <defs>
+                  <linearGradient id="navPinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#c084fc"/>
+                    <stop offset="40%" stopColor="#a855f7"/>
+                    <stop offset="100%" stopColor="#f59e0b"/>
+                  </linearGradient>
+                </defs>
+                <path d="M16 2C10.5 2 6 6.2 6 11.2C6 18.5 16 30 16 30S26 18.5 26 11.2C26 6.2 21.5 2 16 2Z"
+                      fill="url(#navPinGrad)"/>
+                <path d="M16 6 L17.5 11 L22 12.5 L17.5 14 L16 19 L14.5 14 L10 12.5 L14.5 11 Z"
+                      fill="white"/>
+                <circle cx="18.5" cy="10" r="0.5" fill="white" opacity="0.7"/>
+                <circle cx="13.5" cy="15" r="0.5" fill="white" opacity="0.7"/>
+                <circle cx="18.5" cy="15" r="0.5" fill="white" opacity="0.7"/>
+                <circle cx="13.5" cy="10" r="0.5" fill="white" opacity="0.7"/>
+              </svg>
               <span className="text-2xl font-bold gradient-text">
                 Eventiphy
               </span>

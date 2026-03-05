@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '@/generated/prisma/client';
 
 /**
  * Middleware helper to require authentication

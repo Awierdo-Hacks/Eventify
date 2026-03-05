@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" fill="none">
+  <defs>
+    <linearGradient id="pinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c084fc"/>
+      <stop offset="40%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+
+  <!-- === ICOON: Gevulde pin met grote poolster === -->
+  <g transform="translate(10, 4)">
+    <path d="M30 4C19.5 4 11 12 11 21.5C11 34 30 58 30 58S49 34 49 21.5C49 12 40.5 4 30 4Z"
+          fill="url(#pinGrad)"/>
+    <path d="M30 11 L32.5 19 L40 22 L32.5 25 L30 33 L27.5 25 L20 22 L27.5 19 Z"
+          fill="white"/>
+    <circle cx="34" cy="18" r="0.8" fill="white" opacity="0.7"/>
+    <circle cx="26" cy="26" r="0.8" fill="white" opacity="0.7"/>
+    <circle cx="34" cy="26" r="0.8" fill="white" opacity="0.7"/>
+    <circle cx="26" cy="18" r="0.8" fill="white" opacity="0.7"/>
+  </g>
+
+  <!-- === TEKST: "Eventiphy" volledige gradient zoals v4 === -->
+  <text x="72" y="48" font-family="Inter, system-ui, -apple-system, sans-serif"
+        font-size="36" font-weight="700" fill="url(#textGrad)">Eventiphy</text>
+</svg>

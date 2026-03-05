@@ -1,6 +1,6 @@
 import 'next-auth';
 import 'next-auth/jwt';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '@/generated/prisma/client';
 
 declare module 'next-auth' {
   interface User {

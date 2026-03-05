@@ -1,6 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
-import { UserRole, UserStatus } from '@prisma/client';
+import { UserRole, UserStatus } from '@/generated/prisma/client';
 
 let secretKeyCache: Uint8Array | null = null;
 let devSecretWarningShown = false;

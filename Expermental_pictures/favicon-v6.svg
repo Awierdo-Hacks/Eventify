@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="fg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Gevulde pin met gradient, geen achtergrond -->
+  <path d="M16 1C9.6 1 4.5 5.8 4.5 11.5 4.5 19.5 16 31 16 31S27.5 19.5 27.5 11.5C27.5 5.8 22.4 1 16 1z" 
+        fill="url(#fg)"/>
+  
+  <!-- 4-puntige poolster — wit met gouden rand, groot en duidelijk -->
+  <path d="M16 5 L17.8 10 L23 12 L17.8 14 L16 19 L14.2 14 L9 12 L14.2 10 Z" 
+        fill="white" stroke="url(#starGrad)" stroke-width="0.5"/>
+  
+  <!-- Kleine lichtpuntjes op de ster -->
+  <circle cx="16" cy="12" r="1" fill="white" opacity="0.6"/>
+</svg>

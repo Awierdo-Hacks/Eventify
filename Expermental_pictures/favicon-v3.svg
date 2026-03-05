@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="fg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- No background — clean pin icon, great for tab favicon -->
+  
+  <!-- Location pin with gradient fill -->
+  <path d="M16 2c-5.52 0-10 4.2-10 9.38C6 17.92 16 30 16 30s10-12.08 10-18.62C26 6.2 21.52 2 16 2z" 
+        fill="url(#fg3)"/>
+  
+  <!-- Star cutout (white) -->
+  <path d="M16 6.5l1.55 3.14 3.47.5-2.51 2.45.59 3.46L16 14.4l-3.1 1.65.59-3.46-2.51-2.45 3.47-.5L16 6.5z" 
+        fill="white"/>
+</svg>

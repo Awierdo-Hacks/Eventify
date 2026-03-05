@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-import { UserRole, PriceRange } from '@prisma/client';
+import { UserRole, PriceRange } from '@/generated/prisma/client';
 import { setSession } from '@/lib/auth';
 
 // Map price range string to PriceRange enum

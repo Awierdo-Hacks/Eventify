@@ -26,6 +26,9 @@
       "@/*": [
         "./*"
       ],
+      "@/generated/*": [
+        "./generated/*"
+      ],
       "@/components/*": [
         "./components/*"
       ],

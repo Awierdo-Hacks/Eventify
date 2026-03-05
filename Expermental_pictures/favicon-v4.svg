@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="fg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="50%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Geen achtergrond — puur gradient pin -->
+  <path d="M16 1C10 1 5 5.7 5 11.5 5 19 16 31 16 31S27 19 27 11.5C27 5.7 22 1 16 1z" 
+        fill="url(#fg)"/>
+  
+  <!-- 4-puntige poolster — wit -->
+  <path d="M16 5.5 L17.2 10.5 L22 12 L17.2 13.5 L16 18.5 L14.8 13.5 L10 12 L14.8 10.5 Z" 
+        fill="white" opacity="0.95"/>
+</svg>

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 48" fill="none">
+  <defs>
+    <!-- Brand gradient purple-600 → amber-500 -->
+    <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="50%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Icon container: rounded square with gradient -->
+  <rect x="2" y="4" width="40" height="40" rx="12" fill="url(#iconGradient)"/>
+  
+  <!-- Location Pin (white, Lucide-style thin strokes) -->
+  <path d="M22 12c-4.97 0-9 3.69-9 8.24 0 5.76 9 15.76 9 15.76s9-10 9-15.76C31 15.69 27.97 12 22 12z" 
+        stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  
+  <!-- Star inside the pin -->
+  <path d="M22 16.5l1.45 2.94 3.24.47-2.35 2.29.55 3.23L22 23.82l-2.89 1.61.55-3.23-2.35-2.29 3.24-.47L22 16.5z" 
+        fill="white" stroke="white" stroke-width="0.5" stroke-linejoin="round"/>
+  
+  <!-- "Eventiphy" text -->
+  <text x="52" y="33" font-family="Inter, system-ui, -apple-system, sans-serif" font-weight="700" font-size="26" fill="url(#brandGradient)">
+    Eventiphy
+  </text>
+</svg>

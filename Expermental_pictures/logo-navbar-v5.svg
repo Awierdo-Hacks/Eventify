@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 310 56" fill="none">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="50%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Location pin — Lucide-style outline, geen achtergrondvorm -->
+  <path d="M24 4C17 4 11.5 9.1 11.5 15.5 11.5 24 24 40 24 40S36.5 24 36.5 15.5C36.5 9.1 31 4 24 4z" 
+        stroke="url(#grad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  
+  <!-- 4-puntige poolster — gradient, slanke elegante punten -->
+  <path d="M24 9.5 L25.4 14 L30 15.5 L25.4 17 L24 21.5 L22.6 17 L18 15.5 L22.6 14 Z" 
+        fill="url(#grad)"/>
+
+  <!-- "Eventiphy" tekst -->
+  <text x="48" y="30" font-family="Inter, system-ui, -apple-system, sans-serif" font-weight="700" font-size="28" fill="url(#textGrad)">
+    Eventiphy
+  </text>
+</svg>

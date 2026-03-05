@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 310 56" fill="none">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="50%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Location pin — gevuld met gradient, geen achtergrondvorm -->
+  <path d="M24 3C16.8 3 11 8.2 11 14.7 11 23 24 41 24 41S37 23 37 14.7C37 8.2 31.2 3 24 3z" 
+        fill="url(#grad)"/>
+  
+  <!-- 4-puntige poolster — wit, langere dunne punten (eleganter, echte polestar feel) -->
+  <path d="M24 8 L25 13.5 L30.5 15 L25 16.5 L24 22 L23 16.5 L17.5 15 L23 13.5 Z" 
+        fill="white" opacity="0.95"/>
+  
+  <!-- Subtiele glans op de pin -->
+  <path d="M24 3C16.8 3 11 8.2 11 14.7 11 23 24 41 24 41" 
+        stroke="white" stroke-width="0.5" stroke-linecap="round" fill="none" opacity="0.3"/>
+
+  <!-- "Eventiphy" tekst -->
+  <text x="48" y="30" font-family="Inter, system-ui, -apple-system, sans-serif" font-weight="800" font-size="28" fill="url(#textGrad)" letter-spacing="-0.5">
+    Eventiphy
+  </text>
+</svg>

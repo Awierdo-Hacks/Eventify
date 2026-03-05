@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 56" fill="none">
+  <defs>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="pinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="60%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Icon: circular gradient background -->
+  <circle cx="28" cy="28" r="26" fill="url(#pinGrad)"/>
+  
+  <!-- Location Pin (white silhouette with cutout) -->
+  <path d="M28 10c-6.08 0-11 4.52-11 10.09C17 27.15 28 40 28 40s11-12.85 11-19.91C39 14.52 34.08 10 28 10z" 
+        fill="white" opacity="0.95"/>
+  
+  <!-- Star cutout inside the pin (shows gradient through) -->
+  <path d="M28 15l1.76 3.57 3.94.57-2.85 2.78.67 3.93L28 24.02l-3.52 1.83.67-3.93-2.85-2.78 3.94-.57L28 15z" 
+        fill="url(#pinGrad)"/>
+
+  <!-- "Eventiphy" text with gradient -->
+  <text x="62" y="36" font-family="Inter, system-ui, -apple-system, sans-serif" font-weight="800" font-size="28" fill="url(#brandGrad)" letter-spacing="-0.5">
+    Eventiphy
+  </text>
+</svg>

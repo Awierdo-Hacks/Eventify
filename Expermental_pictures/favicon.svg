@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="fg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="50%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Rounded square background -->
+  <rect width="32" height="32" rx="8" fill="url(#fg)"/>
+  
+  <!-- Location pin (white, bold for small size) -->
+  <path d="M16 5c-4.42 0-8 3.36-8 7.5C8 18.15 16 27 16 27s8-8.85 8-14.5C24 8.36 20.42 5 16 5z" 
+        fill="white" opacity="0.95"/>
+  
+  <!-- Star (gradient shows through) -->
+  <path d="M16 8.5l1.3 2.63 2.9.42-2.1 2.04.5 2.9L16 15.2l-2.6 1.29.5-2.9-2.1-2.04 2.9-.42L16 8.5z" 
+        fill="url(#fg)"/>
+</svg>

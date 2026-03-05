@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="pinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c084fc"/>
+      <stop offset="40%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Gevulde pin — gecentreerd in 32x32 -->
+  <path d="M16 2C10.5 2 6 6.2 6 11.2C6 18.5 16 30 16 30S26 18.5 26 11.2C26 6.2 21.5 2 16 2Z"
+        fill="url(#pinGrad)"/>
+
+  <!-- 4-puntige poolster — groot en duidelijk -->
+  <path d="M16 6 L17.5 11 L22 12.5 L17.5 14 L16 19 L14.5 14 L10 12.5 L14.5 11 Z"
+        fill="white"/>
+
+  <!-- Accent puntjes -->
+  <circle cx="18.5" cy="10" r="0.5" fill="white" opacity="0.7"/>
+  <circle cx="13.5" cy="15" r="0.5" fill="white" opacity="0.7"/>
+  <circle cx="18.5" cy="15" r="0.5" fill="white" opacity="0.7"/>
+  <circle cx="13.5" cy="10" r="0.5" fill="white" opacity="0.7"/>
+</svg>

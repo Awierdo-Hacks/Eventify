@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 52" fill="none">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Icon: rounded-xl square, gradient filled -->
+  <rect x="2" y="2" width="48" height="48" rx="14" fill="url(#grad1)"/>
+  
+  <!-- Location pin outline (Lucide style: 2px stroke, rounded) -->
+  <path d="M26 10c-5.52 0-10 4.15-10 9.27C16 25.84 26 38 26 38s10-12.16 10-18.73C36 14.15 31.52 10 26 10z" 
+        stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  
+  <!-- Circle inside pin (Lucide mapPin style) -->
+  <circle cx="26" cy="19.5" r="3" stroke="white" stroke-width="0" fill="none"/>
+  
+  <!-- 5-point star inside the pin (filled white) -->
+  <path d="M26 14.8l1.55 3.14 3.47.5-2.51 2.45.59 3.46L26 22.7l-3.1 1.65.59-3.46-2.51-2.45 3.47-.5L26 14.8z" 
+        fill="white"/>
+  
+  <!-- "Eventiphy" gradient text -->
+  <text x="60" y="35" font-family="Inter, system-ui, -apple-system, sans-serif" font-weight="700" font-size="28" fill="url(#grad2)">
+    Eventiphy
+  </text>
+</svg>
