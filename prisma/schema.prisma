@@ -104,8 +104,8 @@ model User {
   service_requests ServiceRequest[]
   bookings         Booking[]
   reviews          Review[]
+  conversations    ConversationParticipant[]
   messages_sent    Message[]        @relation("SentMessages")
-  messages_received Message[]       @relation("ReceivedMessages")
   events           Event[]
 
   @@map("users")
@@ -195,6 +195,7 @@ model Quote {
   provider        ServiceProvider @relation(fields: [provider_id], references: [id], onDelete: Cascade)
   event_slot      EventSlot?      @relation("SlotQuotes", fields: [event_slot_id], references: [id], onDelete: SetNull)
   booked_for_slot EventSlot?      @relation("BookedQuote")
+  chat_messages   Message[]
 
   @@map("quotes")
 }
@@ -241,20 +242,72 @@ model Review {
   @@map("reviews")
 }
 
-model Message {
-  id          String   @id @default(cuid())
-  sender_id   String
-  receiver_id String
-  subject     String?
-  content     String
-  read        Boolean  @default(false)
-  created_at  DateTime @default(now())
+enum MessageType {
+  TEXT
+  IMAGE
+  QUOTE
+  SYSTEM
+}
+
+model Conversation {
+  id           String   @id @default(cuid())
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 
   // Relations
-  sender   User @relation("SentMessages", fields: [sender_id], references: [id], onDelete: Cascade)
-  receiver User @relation("ReceivedMessages", fields: [receiver_id], references: [id], onDelete: Cascade)
+  participants ConversationParticipant[]
+  messages     Message[]
 
+  @@map("conversations")
+}
+
+model ConversationParticipant {
+  id              String   @id @default(cuid())
+  conversation_id String
+  user_id         String
+  last_read_at    DateTime @default(now())
+  created_at      DateTime @default(now())
+
+  // Relations
+  conversation Conversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([conversation_id, user_id])
+  @@map("conversation_participants")
+}
+
+model Message {
+  id              String      @id @default(cuid())
+  conversation_id String
+  sender_id       String
+  content         String
+  message_type    MessageType @default(TEXT)
+  quote_id        String?
+  created_at      DateTime    @default(now())
+
+  // Relations
+  conversation Conversation       @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  sender       User               @relation("SentMessages", fields: [sender_id], references: [id], onDelete: Cascade)
+  quote        Quote?             @relation(fields: [quote_id], references: [id], onDelete: SetNull)
+  attachments  MessageAttachment[]
+
+  @@index([conversation_id, created_at])
   @@map("messages")
+}
+
+model MessageAttachment {
+  id         String   @id @default(cuid())
+  message_id String
+  url        String
+  file_name  String
+  file_type  String
+  file_size  Int
+  created_at DateTime @default(now())
+
+  // Relations
+  message Message @relation(fields: [message_id], references: [id], onDelete: Cascade)
+
+  @@map("message_attachments")
 }
 
 model Event {

@@ -52,6 +52,7 @@ export async function GET(request: Request) {
             category: true,
             location: true,
             images: true,
+            user_id: true,
           },
         },
         request: {
@@ -101,6 +102,7 @@ export async function GET(request: Request) {
         category: booking.provider.category,
         location: booking.provider.location,
         images: booking.provider.images,
+        userId: booking.provider.user_id,
       },
       request: {
         id: booking.request.id,

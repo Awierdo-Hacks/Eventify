@@ -52,6 +52,7 @@ export async function GET(request: Request) {
             business_name: true,
             category: true,
             location: true,
+            user_id: true,
           },
         },
         request: {
@@ -91,6 +92,7 @@ export async function GET(request: Request) {
         businessName: quote.provider.business_name,
         category: quote.provider.category,
         location: quote.provider.location,
+        userId: quote.provider.user_id,
       },
       serviceRequest: {
         id: quote.request.id,

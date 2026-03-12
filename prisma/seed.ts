@@ -340,28 +340,33 @@ async function main() {
 
   console.log('⭐ Created reviews');
 
-  // Create Messages
-  await prisma.message.create({
+  // Create Conversations & Messages
+  const conversation1 = await prisma.conversation.create({
     data: {
-      sender_id: customer1.id,
-      receiver_id: provider1User.id,
-      subject: 'Vraag over menu opties',
-      content: 'Hallo, kunnen jullie ook glutenvrije opties aanbieden?',
-      read: true,
+      participants: {
+        create: [
+          { user_id: customer1.id },
+          { user_id: provider1User.id },
+        ],
+      },
+      messages: {
+        create: [
+          {
+            sender_id: customer1.id,
+            content: 'Hallo, kunnen jullie ook glutenvrije opties aanbieden?',
+            message_type: 'TEXT',
+          },
+          {
+            sender_id: provider1User.id,
+            content: 'Ja zeker! We hebben ruime ervaring met glutenvrije catering. Laten we dit bespreken bij de proeverij.',
+            message_type: 'TEXT',
+          },
+        ],
+      },
     },
   });
 
-  await prisma.message.create({
-    data: {
-      sender_id: provider1User.id,
-      receiver_id: customer1.id,
-      subject: 'Re: Vraag over menu opties',
-      content: 'Ja zeker! We hebben ruime ervaring met glutenvrije catering. Laten we dit bespreken bij de proeverij.',
-      read: false,
-    },
-  });
-
-  console.log('💬 Created messages');
+  console.log('💬 Created conversations & messages');
 
   console.log('✅ Seeding completed successfully!');
   console.log('\n📊 Summary:');
@@ -372,6 +377,7 @@ async function main() {
   console.log(`- Bookings: ${await prisma.booking.count()}`);
   console.log(`- Reviews: ${await prisma.review.count()}`);
   console.log(`- Messages: ${await prisma.message.count()}`);
+  console.log(`- Conversations: ${await prisma.conversation.count()}`);
   console.log('\n🔐 Test Credentials:');
   console.log('Admin: admin@eventiphy.nl / password123');
   console.log('Customer: sarah.jansen@example.com / password123');

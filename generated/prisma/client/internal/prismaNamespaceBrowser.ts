@@ -57,7 +57,10 @@ export const ModelName = {
   Quote: 'Quote',
   Booking: 'Booking',
   Review: 'Review',
+  Conversation: 'Conversation',
+  ConversationParticipant: 'ConversationParticipant',
   Message: 'Message',
+  MessageAttachment: 'MessageAttachment',
   Event: 'Event',
   EventSlot: 'EventSlot',
   ProviderService: 'ProviderService'
@@ -203,17 +206,50 @@ export const ReviewScalarFieldEnum = {
 export type ReviewScalarFieldEnum = (typeof ReviewScalarFieldEnum)[keyof typeof ReviewScalarFieldEnum]
 
 
+export const ConversationScalarFieldEnum = {
+  id: 'id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type ConversationScalarFieldEnum = (typeof ConversationScalarFieldEnum)[keyof typeof ConversationScalarFieldEnum]
+
+
+export const ConversationParticipantScalarFieldEnum = {
+  id: 'id',
+  conversation_id: 'conversation_id',
+  user_id: 'user_id',
+  last_read_at: 'last_read_at',
+  created_at: 'created_at'
+} as const
+
+export type ConversationParticipantScalarFieldEnum = (typeof ConversationParticipantScalarFieldEnum)[keyof typeof ConversationParticipantScalarFieldEnum]
+
+
 export const MessageScalarFieldEnum = {
   id: 'id',
+  conversation_id: 'conversation_id',
   sender_id: 'sender_id',
-  receiver_id: 'receiver_id',
-  subject: 'subject',
   content: 'content',
-  read: 'read',
+  message_type: 'message_type',
+  quote_id: 'quote_id',
   created_at: 'created_at'
 } as const
 
 export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
+
+
+export const MessageAttachmentScalarFieldEnum = {
+  id: 'id',
+  message_id: 'message_id',
+  url: 'url',
+  file_name: 'file_name',
+  file_type: 'file_type',
+  file_size: 'file_size',
+  created_at: 'created_at'
+} as const
+
+export type MessageAttachmentScalarFieldEnum = (typeof MessageAttachmentScalarFieldEnum)[keyof typeof MessageAttachmentScalarFieldEnum]
 
 
 export const EventScalarFieldEnum = {

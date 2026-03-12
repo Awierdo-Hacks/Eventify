@@ -27,13 +27,14 @@ import {
   Calendar,
   MapPin,
   Users,
-  TrendingUp,
   Clock,
   Send,
   X,
   Plus,
+  UserCircle,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import ProfileEditForm from '@/components/providers/ProfileEditForm';
 
 interface ServiceRequest {
   id: string;
@@ -46,6 +47,7 @@ interface ServiceRequest {
   status: string;
   createdAt: string;
   customer: {
+    id: number;
     name: string;
     email: string;
     phone: string;
@@ -72,6 +74,7 @@ interface Quote {
     eventType: string;
     eventDate: string;
     customer: {
+      id: number;
       name: string;
     };
   };
@@ -87,6 +90,7 @@ interface Booking {
   paymentStatus: string;
   createdAt: string;
   customer: {
+    id: number;
     name: string;
     email: string;
   };
@@ -96,7 +100,7 @@ export default function ProviderDashboardPage() {
   const router = useRouter();
   const { user, status } = useSession();
   
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('requests');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -104,6 +108,8 @@ export default function ProviderDashboardPage() {
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [providerProfile, setProviderProfile] = useState<any>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
   
   // Quote creation dialog state
   const [creatingQuoteFor, setCreatingQuoteFor] = useState<ServiceRequest | null>(null);
@@ -167,6 +173,29 @@ export default function ProviderDashboardPage() {
 
     fetchDashboardData();
   }, [status, user]);
+
+  // Fetch provider profile data
+  const fetchProfile = async () => {
+    setProfileLoading(true);
+    try {
+      const res = await fetch('/api/providers/me');
+      if (res.ok) {
+        const data = await res.json();
+        setProviderProfile(data);
+      }
+    } catch (err) {
+      console.error('Profile fetch error:', err);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
+  // Load profile when switching to profile tab
+  useEffect(() => {
+    if (activeTab === 'profile' && !providerProfile && !profileLoading) {
+      fetchProfile();
+    }
+  }, [activeTab, providerProfile, profileLoading]);
 
   // Calculate stats
   const stats = {
@@ -275,6 +304,21 @@ export default function ProviderDashboardPage() {
       setTimeout(() => setError(null), 5000);
     } finally {
       setCancelingQuoteId(null);
+    }
+  };
+
+  const handleOpenChat = async (customerId: number) => {
+    try {
+      const res = await fetch('/api/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipientId: customerId }),
+      });
+      if (!res.ok) throw new Error('Kon gesprek niet openen');
+      const conversation = await res.json();
+      router.push(`/messages/${conversation.id}`);
+    } catch (err) {
+      console.error('Error opening chat:', err);
     }
   };
 
@@ -399,24 +443,28 @@ export default function ProviderDashboardPage() {
               label: 'Nieuwe Aanvragen',
               value: stats.pendingRequests,
               color: 'from-amber-500 to-orange-500',
+              onClick: () => setActiveTab('requests'),
             },
             {
               icon: MessageSquare,
               label: 'Verzonden Offertes',
               value: stats.sentQuotes,
               color: 'from-blue-500 to-cyan-500',
+              onClick: () => setActiveTab('quotes'),
             },
             {
               icon: CheckCircle,
               label: 'Actieve Boekingen',
               value: stats.activeBookings,
               color: 'from-green-500 to-emerald-500',
+              onClick: () => setActiveTab('bookings'),
             },
             {
               icon: DollarSign,
               label: 'Totale Omzet',
               value: `€${stats.totalRevenue.toLocaleString()}`,
               color: 'from-purple-500 to-pink-500',
+              onClick: () => setActiveTab('bookings'),
             },
           ].map((stat, index) => (
             <motion.div
@@ -425,7 +473,10 @@ export default function ProviderDashboardPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <Card className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md transition-all">
+              <Card
+                className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md hover:-translate-y-1 transition-all cursor-pointer"
+                onClick={stat.onClick}
+              >
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
@@ -443,7 +494,6 @@ export default function ProviderDashboardPage() {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-white border-2 border-gray-200 p-1 rounded-2xl">
-            <TabsTrigger value="overview" className="rounded-xl">Overzicht</TabsTrigger>
             <TabsTrigger value="requests" className="rounded-xl">
               Aanvragen
               {stats.pendingRequests > 0 && (
@@ -451,50 +501,19 @@ export default function ProviderDashboardPage() {
               )}
             </TabsTrigger>
             <TabsTrigger value="quotes" className="rounded-xl">
-                    Mijn Offertes
-                        {stats.quotesWithUpdate > 0 && (
-                            <Badge className="ml-2 bg-blue-500 text-white">
-                            {stats.quotesWithUpdate}
-                        </Badge>
-                             )}
-                                </TabsTrigger>
+              Verzonden offertes
+              {stats.quotesWithUpdate > 0 && (
+                <Badge className="ml-2 bg-blue-500 text-white">
+                  {stats.quotesWithUpdate}
+                </Badge>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="bookings" className="rounded-xl">Boekingen</TabsTrigger>
+            <TabsTrigger value="profile" className="rounded-xl">
+              <UserCircle className="w-4 h-4 mr-1" />
+              Mijn Profiel
+            </TabsTrigger>
           </TabsList>
-
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6">
-            <Card className="p-6 border-2 border-gray-100 rounded-3xl">
-              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <TrendingUp className="w-6 h-6 text-purple-600" />
-                Recente Activiteit
-              </h3>
-              
-              <div className="space-y-4">
-                {loading ? (
-                  <>
-                    <Skeleton className="h-20 w-full" />
-                    <Skeleton className="h-20 w-full" />
-                  </>
-                ) : (
-                  <>
-                    {requests.slice(0, 3).map((request) => (
-                      <div key={request.id} className="p-4 bg-gray-50 rounded-xl flex items-center justify-between">
-                        <div>
-                          <p className="font-semibold text-gray-900">{request.eventType}</p>
-                          <p className="text-sm text-gray-600">{request.customer.name} · {formatDate(request.eventDate)}</p>
-                        </div>
-                        {getStatusBadge(request.status)}
-                      </div>
-                    ))}
-                    
-                    {requests.length === 0 && (
-                      <p className="text-center text-gray-500 py-8">Geen recente activiteit</p>
-                    )}
-                  </>
-                )}
-              </div>
-            </Card>
-          </TabsContent>
 
           {/* Requests Tab */}
           <TabsContent value="requests" className="space-y-6">
@@ -551,18 +570,38 @@ export default function ProviderDashboardPage() {
                     </div>
 
                     {request.quotes.length === 0 ? (
-                      <Button
-                        onClick={() => setCreatingQuoteFor(request)}
-                        className="w-full gradient-brand rounded-xl"
-                      >
-                        <Send className="w-4 h-4 mr-2" />
-                        Offerte Maken
-                      </Button>
+                      <div className="flex gap-3">
+                        <Button
+                          onClick={() => setCreatingQuoteFor(request)}
+                          className="flex-1 gradient-brand rounded-xl"
+                        >
+                          <Send className="w-4 h-4 mr-2" />
+                          Offerte Maken
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="rounded-xl"
+                          onClick={() => handleOpenChat(request.customer.id)}
+                        >
+                          <MessageSquare className="w-4 h-4 mr-1" />
+                          Chat
+                        </Button>
+                      </div>
                     ) : (
-                      <div className="p-3 bg-blue-50 rounded-xl text-center">
-                        <p className="text-sm text-blue-800 font-semibold">
-                          ✓ Offerte verstuurd ({request.quotes.length})
-                        </p>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 p-3 bg-blue-50 rounded-xl text-center">
+                          <p className="text-sm text-blue-800 font-semibold">
+                            ✓ Offerte verstuurd ({request.quotes.length})
+                          </p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          className="rounded-xl"
+                          onClick={() => handleOpenChat(request.customer.id)}
+                        >
+                          <MessageSquare className="w-4 h-4 mr-1" />
+                          Chat
+                        </Button>
                       </div>
                     )}
                   </Card>
@@ -657,12 +696,34 @@ export default function ProviderDashboardPage() {
                           Opnieuw Offerte Maken
                         </Button>
                         <Button
+                          onClick={() => handleOpenChat(quote.serviceRequest.customer.id)}
+                          variant="outline"
+                          className="rounded-xl"
+                        >
+                          <MessageSquare className="w-4 h-4 mr-1" />
+                          Chat
+                        </Button>
+                        <Button
                           onClick={() => setCancelingQuote(quote)}
                           variant="outline"
                           className="flex-1 border-2 border-red-300 text-red-700 hover:bg-red-50 rounded-xl"
                         >
                           <X className="w-4 h-4 mr-2" />
                           Aanvraag Annuleren
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* Chat button for non-rejected quotes */}
+                    {quote.status !== 'REJECTED' && (
+                      <div className="pt-4 border-t border-gray-200">
+                        <Button
+                          onClick={() => handleOpenChat(quote.serviceRequest.customer.id)}
+                          variant="outline"
+                          className="w-full rounded-xl"
+                        >
+                          <MessageSquare className="w-4 h-4 mr-2" />
+                          Chat met {quote.serviceRequest.customer.name}
                         </Button>
                       </div>
                     )}
@@ -720,13 +781,61 @@ export default function ProviderDashboardPage() {
                       </div>
                     </div>
 
-                    <div className="pt-4 border-t border-gray-200">
-                      <p className="text-sm text-gray-600">Contact: {booking.customer.email}</p>
-                      <p className="text-sm text-gray-600">Geboekt op: {formatDate(booking.createdAt)}</p>
+                    <div className="pt-4 border-t border-gray-200 flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-gray-600">Contact: {booking.customer.email}</p>
+                        <p className="text-sm text-gray-600">Geboekt op: {formatDate(booking.createdAt)}</p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        className="rounded-xl"
+                        onClick={() => handleOpenChat(booking.customer.id)}
+                      >
+                        <MessageSquare className="w-4 h-4 mr-1" />
+                        Chat
+                      </Button>
                     </div>
                   </Card>
                 ))}
               </div>
+            )}
+          </TabsContent>
+
+          {/* Profile Tab */}
+          <TabsContent value="profile" className="space-y-6">
+            {profileLoading ? (
+              <div className="space-y-6">
+                <Card className="p-6 border-2 border-gray-100 rounded-3xl">
+                  <Skeleton className="h-8 w-48 mb-4" />
+                  <div className="space-y-4">
+                    <Skeleton className="h-12 w-full" />
+                    <Skeleton className="h-12 w-full" />
+                    <Skeleton className="h-12 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                  </div>
+                </Card>
+                <Card className="p-6 border-2 border-gray-100 rounded-3xl">
+                  <Skeleton className="h-8 w-48 mb-4" />
+                  <div className="space-y-4">
+                    <Skeleton className="h-12 w-full" />
+                    <Skeleton className="h-12 w-full" />
+                  </div>
+                </Card>
+              </div>
+            ) : providerProfile ? (
+              <ProfileEditForm
+                initialData={providerProfile}
+                onSave={() => fetchProfile()}
+              />
+            ) : (
+              <Card className="p-12 border-2 border-gray-100 rounded-3xl text-center">
+                <UserCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Profiel laden mislukt</h3>
+                <p className="text-gray-600 mb-4">Er is iets misgegaan bij het ophalen van je profiel</p>
+                <Button onClick={fetchProfile} className="rounded-xl">
+                  Opnieuw proberen
+                </Button>
+              </Card>
             )}
           </TabsContent>
         </Tabs>

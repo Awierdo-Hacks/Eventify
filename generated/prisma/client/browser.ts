@@ -48,10 +48,25 @@ export type Booking = Prisma.BookingModel
  */
 export type Review = Prisma.ReviewModel
 /**
+ * Model Conversation
+ * 
+ */
+export type Conversation = Prisma.ConversationModel
+/**
+ * Model ConversationParticipant
+ * 
+ */
+export type ConversationParticipant = Prisma.ConversationParticipantModel
+/**
  * Model Message
  * 
  */
 export type Message = Prisma.MessageModel
+/**
+ * Model MessageAttachment
+ * 
+ */
+export type MessageAttachment = Prisma.MessageAttachmentModel
 /**
  * Model Event
  * 

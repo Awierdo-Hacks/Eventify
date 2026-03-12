@@ -288,6 +288,7 @@ export type QuoteWhereInput = {
   provider?: Prisma.XOR<Prisma.ServiceProviderScalarRelationFilter, Prisma.ServiceProviderWhereInput>
   event_slot?: Prisma.XOR<Prisma.EventSlotNullableScalarRelationFilter, Prisma.EventSlotWhereInput> | null
   booked_for_slot?: Prisma.XOR<Prisma.EventSlotNullableScalarRelationFilter, Prisma.EventSlotWhereInput> | null
+  chat_messages?: Prisma.MessageListRelationFilter
 }
 
 export type QuoteOrderByWithRelationInput = {
@@ -309,6 +310,7 @@ export type QuoteOrderByWithRelationInput = {
   provider?: Prisma.ServiceProviderOrderByWithRelationInput
   event_slot?: Prisma.EventSlotOrderByWithRelationInput
   booked_for_slot?: Prisma.EventSlotOrderByWithRelationInput
+  chat_messages?: Prisma.MessageOrderByRelationAggregateInput
 }
 
 export type QuoteWhereUniqueInput = Prisma.AtLeast<{
@@ -333,6 +335,7 @@ export type QuoteWhereUniqueInput = Prisma.AtLeast<{
   provider?: Prisma.XOR<Prisma.ServiceProviderScalarRelationFilter, Prisma.ServiceProviderWhereInput>
   event_slot?: Prisma.XOR<Prisma.EventSlotNullableScalarRelationFilter, Prisma.EventSlotWhereInput> | null
   booked_for_slot?: Prisma.XOR<Prisma.EventSlotNullableScalarRelationFilter, Prisma.EventSlotWhereInput> | null
+  chat_messages?: Prisma.MessageListRelationFilter
 }, "id">
 
 export type QuoteOrderByWithAggregationInput = {
@@ -393,6 +396,7 @@ export type QuoteCreateInput = {
   provider: Prisma.ServiceProviderCreateNestedOneWithoutQuotesInput
   event_slot?: Prisma.EventSlotCreateNestedOneWithoutQuotesInput
   booked_for_slot?: Prisma.EventSlotCreateNestedOneWithoutBooked_quoteInput
+  chat_messages?: Prisma.MessageCreateNestedManyWithoutQuoteInput
 }
 
 export type QuoteUncheckedCreateInput = {
@@ -411,6 +415,7 @@ export type QuoteUncheckedCreateInput = {
   created_at?: Date | string
   updated_at?: Date | string
   booked_for_slot?: Prisma.EventSlotUncheckedCreateNestedOneWithoutBooked_quoteInput
+  chat_messages?: Prisma.MessageUncheckedCreateNestedManyWithoutQuoteInput
 }
 
 export type QuoteUpdateInput = {
@@ -429,6 +434,7 @@ export type QuoteUpdateInput = {
   provider?: Prisma.ServiceProviderUpdateOneRequiredWithoutQuotesNestedInput
   event_slot?: Prisma.EventSlotUpdateOneWithoutQuotesNestedInput
   booked_for_slot?: Prisma.EventSlotUpdateOneWithoutBooked_quoteNestedInput
+  chat_messages?: Prisma.MessageUpdateManyWithoutQuoteNestedInput
 }
 
 export type QuoteUncheckedUpdateInput = {
@@ -447,6 +453,7 @@ export type QuoteUncheckedUpdateInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   booked_for_slot?: Prisma.EventSlotUncheckedUpdateOneWithoutBooked_quoteNestedInput
+  chat_messages?: Prisma.MessageUncheckedUpdateManyWithoutQuoteNestedInput
 }
 
 export type QuoteCreateManyInput = {
@@ -662,6 +669,22 @@ export type QuoteUpdateincluded_servicesInput = {
   push?: string | string[]
 }
 
+export type QuoteCreateNestedOneWithoutChat_messagesInput = {
+  create?: Prisma.XOR<Prisma.QuoteCreateWithoutChat_messagesInput, Prisma.QuoteUncheckedCreateWithoutChat_messagesInput>
+  connectOrCreate?: Prisma.QuoteCreateOrConnectWithoutChat_messagesInput
+  connect?: Prisma.QuoteWhereUniqueInput
+}
+
+export type QuoteUpdateOneWithoutChat_messagesNestedInput = {
+  create?: Prisma.XOR<Prisma.QuoteCreateWithoutChat_messagesInput, Prisma.QuoteUncheckedCreateWithoutChat_messagesInput>
+  connectOrCreate?: Prisma.QuoteCreateOrConnectWithoutChat_messagesInput
+  upsert?: Prisma.QuoteUpsertWithoutChat_messagesInput
+  disconnect?: Prisma.QuoteWhereInput | boolean
+  delete?: Prisma.QuoteWhereInput | boolean
+  connect?: Prisma.QuoteWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.QuoteUpdateToOneWithWhereWithoutChat_messagesInput, Prisma.QuoteUpdateWithoutChat_messagesInput>, Prisma.QuoteUncheckedUpdateWithoutChat_messagesInput>
+}
+
 export type QuoteCreateNestedManyWithoutEvent_slotInput = {
   create?: Prisma.XOR<Prisma.QuoteCreateWithoutEvent_slotInput, Prisma.QuoteUncheckedCreateWithoutEvent_slotInput> | Prisma.QuoteCreateWithoutEvent_slotInput[] | Prisma.QuoteUncheckedCreateWithoutEvent_slotInput[]
   connectOrCreate?: Prisma.QuoteCreateOrConnectWithoutEvent_slotInput | Prisma.QuoteCreateOrConnectWithoutEvent_slotInput[]
@@ -735,6 +758,7 @@ export type QuoteCreateWithoutProviderInput = {
   request: Prisma.ServiceRequestCreateNestedOneWithoutQuotesInput
   event_slot?: Prisma.EventSlotCreateNestedOneWithoutQuotesInput
   booked_for_slot?: Prisma.EventSlotCreateNestedOneWithoutBooked_quoteInput
+  chat_messages?: Prisma.MessageCreateNestedManyWithoutQuoteInput
 }
 
 export type QuoteUncheckedCreateWithoutProviderInput = {
@@ -752,6 +776,7 @@ export type QuoteUncheckedCreateWithoutProviderInput = {
   created_at?: Date | string
   updated_at?: Date | string
   booked_for_slot?: Prisma.EventSlotUncheckedCreateNestedOneWithoutBooked_quoteInput
+  chat_messages?: Prisma.MessageUncheckedCreateNestedManyWithoutQuoteInput
 }
 
 export type QuoteCreateOrConnectWithoutProviderInput = {
@@ -815,6 +840,7 @@ export type QuoteCreateWithoutRequestInput = {
   provider: Prisma.ServiceProviderCreateNestedOneWithoutQuotesInput
   event_slot?: Prisma.EventSlotCreateNestedOneWithoutQuotesInput
   booked_for_slot?: Prisma.EventSlotCreateNestedOneWithoutBooked_quoteInput
+  chat_messages?: Prisma.MessageCreateNestedManyWithoutQuoteInput
 }
 
 export type QuoteUncheckedCreateWithoutRequestInput = {
@@ -832,6 +858,7 @@ export type QuoteUncheckedCreateWithoutRequestInput = {
   created_at?: Date | string
   updated_at?: Date | string
   booked_for_slot?: Prisma.EventSlotUncheckedCreateNestedOneWithoutBooked_quoteInput
+  chat_messages?: Prisma.MessageUncheckedCreateNestedManyWithoutQuoteInput
 }
 
 export type QuoteCreateOrConnectWithoutRequestInput = {
@@ -860,6 +887,94 @@ export type QuoteUpdateManyWithWhereWithoutRequestInput = {
   data: Prisma.XOR<Prisma.QuoteUpdateManyMutationInput, Prisma.QuoteUncheckedUpdateManyWithoutRequestInput>
 }
 
+export type QuoteCreateWithoutChat_messagesInput = {
+  id?: string
+  total_price: number
+  included_services?: Prisma.QuoteCreateincluded_servicesInput | string[]
+  terms?: string | null
+  valid_until: Date | string
+  message?: string | null
+  accepted?: boolean
+  rejected_at?: Date | string | null
+  rejection_reason?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  request: Prisma.ServiceRequestCreateNestedOneWithoutQuotesInput
+  provider: Prisma.ServiceProviderCreateNestedOneWithoutQuotesInput
+  event_slot?: Prisma.EventSlotCreateNestedOneWithoutQuotesInput
+  booked_for_slot?: Prisma.EventSlotCreateNestedOneWithoutBooked_quoteInput
+}
+
+export type QuoteUncheckedCreateWithoutChat_messagesInput = {
+  id?: string
+  request_id: string
+  provider_id: string
+  total_price: number
+  included_services?: Prisma.QuoteCreateincluded_servicesInput | string[]
+  terms?: string | null
+  valid_until: Date | string
+  message?: string | null
+  accepted?: boolean
+  rejected_at?: Date | string | null
+  rejection_reason?: string | null
+  event_slot_id?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  booked_for_slot?: Prisma.EventSlotUncheckedCreateNestedOneWithoutBooked_quoteInput
+}
+
+export type QuoteCreateOrConnectWithoutChat_messagesInput = {
+  where: Prisma.QuoteWhereUniqueInput
+  create: Prisma.XOR<Prisma.QuoteCreateWithoutChat_messagesInput, Prisma.QuoteUncheckedCreateWithoutChat_messagesInput>
+}
+
+export type QuoteUpsertWithoutChat_messagesInput = {
+  update: Prisma.XOR<Prisma.QuoteUpdateWithoutChat_messagesInput, Prisma.QuoteUncheckedUpdateWithoutChat_messagesInput>
+  create: Prisma.XOR<Prisma.QuoteCreateWithoutChat_messagesInput, Prisma.QuoteUncheckedCreateWithoutChat_messagesInput>
+  where?: Prisma.QuoteWhereInput
+}
+
+export type QuoteUpdateToOneWithWhereWithoutChat_messagesInput = {
+  where?: Prisma.QuoteWhereInput
+  data: Prisma.XOR<Prisma.QuoteUpdateWithoutChat_messagesInput, Prisma.QuoteUncheckedUpdateWithoutChat_messagesInput>
+}
+
+export type QuoteUpdateWithoutChat_messagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  total_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  included_services?: Prisma.QuoteUpdateincluded_servicesInput | string[]
+  terms?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  valid_until?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accepted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rejected_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rejection_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  request?: Prisma.ServiceRequestUpdateOneRequiredWithoutQuotesNestedInput
+  provider?: Prisma.ServiceProviderUpdateOneRequiredWithoutQuotesNestedInput
+  event_slot?: Prisma.EventSlotUpdateOneWithoutQuotesNestedInput
+  booked_for_slot?: Prisma.EventSlotUpdateOneWithoutBooked_quoteNestedInput
+}
+
+export type QuoteUncheckedUpdateWithoutChat_messagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  request_id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider_id?: Prisma.StringFieldUpdateOperationsInput | string
+  total_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  included_services?: Prisma.QuoteUpdateincluded_servicesInput | string[]
+  terms?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  valid_until?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accepted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rejected_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rejection_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  event_slot_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  booked_for_slot?: Prisma.EventSlotUncheckedUpdateOneWithoutBooked_quoteNestedInput
+}
+
 export type QuoteCreateWithoutEvent_slotInput = {
   id?: string
   total_price: number
@@ -875,6 +990,7 @@ export type QuoteCreateWithoutEvent_slotInput = {
   request: Prisma.ServiceRequestCreateNestedOneWithoutQuotesInput
   provider: Prisma.ServiceProviderCreateNestedOneWithoutQuotesInput
   booked_for_slot?: Prisma.EventSlotCreateNestedOneWithoutBooked_quoteInput
+  chat_messages?: Prisma.MessageCreateNestedManyWithoutQuoteInput
 }
 
 export type QuoteUncheckedCreateWithoutEvent_slotInput = {
@@ -892,6 +1008,7 @@ export type QuoteUncheckedCreateWithoutEvent_slotInput = {
   created_at?: Date | string
   updated_at?: Date | string
   booked_for_slot?: Prisma.EventSlotUncheckedCreateNestedOneWithoutBooked_quoteInput
+  chat_messages?: Prisma.MessageUncheckedCreateNestedManyWithoutQuoteInput
 }
 
 export type QuoteCreateOrConnectWithoutEvent_slotInput = {
@@ -919,6 +1036,7 @@ export type QuoteCreateWithoutBooked_for_slotInput = {
   request: Prisma.ServiceRequestCreateNestedOneWithoutQuotesInput
   provider: Prisma.ServiceProviderCreateNestedOneWithoutQuotesInput
   event_slot?: Prisma.EventSlotCreateNestedOneWithoutQuotesInput
+  chat_messages?: Prisma.MessageCreateNestedManyWithoutQuoteInput
 }
 
 export type QuoteUncheckedCreateWithoutBooked_for_slotInput = {
@@ -936,6 +1054,7 @@ export type QuoteUncheckedCreateWithoutBooked_for_slotInput = {
   event_slot_id?: string | null
   created_at?: Date | string
   updated_at?: Date | string
+  chat_messages?: Prisma.MessageUncheckedCreateNestedManyWithoutQuoteInput
 }
 
 export type QuoteCreateOrConnectWithoutBooked_for_slotInput = {
@@ -985,6 +1104,7 @@ export type QuoteUpdateWithoutBooked_for_slotInput = {
   request?: Prisma.ServiceRequestUpdateOneRequiredWithoutQuotesNestedInput
   provider?: Prisma.ServiceProviderUpdateOneRequiredWithoutQuotesNestedInput
   event_slot?: Prisma.EventSlotUpdateOneWithoutQuotesNestedInput
+  chat_messages?: Prisma.MessageUpdateManyWithoutQuoteNestedInput
 }
 
 export type QuoteUncheckedUpdateWithoutBooked_for_slotInput = {
@@ -1002,6 +1122,7 @@ export type QuoteUncheckedUpdateWithoutBooked_for_slotInput = {
   event_slot_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  chat_messages?: Prisma.MessageUncheckedUpdateManyWithoutQuoteNestedInput
 }
 
 export type QuoteCreateManyProviderInput = {
@@ -1035,6 +1156,7 @@ export type QuoteUpdateWithoutProviderInput = {
   request?: Prisma.ServiceRequestUpdateOneRequiredWithoutQuotesNestedInput
   event_slot?: Prisma.EventSlotUpdateOneWithoutQuotesNestedInput
   booked_for_slot?: Prisma.EventSlotUpdateOneWithoutBooked_quoteNestedInput
+  chat_messages?: Prisma.MessageUpdateManyWithoutQuoteNestedInput
 }
 
 export type QuoteUncheckedUpdateWithoutProviderInput = {
@@ -1052,6 +1174,7 @@ export type QuoteUncheckedUpdateWithoutProviderInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   booked_for_slot?: Prisma.EventSlotUncheckedUpdateOneWithoutBooked_quoteNestedInput
+  chat_messages?: Prisma.MessageUncheckedUpdateManyWithoutQuoteNestedInput
 }
 
 export type QuoteUncheckedUpdateManyWithoutProviderInput = {
@@ -1101,6 +1224,7 @@ export type QuoteUpdateWithoutRequestInput = {
   provider?: Prisma.ServiceProviderUpdateOneRequiredWithoutQuotesNestedInput
   event_slot?: Prisma.EventSlotUpdateOneWithoutQuotesNestedInput
   booked_for_slot?: Prisma.EventSlotUpdateOneWithoutBooked_quoteNestedInput
+  chat_messages?: Prisma.MessageUpdateManyWithoutQuoteNestedInput
 }
 
 export type QuoteUncheckedUpdateWithoutRequestInput = {
@@ -1118,6 +1242,7 @@ export type QuoteUncheckedUpdateWithoutRequestInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   booked_for_slot?: Prisma.EventSlotUncheckedUpdateOneWithoutBooked_quoteNestedInput
+  chat_messages?: Prisma.MessageUncheckedUpdateManyWithoutQuoteNestedInput
 }
 
 export type QuoteUncheckedUpdateManyWithoutRequestInput = {
@@ -1167,6 +1292,7 @@ export type QuoteUpdateWithoutEvent_slotInput = {
   request?: Prisma.ServiceRequestUpdateOneRequiredWithoutQuotesNestedInput
   provider?: Prisma.ServiceProviderUpdateOneRequiredWithoutQuotesNestedInput
   booked_for_slot?: Prisma.EventSlotUpdateOneWithoutBooked_quoteNestedInput
+  chat_messages?: Prisma.MessageUpdateManyWithoutQuoteNestedInput
 }
 
 export type QuoteUncheckedUpdateWithoutEvent_slotInput = {
@@ -1184,6 +1310,7 @@ export type QuoteUncheckedUpdateWithoutEvent_slotInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   booked_for_slot?: Prisma.EventSlotUncheckedUpdateOneWithoutBooked_quoteNestedInput
+  chat_messages?: Prisma.MessageUncheckedUpdateManyWithoutQuoteNestedInput
 }
 
 export type QuoteUncheckedUpdateManyWithoutEvent_slotInput = {
@@ -1202,6 +1329,35 @@ export type QuoteUncheckedUpdateManyWithoutEvent_slotInput = {
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+
+/**
+ * Count Type QuoteCountOutputType
+ */
+
+export type QuoteCountOutputType = {
+  chat_messages: number
+}
+
+export type QuoteCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  chat_messages?: boolean | QuoteCountOutputTypeCountChat_messagesArgs
+}
+
+/**
+ * QuoteCountOutputType without action
+ */
+export type QuoteCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the QuoteCountOutputType
+   */
+  select?: Prisma.QuoteCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * QuoteCountOutputType without action
+ */
+export type QuoteCountOutputTypeCountChat_messagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MessageWhereInput
+}
 
 
 export type QuoteSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1223,6 +1379,8 @@ export type QuoteSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   provider?: boolean | Prisma.ServiceProviderDefaultArgs<ExtArgs>
   event_slot?: boolean | Prisma.Quote$event_slotArgs<ExtArgs>
   booked_for_slot?: boolean | Prisma.Quote$booked_for_slotArgs<ExtArgs>
+  chat_messages?: boolean | Prisma.Quote$chat_messagesArgs<ExtArgs>
+  _count?: boolean | Prisma.QuoteCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["quote"]>
 
 export type QuoteSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1288,6 +1446,8 @@ export type QuoteInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   provider?: boolean | Prisma.ServiceProviderDefaultArgs<ExtArgs>
   event_slot?: boolean | Prisma.Quote$event_slotArgs<ExtArgs>
   booked_for_slot?: boolean | Prisma.Quote$booked_for_slotArgs<ExtArgs>
+  chat_messages?: boolean | Prisma.Quote$chat_messagesArgs<ExtArgs>
+  _count?: boolean | Prisma.QuoteCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type QuoteIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   request?: boolean | Prisma.ServiceRequestDefaultArgs<ExtArgs>
@@ -1307,6 +1467,7 @@ export type $QuotePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     provider: Prisma.$ServiceProviderPayload<ExtArgs>
     event_slot: Prisma.$EventSlotPayload<ExtArgs> | null
     booked_for_slot: Prisma.$EventSlotPayload<ExtArgs> | null
+    chat_messages: Prisma.$MessagePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1721,6 +1882,7 @@ export interface Prisma__QuoteClient<T, Null = never, ExtArgs extends runtime.Ty
   provider<T extends Prisma.ServiceProviderDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ServiceProviderDefaultArgs<ExtArgs>>): Prisma.Prisma__ServiceProviderClient<runtime.Types.Result.GetResult<Prisma.$ServiceProviderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   event_slot<T extends Prisma.Quote$event_slotArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Quote$event_slotArgs<ExtArgs>>): Prisma.Prisma__EventSlotClient<runtime.Types.Result.GetResult<Prisma.$EventSlotPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   booked_for_slot<T extends Prisma.Quote$booked_for_slotArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Quote$booked_for_slotArgs<ExtArgs>>): Prisma.Prisma__EventSlotClient<runtime.Types.Result.GetResult<Prisma.$EventSlotPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  chat_messages<T extends Prisma.Quote$chat_messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Quote$chat_messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2195,6 +2357,30 @@ export type Quote$booked_for_slotArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   include?: Prisma.EventSlotInclude<ExtArgs> | null
   where?: Prisma.EventSlotWhereInput
+}
+
+/**
+ * Quote.chat_messages
+ */
+export type Quote$chat_messagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Message
+   */
+  select?: Prisma.MessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Message
+   */
+  omit?: Prisma.MessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MessageInclude<ExtArgs> | null
+  where?: Prisma.MessageWhereInput
+  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[]
+  cursor?: Prisma.MessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
 }
 
 /**

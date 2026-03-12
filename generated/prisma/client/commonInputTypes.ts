@@ -331,6 +331,23 @@ export type EnumBookingStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumBookingStatusFilter<$PrismaModel>
 }
 
+export type EnumMessageTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.MessageType | Prisma.EnumMessageTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.MessageType[] | Prisma.ListEnumMessageTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MessageType[] | Prisma.ListEnumMessageTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMessageTypeFilter<$PrismaModel> | $Enums.MessageType
+}
+
+export type EnumMessageTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MessageType | Prisma.EnumMessageTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.MessageType[] | Prisma.ListEnumMessageTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MessageType[] | Prisma.ListEnumMessageTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMessageTypeWithAggregatesFilter<$PrismaModel> | $Enums.MessageType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMessageTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMessageTypeFilter<$PrismaModel>
+}
+
 export type EnumEventTypeFilter<$PrismaModel = never> = {
   equals?: $Enums.EventType | Prisma.EnumEventTypeFieldRefInput<$PrismaModel>
   in?: $Enums.EventType[] | Prisma.ListEnumEventTypeFieldRefInput<$PrismaModel>
@@ -743,6 +760,23 @@ export type NestedEnumBookingStatusWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumBookingStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumBookingStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumMessageTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.MessageType | Prisma.EnumMessageTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.MessageType[] | Prisma.ListEnumMessageTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MessageType[] | Prisma.ListEnumMessageTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMessageTypeFilter<$PrismaModel> | $Enums.MessageType
+}
+
+export type NestedEnumMessageTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MessageType | Prisma.EnumMessageTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.MessageType[] | Prisma.ListEnumMessageTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MessageType[] | Prisma.ListEnumMessageTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMessageTypeWithAggregatesFilter<$PrismaModel> | $Enums.MessageType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMessageTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMessageTypeFilter<$PrismaModel>
 }
 
 export type NestedEnumEventTypeFilter<$PrismaModel = never> = {

@@ -61,6 +61,7 @@ export async function GET(request: Request) {
             business_name: true,
             category: true,
             location: true,
+            user_id: true,
           },
         },
         quotes: {
@@ -102,6 +103,7 @@ export async function GET(request: Request) {
             businessName: req.provider.business_name,
             category: req.provider.category,
             location: req.provider.location,
+            userId: req.provider.user_id,
           }
         : null,
       quotes: req.quotes.map((quote) => ({

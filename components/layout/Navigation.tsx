@@ -2,15 +2,15 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import { useSession } from '@/components/providers/SessionProvider';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Home, Search, FileText, LayoutDashboard, MessageSquare, Shield, LogOut, User, Plus } from 'lucide-react';
+import { Home, Search, LayoutDashboard, MessageSquare, Shield, LogOut, User, Plus } from 'lucide-react';
 
 const navigation = [
   { name: 'Home', href: '/', icon: Home },
   { name: 'Browse', href: '/browse', icon: Search },
-  { name: 'Documentatie', href: '/docs', icon: FileText },
 ];
 
 const getDashboardLink = (role?: string) => {
@@ -24,6 +24,31 @@ export function Navigation() {
   const router = useRouter();
   const { user, status, update } = useSession();
   const isLoading = status === 'loading';
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Poll for unread message count
+  useEffect(() => {
+    if (status !== 'authenticated') {
+      setUnreadCount(0);
+      return;
+    }
+
+    const fetchUnread = async () => {
+      try {
+        const res = await fetch('/api/conversations/unread');
+        if (res.ok) {
+          const data = await res.json();
+          setUnreadCount(data.unreadCount || 0);
+        }
+      } catch {
+        // Silently fail
+      }
+    };
+
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 15000);
+    return () => clearInterval(interval);
+  }, [status]);
 
   const handleLogout = async () => {
     try {
@@ -106,8 +131,28 @@ export function Navigation() {
                 )}
                 <Link href={getDashboardLink(user.role)}>
                   <Button variant="outline" className="rounded-xl border-purple-200 text-purple-700 hover:bg-purple-50">
-                    <LayoutDashboard className="w-4 h-4 mr-2 " />
+                    <LayoutDashboard className="w-4 h-4 mr-2" />
                     Dashboard
+                  </Button>
+                </Link>
+                {/* Chat knop (icon-only) met ongelezen badge */}
+                <Link href="/messages">
+                  <Button
+                    variant={pathname.startsWith('/messages') ? 'default' : 'ghost'}
+                    size="icon"
+                    className={cn(
+                      'rounded-xl relative',
+                      pathname.startsWith('/messages')
+                        ? 'gradient-brand text-white'
+                        : 'text-gray-600 hover:text-purple-700 hover:bg-purple-50'
+                    )}
+                  >
+                    <MessageSquare className="w-5 h-5" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 w-4.5 h-4.5 bg-red-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold min-w-[18px] min-h-[18px]">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
                   </Button>
                 </Link>
                 <div className="hidden md:flex items-center space-x-2 text-sm">
@@ -166,6 +211,43 @@ export function Navigation() {
               </Link>
             );
           })}
+          {/* Mobile Dashboard link - role-aware */}
+          {user && (
+            <Link href={getDashboardLink(user.role)}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  'flex flex-col items-center space-y-1',
+                  (pathname === '/dashboard' || pathname === '/provider-dashboard' || pathname === '/admin') && 'text-purple-600'
+                )}
+              >
+                <LayoutDashboard className="w-5 h-5" />
+                <span className="text-xs">Dashboard</span>
+              </Button>
+            </Link>
+          )}
+          {/* Mobile chat link */}
+          {user && (
+            <Link href="/messages">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  'flex flex-col items-center space-y-1 relative',
+                  pathname.startsWith('/messages') && 'text-purple-600'
+                )}
+              >
+                <MessageSquare className="w-5 h-5" />
+                <span className="text-xs">Chat</span>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 right-0 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-white text-[9px] font-bold">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     </nav>

@@ -109,3 +109,13 @@ export const ProviderCategory = {
 } as const
 
 export type ProviderCategory = (typeof ProviderCategory)[keyof typeof ProviderCategory]
+
+
+export const MessageType = {
+  TEXT: 'TEXT',
+  IMAGE: 'IMAGE',
+  QUOTE: 'QUOTE',
+  SYSTEM: 'SYSTEM'
+} as const
+
+export type MessageType = (typeof MessageType)[keyof typeof MessageType]

@@ -50,6 +50,7 @@ interface ServiceRequest {
     businessName: string;
     category: string;
     location: string;
+    userId: number;
   };
   quotes: Array<{
     id: string;
@@ -71,6 +72,7 @@ interface Quote {
     id: string;
     businessName: string;
     category: string;
+    userId: number;
   };
   serviceRequest: {
     id: string;
@@ -96,6 +98,7 @@ interface Booking {
     id: string;
     businessName: string;
     category: string;
+    userId: number;
   };
   quote?: {
     id: string;
@@ -163,7 +166,7 @@ function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, status } = useSession();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('events');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -176,6 +179,7 @@ function DashboardContent() {
   const [acceptingQuote, setAcceptingQuote] = useState<string | null>(null);
   const [rejectingQuote, setRejectingQuote] = useState<Quote | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
+  const [unreadCount, setUnreadCount] = useState(0);
 
   // Check for success message
   useEffect(() => {
@@ -186,6 +190,23 @@ function DashboardContent() {
     const tab = searchParams.get('tab');
     if (tab) setActiveTab(tab);
   }, [searchParams]);
+
+  // Poll for unread message count
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+    const fetchUnread = async () => {
+      try {
+        const res = await fetch('/api/conversations/unread');
+        if (res.ok) {
+          const data = await res.json();
+          setUnreadCount(data.unreadCount || 0);
+        }
+      } catch { /* Silently fail */ }
+    };
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 15000);
+    return () => clearInterval(interval);
+  }, [status]);
 
   // Redirect based on user role
   useEffect(() => {
@@ -343,6 +364,21 @@ function DashboardContent() {
     }
   };
 
+  const handleOpenChat = async (providerUserId: number) => {
+    try {
+      const res = await fetch('/api/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipientId: providerUserId }),
+      });
+      if (!res.ok) throw new Error('Kon gesprek niet openen');
+      const conversation = await res.json();
+      router.push(`/messages/${conversation.id}`);
+    } catch (err) {
+      console.error('Error opening chat:', err);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { label: string; className: string }> = {
       PENDING: { label: 'In behandeling', className: 'bg-blue-100 text-blue-800' },
@@ -374,6 +410,7 @@ function DashboardContent() {
       icon: PartyPopper,
       color: 'text-pink-600',
       bgColor: 'bg-pink-100',
+      onClick: () => setActiveTab('events'),
     },
     {
       label: 'Actieve Aanvragen',
@@ -381,13 +418,15 @@ function DashboardContent() {
       icon: FileText,
       color: 'text-blue-600',
       bgColor: 'bg-blue-100',
+      onClick: () => setActiveTab('requests'),
     },
     {
-      label: 'Ontvangen Offertes',
-      value: quotes.filter((q) => q.status === 'PENDING').length,
+      label: 'Ongelezen Berichten',
+      value: unreadCount,
       icon: MessageSquare,
       color: 'text-purple-600',
       bgColor: 'bg-purple-100',
+      onClick: () => router.push('/messages'),
     },
     {
       label: 'Bevestigde Boekingen',
@@ -395,6 +434,7 @@ function DashboardContent() {
       icon: CheckCircle,
       color: 'text-green-600',
       bgColor: 'bg-green-100',
+      onClick: () => setActiveTab('bookings'),
     },
   ];
 
@@ -472,7 +512,10 @@ function DashboardContent() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
               >
-                <Card className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md transition-shadow">
+                <Card
+                  className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md hover:-translate-y-1 transition-all cursor-pointer"
+                  onClick={stat.onClick}
+                >
                   <div className={`w-12 h-12 ${stat.bgColor} rounded-2xl flex items-center justify-center mb-4`}>
                     <Icon className={`w-6 h-6 ${stat.color}`} />
                   </div>
@@ -487,72 +530,13 @@ function DashboardContent() {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-white border-2 border-gray-100 p-1 rounded-2xl">
-            <TabsTrigger value="overview" className="rounded-xl">Overzicht</TabsTrigger>
             <TabsTrigger value="events" className="rounded-xl">
               <PartyPopper className="w-4 h-4 mr-1" />
               Mijn Events
             </TabsTrigger>
             <TabsTrigger value="requests" className="rounded-xl">Aanvragen</TabsTrigger>
-            <TabsTrigger value="quotes" className="rounded-xl">Offertes</TabsTrigger>
             <TabsTrigger value="bookings" className="rounded-xl">Boekingen</TabsTrigger>
           </TabsList>
-
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6">
-            <Card className="p-8 border-2 border-gray-100 rounded-3xl">
-              <h2 className="text-2xl font-bold mb-6">Recente Activiteit</h2>
-              
-              {requests.length === 0 && quotes.length === 0 && bookings.length === 0 ? (
-                <div className="text-center py-12">
-                  <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Nog geen activiteit</h3>
-                  <p className="text-gray-600 mb-6">Begin met het aanvragen van een offerte bij een provider</p>
-                  <Button
-                    onClick={() => router.push('/browse')}
-                    className="gradient-brand rounded-xl"
-                  >
-                    Browse Providers
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {/* Recent Requests */}
-                  {requests.slice(0, 3).map((request) => (
-                    <div key={request.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                          <FileText className="w-5 h-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-gray-900">{request.eventType}</p>
-                          <p className="text-sm text-gray-600">{formatDate(request.eventDate)} • {request.eventLocation}</p>
-                        </div>
-                      </div>
-                      {getStatusBadge(request.status)}
-                    </div>
-                  ))}
-
-                  {/* Recent Quotes */}
-                  {quotes.slice(0, 2).map((quote) => (
-                    <div key={quote.id} className="flex items-center justify-between p-4 bg-purple-50 rounded-xl">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-                          <MessageSquare className="w-5 h-5 text-purple-600" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-gray-900">{quote.provider.businessName}</p>
-                          <p className="text-sm text-gray-600">€{quote.totalPrice.toLocaleString()} • {quote.packageName}</p>
-                        </div>
-                      </div>
-                      <Badge className={quote.status === 'ACCEPTED' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}>
-                        {quote.status === 'ACCEPTED' ? 'Geaccepteerd' : 'Nog te beoordelen'}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </Card>
-          </TabsContent>
 
           {/* Events Tab */}
           <TabsContent value="events" className="space-y-6">
@@ -786,11 +770,22 @@ function DashboardContent() {
                     {request.provider && (
                       <div className="pt-4 border-t border-gray-200">
                         <p className="text-sm text-gray-600 mb-2">Provider</p>
-                        <div className="flex items-center gap-3">
-                          <Badge variant="secondary" className="bg-purple-100 text-purple-700">
-                            {request.provider.category}
-                          </Badge>
-                          <span className="font-semibold text-gray-900">{request.provider.businessName}</span>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <Badge variant="secondary" className="bg-purple-100 text-purple-700">
+                              {request.provider.category}
+                            </Badge>
+                            <span className="font-semibold text-gray-900">{request.provider.businessName}</span>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="rounded-xl"
+                            onClick={() => handleOpenChat(request.provider!.userId)}
+                          >
+                            <MessageSquare className="w-4 h-4 mr-1" />
+                            Chat
+                          </Button>
                         </div>
                       </div>
                     )}
@@ -801,100 +796,6 @@ function DashboardContent() {
                           <MessageSquare className="w-4 h-4 inline mr-1" />
                           {request.quotes.length} offerte{request.quotes.length > 1 ? 's' : ''} ontvangen
                         </p>
-                      </div>
-                    )}
-                  </Card>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-
-          {/* Quotes Tab */}
-          <TabsContent value="quotes" className="space-y-6">
-            {quotes.filter((q) => q.status !== 'ACCEPTED').length === 0 ? (
-              <Card className="p-12 border-2 border-gray-100 rounded-3xl text-center">
-                <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Geen openstaande offertes</h3>
-                <p className="text-gray-600">Je hebt momenteel geen offertes om te beoordelen</p>
-              </Card>
-            ) : (
-              <div className="grid gap-6">
-                {quotes.filter((q) => q.status !== 'ACCEPTED').map((quote) => (
-                  <Card key={quote.id} className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md transition-shadow">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-1">
-                          €{quote.totalPrice.toLocaleString()}
-                        </h3>
-                        <p className="text-lg font-semibold text-gray-700 mb-2">{quote.packageName}</p>
-                        <p className="text-gray-600 mb-3">{quote.packageDescription}</p>
-                        <div className="flex items-center gap-3 text-sm">
-                          <Badge variant="secondary" className="bg-purple-100 text-purple-700">
-                            {quote.provider.category}
-                          </Badge>
-                          <span className="font-semibold text-gray-900">{quote.provider.businessName}</span>
-                        </div>
-                      </div>
-                      <Badge className={quote.status === 'ACCEPTED' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}>
-                        {quote.status === 'ACCEPTED' ? 'Geaccepteerd' : 'In afwachting'}
-                      </Badge>
-                    </div>
-
-                    {/* Included Services */}
-                    {quote.includedServices && quote.includedServices.length > 0 && (
-                      <div className="mb-4">
-                        <p className="text-sm font-semibold text-gray-700 mb-2">Inbegrepen:</p>
-                        <ul className="space-y-1">
-                          {quote.includedServices.map((service, idx) => (
-                            <li key={idx} className="text-sm text-gray-600 flex items-center gap-2">
-                              <CheckCircle className="w-4 h-4 text-green-600" />
-                              {service}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Event Details */}
-                    <div className="pt-4 border-t border-gray-200 mb-4">
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          {formatDate(quote.serviceRequest.eventDate)}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-4 h-4" />
-                          {quote.serviceRequest.eventLocation}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    {quote.status !== 'ACCEPTED' && (
-                      <div className="flex gap-3 pt-4 border-t border-gray-200">
-                        <Button
-                          onClick={() => handleAcceptQuote(quote.id)}
-                          disabled={acceptingQuote === quote.id}
-                          className="flex-1 gradient-brand rounded-xl"
-                        >
-                          {acceptingQuote === quote.id ? 'Bezig...' : 'Accepteren'}
-                        </Button>
-                        <Button
-                          onClick={() => setRejectingQuote(quote)}
-                          variant="outline"
-                          className="flex-1 rounded-xl"
-                        >
-                          Afwijzen
-                        </Button>
-                      </div>
-                    )}
-
-                    {quote.status === 'ACCEPTED' && (
-                      <div className="pt-4 border-t border-gray-200">
-                        <div className="flex items-center gap-2 text-green-600">
-                          <CheckCircle className="w-5 h-5" />
-                          <span className="font-semibold">Offerte geaccepteerd - Boeking bevestigd!</span>
-                        </div>
                       </div>
                     )}
                   </Card>
@@ -981,6 +882,17 @@ function DashboardContent() {
                         </p>
                       </div>
                     )}
+
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <Button
+                        onClick={() => handleOpenChat(booking.provider.userId)}
+                        variant="outline"
+                        className="w-full rounded-xl"
+                      >
+                        <MessageSquare className="w-4 h-4 mr-2" />
+                        Chat met {booking.provider.businessName}
+                      </Button>
+                    </div>
                   </Card>
                 ))}
               </div>

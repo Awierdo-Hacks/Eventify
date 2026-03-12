@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useSession } from '@/components/providers/SessionProvider';
 import { Container } from '@/components/layout';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +17,7 @@ import {
   Clock,
   Users,
   Mail,
+  MessageSquare,
   Phone,
   Calendar,
   ArrowLeft,
@@ -52,16 +54,23 @@ interface Provider {
   rating: number;
   reviewCount: number;
   bookingCount: number;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  };
 }
 
 export default function ProviderDetailPage({ params }: { params: Promise<{ id: string }> | { id: string } }) {
   const router = useRouter();
+  const { user } = useSession();
   const [selectedImage, setSelectedImage] = useState(0);
   const [provider, setProvider] = useState<Provider | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [providerId, setProviderId] = useState<string | null>(null);
+  const [contactLoading, setContactLoading] = useState(false);
 
   // Handle async params for Next.js 15+
   useEffect(() => {
@@ -114,6 +123,31 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
       PREMIUM: '€€€€',
     };
     return priceMap[range] || range;
+  };
+
+  const handleContact = async () => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+    if (!provider) return;
+
+    setContactLoading(true);
+    try {
+      const res = await fetch('/api/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipientId: provider.user.id }),
+      });
+      if (!res.ok) throw new Error('Kon gesprek niet starten');
+      const conversation = await res.json();
+      router.push(`/messages/${conversation.id}`);
+    } catch (err) {
+      console.error('Error starting conversation:', err);
+      alert('Er is iets misgegaan bij het starten van het gesprek');
+    } finally {
+      setContactLoading(false);
+    }
   };
 
   if (loading) {
@@ -393,9 +427,23 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
                 </Button>
               </Link>
 
-              <Button variant="outline" className="w-full rounded-xl h-12">
-                <Mail className="w-4 h-4 mr-2" />
-                Contact Opnemen
+              <Button 
+                variant="outline" 
+                className="w-full rounded-xl h-12"
+                onClick={handleContact}
+                disabled={contactLoading}
+              >
+                {contactLoading ? (
+                  <>
+                    <div className="w-4 h-4 mr-2 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                    Even geduld...
+                  </>
+                ) : (
+                  <>
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    Stuur Bericht
+                  </>
+                )}
               </Button>
 
               <div className="mt-6 pt-6 border-t border-gray-200">
