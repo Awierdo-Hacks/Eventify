@@ -30,6 +30,7 @@ import {
   X,
   Eye,
   Star,
+  Loader2,
 } from 'lucide-react';
 import {
   EventType,
@@ -134,6 +135,9 @@ export function EventDetailView({
   const [slotToRemove, setSlotToRemove] = useState<{ id: string; category: ProviderCategory } | null>(null);
   const [isRemovingSlot, setIsRemovingSlot] = useState(false);
   
+  // Accept quote state
+  const [acceptingQuoteId, setAcceptingQuoteId] = useState<string | null>(null);
+  
   // Event editing state
   const [isEditingMeta, setIsEditingMeta] = useState(false);
   const [isSavingMeta, setIsSavingMeta] = useState(false);
@@ -155,6 +159,8 @@ export function EventDetailView({
     booked_quote: slot.bookedQuote ? { total_price: slot.bookedQuote.totalPrice } : null,
   }));
   const costRange = calculateCostRange(slotsWithPrices);
+  const bookedSlots = event.slots.filter((slot) => slot.status === 'BOOKED' && slot.bookedQuote);
+  const quoteOnlySlots = event.slots.filter((slot) => slot.status !== 'BOOKED' && slot.quotes.length > 0);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('nl-NL', {
@@ -256,6 +262,43 @@ export function EventDetailView({
       budgetMax: event.budgetMax?.toString() || '',
     });
     setIsEditingMeta(false);
+  };
+
+  // Accept a quote (from within the event detail view)
+  const handleAcceptQuote = async (quoteId: string, slotId: string) => {
+    setAcceptingQuoteId(quoteId);
+    try {
+      // First accept the quote via the API
+      const acceptRes = await fetch(`/api/quotes/${quoteId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'accept' }),
+      });
+
+      if (!acceptRes.ok) {
+        const err = await acceptRes.json();
+        console.error('Error accepting quote:', err);
+        return;
+      }
+
+      // Then link the quote to this event slot
+      const linkRes = await fetch(`/api/quotes/${quoteId}/link`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventSlotId: slotId }),
+      });
+
+      if (linkRes.ok) {
+        // Refresh event data
+        onRefresh?.();
+        setSelectedSlotForQuotes(null);
+        setSelectedQuoteForDetails(null);
+      }
+    } catch (error) {
+      console.error('Error accepting quote:', error);
+    } finally {
+      setAcceptingQuoteId(null);
+    }
   };
 
   // Get selected slot for quotes modal
@@ -550,48 +593,72 @@ export function EventDetailView({
       </div>
 
       {/* Cost Overview */}
-      {(costRange.min > 0 || costRange.max > 0) && (
+      {(bookedSlots.length > 0 || quoteOnlySlots.length > 0) && (
         <Card className="p-6 border-2 border-gray-100 rounded-3xl">
           <h3 className="text-xl font-bold text-gray-900 mb-4">Kostenoverzicht</h3>
-          <div className="space-y-3">
-            {event.slots
-              .filter((slot) => slot.status === 'BOOKED' || slot.quotes.length > 0)
-              .map((slot) => {
-                const isBooked = slot.status === 'BOOKED' && slot.bookedQuote;
-                const prices = slot.quotes.map((q) => q.totalPrice);
-                const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
-                const maxPrice = prices.length > 0 ? Math.max(...prices) : 0;
 
-                return (
-                  <div
-                    key={slot.id}
-                    className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span>{categoryIcons[slot.category]}</span>
-                      <span className="text-gray-700">
-                        {slot.customName || categoryNames[slot.category]}
-                      </span>
-                      {isBooked && (
-                        <Badge className="bg-green-100 text-green-800 text-xs">Geboekt</Badge>
-                      )}
-                    </div>
-                    <span className="font-semibold text-gray-900">
-                      {isBooked
-                        ? `€${slot.bookedQuote!.totalPrice.toLocaleString()}`
-                        : `€${minPrice.toLocaleString()} - €${maxPrice.toLocaleString()}`}
+          {bookedSlots.length > 0 && (
+            <div className="space-y-3">
+              {bookedSlots.map((slot) => (
+                <div
+                  key={slot.id}
+                  className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"
+                >
+                  <div className="flex items-center gap-2">
+                    <span>{categoryIcons[slot.category]}</span>
+                    <span className="text-gray-700">
+                      {slot.customName || categoryNames[slot.category]}
                     </span>
+                    <Badge className="bg-green-100 text-green-800 text-xs">Geboekt</Badge>
                   </div>
-                );
-              })}
-          </div>
-          <div className="mt-4 pt-4 border-t-2 border-gray-200 flex items-center justify-between">
-            <span className="text-lg font-bold text-gray-900">Geschat Totaal</span>
-            <span className="text-xl font-bold text-gray-900">
-              €{costRange.min.toLocaleString()}
-              {costRange.max !== costRange.min && ` - €${costRange.max.toLocaleString()}`}
-            </span>
-          </div>
+                  <span className="font-semibold text-gray-900">
+                    €{slot.bookedQuote!.totalPrice.toLocaleString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {quoteOnlySlots.length > 0 && (
+            <div className={bookedSlots.length > 0 ? 'mt-5' : ''}>
+              <p className="text-sm text-gray-500 mb-2">
+                Offertes ontvangen (nog niet geboekt)
+              </p>
+              <div className="space-y-2">
+                {quoteOnlySlots.map((slot) => {
+                  const prices = slot.quotes.map((q) => q.totalPrice);
+                  const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
+                  const maxPrice = prices.length > 0 ? Math.max(...prices) : 0;
+
+                  return (
+                    <div
+                      key={slot.id}
+                      className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span>{categoryIcons[slot.category]}</span>
+                        <span className="text-gray-700">
+                          {slot.customName || categoryNames[slot.category]}
+                        </span>
+                      </div>
+                      <span className="text-sm font-semibold text-gray-700">
+                        €{minPrice.toLocaleString()} - €{maxPrice.toLocaleString()}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {bookedSlots.length > 0 && (
+            <div className="mt-4 pt-4 border-t-2 border-gray-200 flex items-center justify-between">
+              <span className="text-lg font-bold text-gray-900">Geboekt totaal</span>
+              <span className="text-xl font-bold text-gray-900">
+                €{costRange.min.toLocaleString()}
+              </span>
+            </div>
+          )}
         </Card>
       )}
 
@@ -687,7 +754,14 @@ export function EventDetailView({
                             variant="default"
                             size="sm"
                             className="flex-1 rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors shadow-sm"
+                            onClick={() => handleAcceptQuote(quote.id, selectedSlot.id)}
+                            disabled={!!acceptingQuoteId}
                           >
+                            {acceptingQuoteId === quote.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin mr-1" />
+                            ) : (
+                              <Check className="w-4 h-4 mr-1" />
+                            )}
                             Accepteren
                           </Button>
                           <Button 
@@ -794,16 +868,24 @@ export function EventDetailView({
           >
             Sluiten
           </DialogButton>
-          <DialogButton
-            onClick={() => {
-              // TODO: Implement accept quote functionality
-              setSelectedQuoteForDetails(null);
-            }}
-            variant="success"
-          >
-            <Check className="w-4 h-4 mr-1" />
-            Accepteren
-          </DialogButton>
+          {selectedSlot && !selectedQuoteForDetails?.accepted && (
+            <DialogButton
+              onClick={() => {
+                if (selectedQuoteForDetails && selectedSlot) {
+                  handleAcceptQuote(selectedQuoteForDetails.id, selectedSlot.id);
+                }
+              }}
+              variant="success"
+              disabled={!!acceptingQuoteId}
+            >
+              {acceptingQuoteId === selectedQuoteForDetails?.id ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-1" />
+              ) : (
+                <Check className="w-4 h-4 mr-1" />
+              )}
+              Accepteren
+            </DialogButton>
+          )}
         </DialogActions>
       </ConfirmationDialog>
 

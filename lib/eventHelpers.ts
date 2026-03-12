@@ -217,10 +217,6 @@ export const calculateCostRange = (
     if (slot.status === 'BOOKED' && slot.booked_quote) {
       min += slot.booked_quote.total_price;
       max += slot.booked_quote.total_price;
-    } else if (slot.quotes.length > 0) {
-      const prices = slot.quotes.map((q) => q.total_price);
-      min += Math.min(...prices);
-      max += Math.max(...prices);
     }
   });
 

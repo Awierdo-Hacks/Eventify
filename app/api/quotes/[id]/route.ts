@@ -60,14 +60,6 @@ export async function PATCH(
       );
     }
 
-    // Check if quote is still pending (not accepted yet)
-    if (quote.accepted && action === 'accept') {
-      return NextResponse.json(
-        { error: 'Offerte is al geaccepteerd' },
-        { status: 400 }
-      );
-    }
-
     if (action === 'accept') {
       // Check if there's already a booking for this request
       const existingBooking = await prisma.booking.findUnique({
@@ -75,6 +67,33 @@ export async function PATCH(
       });
 
       if (existingBooking) {
+        // Allow idempotent accept for the same provider/quote
+        if (quote.accepted && existingBooking.provider_id === quote.provider_id) {
+          if (quote.event_slot_id) {
+            await prisma.eventSlot.update({
+              where: { id: quote.event_slot_id },
+              data: {
+                status: 'BOOKED',
+                booked_quote_id: quoteId,
+              },
+            });
+          }
+
+          return NextResponse.json({
+            success: true,
+            message: 'Offerte is al geaccepteerd',
+            quote: {
+              id: quote.id,
+              accepted: true,
+            },
+            booking: {
+              id: existingBooking.id,
+              eventDate: existingBooking.event_date,
+              status: existingBooking.status,
+            },
+          });
+        }
+
         return NextResponse.json(
           { error: 'Er is al een boeking voor deze aanvraag. Je kunt maar één offerte per aanvraag accepteren.' },
           { status: 400 }
@@ -125,6 +144,17 @@ export async function PATCH(
         where: { id: quote.request_id },
         data: { status: 'ACCEPTED' },
       });
+
+      // If quote is linked to an event slot, update slot status to BOOKED
+      if (quote.event_slot_id) {
+        await prisma.eventSlot.update({
+          where: { id: quote.event_slot_id },
+          data: { 
+            status: 'BOOKED',
+            booked_quote_id: quoteId,
+          },
+        });
+      }
 
       return NextResponse.json({
         success: true,

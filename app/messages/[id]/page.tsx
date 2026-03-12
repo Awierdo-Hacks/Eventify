@@ -22,8 +22,12 @@ import {
   Clock,
   Loader2,
   Download,
+  Calendar,
+  MapPin,
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import VisuallyHidden from '@/components/ui/visually-hidden';
+import { mapCategoryToEnum, ProviderCategory } from '@/lib/eventHelpers';
 
 interface Attachment {
   id: string;
@@ -79,6 +83,18 @@ interface ConversationInfo {
   } | null;
 }
 
+interface UserEvent {
+  id: string;
+  name: string;
+  eventType: string;
+  eventDate: string | null;
+  slots: {
+    id: string;
+    category: string;
+    status: string;
+  }[];
+}
+
 export default function ChatPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const { user, status } = useSession();
@@ -94,6 +110,16 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
+
+  // Accept quote with event linking state
+  const [showAcceptQuoteDialog, setShowAcceptQuoteDialog] = useState(false);
+  const [acceptingQuoteId, setAcceptingQuoteId] = useState<string | null>(null);
+  const [acceptingQuoteCategory, setAcceptingQuoteCategory] = useState<ProviderCategory | null>(null);
+  const [userEvents, setUserEvents] = useState<UserEvent[]>([]);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
+  const [loadingEvents, setLoadingEvents] = useState(false);
+  const [acceptingQuote, setAcceptingQuote] = useState(false);
 
   // Quote form state
   const [quotePrice, setQuotePrice] = useState('');
@@ -407,7 +433,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
             className="flex-1 rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors text-sm shadow-sm"
             onClick={(e) => {
               e.stopPropagation();
-              handleAcceptQuote(quote.id);
+              handleAcceptQuote(quote.id, quote.provider?.category);
             }}
           >
             <Check className="w-4 h-4 mr-1" />
@@ -430,21 +456,92 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
     </div>
   );
 
-  const handleAcceptQuote = async (quoteId: string) => {
+  const handleAcceptQuote = async (quoteId: string, providerCategory?: string) => {
+    // Open dialog to select event and slot
+    setAcceptingQuoteId(quoteId);
+    const mappedCategory = providerCategory
+      ? mapCategoryToEnum(providerCategory) || (providerCategory as ProviderCategory)
+      : null;
+    setAcceptingQuoteCategory(mappedCategory);
+    setSelectedEventId(null);
+    setSelectedSlotId(null);
+    setShowAcceptQuoteDialog(true);
+    
+    // Load user's events
+    setLoadingEvents(true);
     try {
-      const res = await fetch(`/api/quotes/${quoteId}`, {
+      const res = await fetch('/api/events');
+      if (res.ok) {
+        const data = await res.json();
+        // API returns { events: [...] }
+        setUserEvents(Array.isArray(data) ? data : data.events || []);
+      }
+    } catch (error) {
+      console.error('Error loading events:', error);
+    } finally {
+      setLoadingEvents(false);
+    }
+  };
+
+  const handleConfirmAcceptQuote = async () => {
+    if (!acceptingQuoteId) return;
+    
+    setAcceptingQuote(true);
+    try {
+      // If event slot selected, link the quote first so accept can book it
+      if (selectedSlotId) {
+        const linkRes = await fetch(`/api/quotes/${acceptingQuoteId}/link`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ eventSlotId: selectedSlotId }),
+        });
+
+        if (!linkRes.ok) {
+          const err = await linkRes.json();
+          console.error('Error linking quote:', err.error || err);
+          return;
+        }
+      }
+
+      // Then accept the quote
+      const res = await fetch(`/api/quotes/${acceptingQuoteId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'accept' }),
       });
 
-      if (res.ok) {
-        // Refresh messages to show updated quote status
-        fetchMessages();
+      if (!res.ok) {
+        const err = await res.json();
+        console.error('Error accepting quote:', err.error || err);
+        return;
       }
+
+  // Remove the accepted quote card from the chat view
+  setMessages((prev) => prev.filter((msg) => msg.quote?.id !== acceptingQuoteId));
+  // Refresh messages to ensure latest status
+  fetchMessages();
+  setShowAcceptQuoteDialog(false);
+  setAcceptingQuoteId(null);
+  setAcceptingQuoteCategory(null);
+  setSelectedEventId(null);
+  setSelectedSlotId(null);
     } catch (error) {
       console.error('Error accepting quote:', error);
+    } finally {
+      setAcceptingQuote(false);
     }
+  };
+
+  // Get compatible slots for the selected event based on provider category
+  const getCompatibleSlots = () => {
+    if (!selectedEventId || !acceptingQuoteCategory) return [];
+    const event = userEvents.find(e => e.id === selectedEventId);
+    if (!event) return [];
+    
+    // Filter slots that match the provider's category and are not yet booked
+    return event.slots.filter(slot => 
+      slot.category === acceptingQuoteCategory && slot.status !== 'BOOKED'
+    );
   };
 
   const handleRejectQuote = async (quoteId: string) => {
@@ -737,48 +834,51 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
 
       {/* Send Quote Dialog (Provider only) */}
       <Dialog open={showQuoteDialog} onOpenChange={setShowQuoteDialog}>
-        <DialogContent className="sm:max-w-lg rounded-3xl">
+        <DialogContent className="sm:max-w-lg border border-gray-100 bg-white rounded-3xl p-0">
           <DialogHeader>
-            <DialogTitle className="gradient-text text-xl">Offerte Versturen</DialogTitle>
+            <VisuallyHidden>
+              <DialogTitle>Offerte versturen</DialogTitle>
+            </VisuallyHidden>
           </DialogHeader>
-
-          <div className="space-y-4 pt-2">
-            {/* Price */}
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">
-                Totaalprijs (€) *
-              </label>
-              <Input
-                type="number"
-                placeholder="750"
-                value={quotePrice}
-                onChange={(e) => setQuotePrice(e.target.value)}
-                className="rounded-xl border-2 border-gray-100 h-12"
-              />
+          <div className="p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
+                <Euro className="w-5 h-5 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Offerte versturen</h3>
+                <p className="text-sm text-gray-500">Stuur een duidelijke offerte naar de klant</p>
+              </div>
             </div>
 
-            {/* Description */}
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">
-                Pakket beschrijving *
-              </label>
-              <Input
-                placeholder="DJ Set 6 uur met professionele geluidsinstallatie"
-                value={quoteDescription}
-                onChange={(e) => setQuoteDescription(e.target.value)}
-                className="rounded-xl border-2 border-gray-100 h-12"
-              />
-            </div>
+            <div className="space-y-4 pt-2">
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Totaalprijs (€)</label>
+                <Input
+                  type="number"
+                  placeholder="750"
+                  value={quotePrice}
+                  onChange={(e) => setQuotePrice(e.target.value)}
+                  className="rounded-xl border-2 border-gray-100 h-12"
+                />
+              </div>
 
-            {/* Included services */}
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">
-                Inbegrepen diensten *
-              </label>
-              <div className="space-y-2">
-                {quoteServices.map((service, index) => (
-                  <div key={index} className="flex gap-2">
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Pakket beschrijving</label>
+                <Input
+                  placeholder="Korte omschrijving van het pakket"
+                  value={quoteDescription}
+                  onChange={(e) => setQuoteDescription(e.target.value)}
+                  className="rounded-xl border-2 border-gray-100 h-12"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Inbegrepen diensten</label>
+                <div className="space-y-2">
+                  {quoteServices.map((service, index) => (
                     <Input
+                      key={index}
                       placeholder={`Dienst ${index + 1}`}
                       value={service}
                       onChange={(e) => {
@@ -788,60 +888,181 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
                       }}
                       className="rounded-xl border-2 border-gray-100"
                     />
-                    {quoteServices.length > 1 && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="rounded-xl flex-shrink-0"
-                        onClick={() => setQuoteServices(quoteServices.filter((_, i) => i !== index))}
-                      >
-                        <X className="w-4 h-4" />
-                      </Button>
-                    )}
+                  ))}
+                  <div className="pt-2">
+                    <Button variant="outline" size="sm" className="rounded-xl" onClick={() => setQuoteServices([...quoteServices, ''])}>
+                      <Plus className="w-4 h-4 mr-1" />
+                      Dienst toevoegen
+                    </Button>
                   </div>
-                ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Voorwaarden (optioneel)</label>
+                <Input
+                  placeholder="Bijv. inclusief opbouw en afbouw"
+                  value={quoteTerms}
+                  onChange={(e) => setQuoteTerms(e.target.value)}
+                  className="rounded-xl border-2 border-gray-100"
+                />
+              </div>
+
+              <div className="pt-2">
                 <Button
-                  variant="outline"
-                  size="sm"
-                  className="rounded-xl"
-                  onClick={() => setQuoteServices([...quoteServices, ''])}
+                  className="w-full rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-12 text-base shadow-sm"
+                  onClick={handleSendQuote}
+                  disabled={!quotePrice || !quoteDescription || quoteServices.filter((s) => s.trim()).length === 0 || sendingQuote}
                 >
-                  <Plus className="w-4 h-4 mr-1" />
-                  Dienst toevoegen
+                  {sendingQuote ? (
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  ) : (
+                    <Euro className="w-5 h-5 mr-2" />
+                  )}
+                  Offerte versturen
                 </Button>
               </div>
+
+              <p className="text-xs text-gray-400 text-center mt-2">De offerte wordt ook zichtbaar in het dashboard van de klant</p>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
-            {/* Terms */}
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">
-                Voorwaarden (optioneel)
-              </label>
-              <Input
-                placeholder="Inclusief opbouw en afbouw, excl. BTW"
-                value={quoteTerms}
-                onChange={(e) => setQuoteTerms(e.target.value)}
-                className="rounded-xl border-2 border-gray-100"
-              />
-            </div>
-
-            {/* Send */}
-            <Button
-              className="w-full rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-12 text-base shadow-sm"
-              onClick={handleSendQuote}
-              disabled={!quotePrice || !quoteDescription || quoteServices.filter((s) => s.trim()).length === 0 || sendingQuote}
-            >
-              {sendingQuote ? (
-                <Loader2 className="w-5 h-5 animate-spin mr-2" />
-              ) : (
-                <Euro className="w-5 h-5 mr-2" />
-              )}
-              Offerte Versturen
-            </Button>
-
-            <p className="text-xs text-gray-400 text-center">
-              De offerte wordt ook zichtbaar in het dashboard van de klant
+      {/* Accept Quote with Event Selection Dialog */}
+      <Dialog open={showAcceptQuoteDialog} onOpenChange={(open) => {
+        if (!open) {
+          setShowAcceptQuoteDialog(false);
+          setAcceptingQuoteId(null);
+          setAcceptingQuoteCategory(null);
+          setSelectedEventId(null);
+          setSelectedSlotId(null);
+        }
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Offerte Accepteren</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600">
+              Wil je deze offerte koppelen aan een event? Dit helpt je om je event-planning bij te houden.
             </p>
+
+            {loadingEvents ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
+              </div>
+            ) : userEvents.length === 0 ? (
+              <div className="text-center py-4">
+                <p className="text-sm text-gray-500 mb-4">Je hebt nog geen events aangemaakt.</p>
+                <p className="text-xs text-gray-400">Je kunt de offerte accepteren zonder te koppelen aan een event.</p>
+              </div>
+            ) : (
+              <>
+                {/* Event Selection */}
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Selecteer een event (optioneel)
+                  </label>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {userEvents.map((event) => (
+                      <div
+                        key={event.id}
+                        onClick={() => {
+                          setSelectedEventId(event.id === selectedEventId ? null : event.id);
+                          setSelectedSlotId(null);
+                        }}
+                        className={`p-3 rounded-xl border-2 cursor-pointer transition-colors ${
+                          selectedEventId === event.id
+                            ? 'border-purple-400 bg-purple-50'
+                            : 'border-gray-100 hover:border-purple-200'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-medium text-gray-900">{event.name}</h4>
+                            <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
+                              {event.eventDate && (
+                                <span className="flex items-center gap-1">
+                                  <Calendar className="w-3 h-3" />
+                                  {new Date(event.eventDate).toLocaleDateString('nl-NL')}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          {selectedEventId === event.id && (
+                            <Check className="w-5 h-5 text-purple-600" />
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Slot Selection (only if event selected and matching category) */}
+                {selectedEventId && acceptingQuoteCategory && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Koppel aan categorie
+                    </label>
+                    {getCompatibleSlots().length === 0 ? (
+                      <p className="text-sm text-amber-600 bg-amber-50 p-3 rounded-xl">
+                        Dit event heeft geen slot voor de categorie van deze provider, of het slot is al geboekt.
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {getCompatibleSlots().map((slot) => (
+                          <div
+                            key={slot.id}
+                            onClick={() => setSelectedSlotId(slot.id === selectedSlotId ? null : slot.id)}
+                            className={`p-3 rounded-xl border-2 cursor-pointer transition-colors ${
+                              selectedSlotId === slot.id
+                                ? 'border-purple-400 bg-purple-50'
+                                : 'border-gray-100 hover:border-purple-200'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium text-gray-900 capitalize">
+                                {slot.category.toLowerCase().replace('_', ' ')}
+                              </span>
+                              {selectedSlotId === slot.id && (
+                                <Check className="w-5 h-5 text-purple-600" />
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Actions */}
+            <div className="flex gap-2 pt-2">
+              <Button
+                variant="outline"
+                className="flex-1 rounded-xl"
+                onClick={() => {
+                  setShowAcceptQuoteDialog(false);
+                  setAcceptingQuoteId(null);
+                }}
+              >
+                Annuleren
+              </Button>
+              <Button
+                className="flex-1 rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors shadow-sm"
+                onClick={handleConfirmAcceptQuote}
+                disabled={acceptingQuote}
+              >
+                {acceptingQuote ? (
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                ) : (
+                  <Check className="w-4 h-4 mr-2" />
+                )}
+                {selectedSlotId ? 'Accepteren & Koppelen' : 'Accepteren'}
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

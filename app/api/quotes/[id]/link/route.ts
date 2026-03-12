@@ -102,12 +102,18 @@ export async function POST(
       },
     });
 
-    // Update the slot status if needed
-    const slotQuotesCount = await prisma.quote.count({
-      where: { event_slot_id: eventSlotId },
-    });
-
-    if (slotQuotesCount > 0 && slot.status === 'EMPTY') {
+    // Update the slot status based on whether quote is accepted
+    // If quote is accepted, set status to BOOKED and link as booked_quote
+    if (quote.accepted) {
+      await prisma.eventSlot.update({
+        where: { id: eventSlotId },
+        data: { 
+          status: 'BOOKED',
+          booked_quote_id: quoteId,
+        },
+      });
+    } else if (slot.status === 'EMPTY') {
+      // If not accepted yet but slot was empty, mark as quotes received
       await prisma.eventSlot.update({
         where: { id: eventSlotId },
         data: { status: 'QUOTES_RECEIVED' },
