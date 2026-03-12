@@ -631,7 +631,7 @@ function DashboardContent() {
                   </div>
                   <Button
                     onClick={() => router.push('/events/new')}
-                    className="gradient-brand rounded-xl"
+                    className="rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-10 px-6 text-sm shadow-sm"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Nieuw Event
