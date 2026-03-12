@@ -334,7 +334,7 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
                     <Button
                       type="submit"
                       disabled={isSubmitting}
-                      className="flex-1 gradient-brand hover:opacity-90 rounded-xl h-12"
+                      className="flex-1 rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-12 shadow-sm"
                     >
                       {isSubmitting ? 'Versturen...' : 'Offerte Aanvragen'}
                     </Button>

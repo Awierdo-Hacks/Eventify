@@ -404,7 +404,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
         <div className="border-t-2 border-purple-100 p-3 flex gap-2">
           <Button
             size="sm"
-            className="flex-1 gradient-brand text-white rounded-xl text-sm"
+            className="flex-1 rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors text-sm shadow-sm"
             onClick={(e) => {
               e.stopPropagation();
               handleAcceptQuote(quote.id);
@@ -594,7 +594,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
                           <div
                             className={`px-4 py-2.5 rounded-2xl ${
                               msg.isOwn
-                                ? 'gradient-brand text-white rounded-br-md'
+                                ? 'bg-white border-2 border-purple-400 text-purple-700 rounded-br-md'
                                 : 'bg-white border-2 border-gray-100 text-gray-900 rounded-bl-md'
                             }`}
                           >
@@ -704,11 +704,11 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
 
             {/* Send button */}
             <Button
-              className="gradient-brand rounded-xl h-10 w-10 p-0 flex-shrink-0"
+              className="rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-10 w-10 p-0 flex-shrink-0 shadow-sm"
               onClick={handleSend}
               disabled={!newMessage.trim() || sending}
             >
-              <Send className="w-4 h-4 text-white" />
+              <Send className="w-4 h-4" />
             </Button>
           </div>
         </div>
@@ -827,7 +827,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
 
             {/* Send */}
             <Button
-              className="w-full gradient-brand rounded-xl h-12 text-base"
+              className="w-full rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-12 text-base shadow-sm"
               onClick={handleSendQuote}
               disabled={!quotePrice || !quoteDescription || quoteServices.filter((s) => s.trim()).length === 0 || sendingQuote}
             >

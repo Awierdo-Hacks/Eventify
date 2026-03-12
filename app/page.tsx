@@ -98,7 +98,7 @@ export default function Home() {
                   />
                   <Button
                     onClick={handleSearch}
-                    className="gradient-brand hover:opacity-90 h-12 px-8 rounded-xl"
+                    className="rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-12 px-8 shadow-sm"
                   >
                     <Search className="w-5 h-5 mr-2" />
                     Zoeken
@@ -186,7 +186,7 @@ export default function Home() {
             </p>
             <div className="flex gap-4 justify-center flex-wrap">
               <Link href="/browse">
-                <Button size="lg" className="gradient-brand hover:opacity-90 rounded-xl">
+                <Button size="lg" className="rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-12 px-8 shadow-sm">
                   Browse Providers
                 </Button>
               </Link>

@@ -180,6 +180,8 @@ function DashboardContent() {
   const [rejectingQuote, setRejectingQuote] = useState<Quote | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
   const [unreadCount, setUnreadCount] = useState(0);
+  const [deletingEvent, setDeletingEvent] = useState<Event | null>(null);
+  const [isDeletingEvent, setIsDeletingEvent] = useState(false);
 
   // Check for success message
   useEffect(() => {
@@ -361,6 +363,32 @@ function DashboardContent() {
       setTimeout(() => setError(null), 5000);
     } finally {
       setAcceptingQuote(null);
+    }
+  };
+
+  const handleDeleteEvent = async () => {
+    if (!deletingEvent) return;
+    setIsDeletingEvent(true);
+    try {
+      const res = await fetch(`/api/events/${deletingEvent.id}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error('Kon event niet verwijderen');
+      
+      // Refresh events list
+      const eventsRes = await fetch('/api/events');
+      const eventsData = await eventsRes.json();
+      setEvents(eventsData.events || []);
+      setSelectedEvent(null);
+      setDeletingEvent(null);
+      setSuccessMessage('Event is succesvol verwijderd');
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      console.error('Error deleting event:', err);
+      setError('Er is iets misgegaan bij het verwijderen van het event');
+      setTimeout(() => setError(null), 5000);
+    } finally {
+      setIsDeletingEvent(false);
     }
   };
 
@@ -620,6 +648,7 @@ function DashboardContent() {
                     setTimeout(() => setError(null), 3000);
                   }
                 }}
+                onDeleteEvent={() => setDeletingEvent(selectedEvent)}
               />
             ) : (
               <>
@@ -647,7 +676,7 @@ function DashboardContent() {
                     </p>
                     <Button
                       onClick={() => router.push('/events/new')}
-                      className="gradient-brand rounded-xl"
+                      className="rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-10 px-6 text-sm shadow-sm"
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       Eerste Event Aanmaken
@@ -737,7 +766,7 @@ function DashboardContent() {
                 <p className="text-gray-600 mb-6">Je hebt nog geen aanvragen gedaan</p>
                 <Button
                   onClick={() => router.push('/browse')}
-                  className="gradient-brand rounded-xl"
+                  className="rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-10 px-6 text-sm shadow-sm"
                 >
                   Browse Providers
                 </Button>
@@ -951,6 +980,44 @@ function DashboardContent() {
                 disabled={!!acceptingQuote}
               >
                 Offerte behouden
+              </DialogButton>
+            </DialogActions>
+          </>
+        )}
+      </ConfirmationDialog>
+
+      {/* Delete Event Confirmation Dialog */}
+      <ConfirmationDialog
+        open={!!deletingEvent}
+        onOpenChange={(open) => !open && setDeletingEvent(null)}
+        title="Event verwijderen?"
+        description="Weet je zeker dat je dit event wilt verwijderen? Alle gekoppelde offertes worden losgekoppeld."
+      >
+        {deletingEvent && (
+          <>
+            <div className="flex items-center gap-4 p-4 bg-red-50 rounded-xl mb-4">
+              <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center text-xl">
+                🗑️
+              </div>
+              <div>
+                <h4 className="font-bold text-gray-900">{deletingEvent.name}</h4>
+                <p className="text-sm text-red-600">Dit event wordt geannuleerd</p>
+              </div>
+            </div>
+
+            <DialogActions>
+              <DialogButton
+                onClick={() => setDeletingEvent(null)}
+                variant="outline"
+              >
+                Annuleren
+              </DialogButton>
+              <DialogButton
+                onClick={handleDeleteEvent}
+                variant="danger"
+                loading={isDeletingEvent}
+              >
+                Verwijder Evenement
               </DialogButton>
             </DialogActions>
           </>

@@ -573,7 +573,7 @@ export default function ProviderDashboardPage() {
                       <div className="flex gap-3">
                         <Button
                           onClick={() => setCreatingQuoteFor(request)}
-                          className="flex-1 gradient-brand rounded-xl"
+                          className="flex-1 rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors shadow-sm"
                         >
                           <Send className="w-4 h-4 mr-2" />
                           Offerte Maken
@@ -690,7 +690,7 @@ export default function ProviderDashboardPage() {
                               });
                             }
                           }}
-                          className="flex-1 gradient-brand rounded-xl"
+                          className="flex-1 rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors shadow-sm"
                         >
                           <Send className="w-4 h-4 mr-2" />
                           Opnieuw Offerte Maken
@@ -1038,7 +1038,7 @@ export default function ProviderDashboardPage() {
                 <Button
                   onClick={handleCreateQuote}
                   disabled={submittingQuote}
-                  className="flex-1 gradient-brand text-white font-semibold py-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                  className="flex-1 rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors font-semibold py-6 shadow-sm"
                 >
                   {submittingQuote ? 'Versturen...' : 'Offerte Versturen'}
                 </Button>

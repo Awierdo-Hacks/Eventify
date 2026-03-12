@@ -200,7 +200,7 @@ export default function MessagesPage() {
             {!searchQuery && user.role !== 'PROVIDER' && (
               <Button
                 onClick={() => router.push('/browse')}
-                className="gradient-brand rounded-xl"
+                className="rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-10 px-6 text-sm shadow-sm"
               >
                 Browse Providers
               </Button>

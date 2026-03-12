@@ -422,7 +422,7 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
               </div>
 
               <Link href={`/request-quote/${provider.id}`}>
-                <Button className="w-full gradient-brand hover:opacity-90 rounded-xl h-12 text-base mb-3">
+                <Button className="w-full rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-12 text-base mb-3 shadow-sm">
                   Offerte Aanvragen
                 </Button>
               </Link>

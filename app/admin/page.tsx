@@ -474,7 +474,7 @@ export default function AdminPage() {
                     {!provider.verified && (
                       <Button
                         onClick={() => setVerifyingProvider(provider)}
-                        className="w-full gradient-brand rounded-xl"
+                        className="w-full rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors shadow-sm"
                       >
                         <CheckCircle className="w-4 h-4 mr-2" />
                         Provider Verifiëren

@@ -290,22 +290,8 @@ export function EventDetailView({
           </div>
         </div>
 
-        <div className="flex gap-2">
-          {onEditEvent && (
-            <Button variant="outline" onClick={onEditEvent} className="rounded-xl">
-              <Edit className="w-4 h-4 mr-2" />
-              Bewerken
-            </Button>
-          )}
-          {onDeleteEvent && (
-            <Button
-              variant="outline"
-              onClick={onDeleteEvent}
-              className="rounded-xl text-red-600 hover:bg-red-50"
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
-          )}
+        <div className="flex gap-2"> 
+          {/* Removed large header edit button to keep only the smaller edit icon in the meta card */}
         </div>
       </div>
 
@@ -317,9 +303,10 @@ export function EventDetailView({
             variant="ghost"
             size="sm"
             onClick={() => setIsEditingMeta(true)}
-            className="absolute top-4 right-4 text-gray-400 hover:text-purple-600"
+            className="absolute top-4 right-4 text-purple-500 hover:text-purple-700 hover:bg-purple-50 gap-1.5"
           >
             <Edit className="w-4 h-4" />
+            <span className="text-xs font-medium">Bewerken</span>
           </Button>
         )}
 
@@ -379,30 +366,47 @@ export function EventDetailView({
                 </div>
               </div>
             </div>
-            <div className="flex justify-end gap-2 pt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={cancelEditMeta}
-                className="rounded-xl"
-              >
-                <X className="w-4 h-4 mr-1" />
-                Annuleren
-              </Button>
-              <Button
-                variant="default"
-                size="sm"
-                onClick={handleSaveEventMeta}
-                disabled={isSavingMeta}
-                className="gradient-brand rounded-xl"
-              >
-                {isSavingMeta ? (
-                  <span className="animate-spin mr-1">⏳</span>
-                ) : (
-                  <Check className="w-4 h-4 mr-1" />
-                )}
-                Opslaan
-              </Button>
+            <div className="flex justify-between items-center pt-2">
+              {/* Delete button - bottom left */}
+              {onDeleteEvent && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onDeleteEvent}
+                  className="rounded-xl text-red-500 hover:text-red-700 hover:bg-red-50 gap-1.5"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span className="text-sm">Verwijder evenement</span>
+                </Button>
+              )}
+              {!onDeleteEvent && <div />}
+              
+              {/* Save/Cancel buttons - bottom right */}
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={cancelEditMeta}
+                  className="rounded-xl"
+                >
+                  <X className="w-4 h-4 mr-1" />
+                  Annuleren
+                </Button>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={handleSaveEventMeta}
+                  disabled={isSavingMeta}
+                  className="rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors shadow-sm"
+                >
+                  {isSavingMeta ? (
+                    <span className="animate-spin mr-1">⏳</span>
+                  ) : (
+                    <Check className="w-4 h-4 mr-1" />
+                  )}
+                  Opslaan
+                </Button>
+              </div>
             </div>
           </div>
         ) : (
@@ -536,7 +540,7 @@ export function EventDetailView({
             <Button
               variant="default"
               onClick={() => setShowAddSlot(true)}
-              className="gradient-brand rounded-xl"
+              className="rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-10 px-6 text-sm shadow-sm"
             >
               <Plus className="w-4 h-4 mr-2" />
               Eerste Categorie Toevoegen
@@ -634,7 +638,7 @@ export function EventDetailView({
                   <p className="text-gray-500 mb-4">Nog geen offertes ontvangen</p>
                   <Button
                     variant="default"
-                    className="gradient-brand rounded-xl"
+                    className="rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-10 px-6 text-sm shadow-sm"
                     onClick={() => {
                       setSelectedSlotForQuotes(null);
                       handleFindProviders(selectedSlot.id, selectedSlot.category);
@@ -682,7 +686,7 @@ export function EventDetailView({
                           <Button
                             variant="default"
                             size="sm"
-                            className="flex-1 gradient-brand rounded-xl"
+                            className="flex-1 rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors shadow-sm"
                           >
                             Accepteren
                           </Button>

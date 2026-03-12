@@ -165,7 +165,7 @@ export function SlotCard({
             <Button
               variant="default"
               size="sm"
-              className="flex-1 gradient-brand rounded-xl"
+              className="flex-1 rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors shadow-sm"
               onClick={() => onFindProviders(slot.id, slot.category)}
             >
               <Search className="w-4 h-4 mr-2" />
@@ -190,7 +190,7 @@ export function SlotCard({
               <Button
                 variant="default"
                 size="sm"
-                className="flex-1 gradient-brand rounded-xl"
+                className="flex-1 rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors shadow-sm"
                 onClick={() => onViewQuotes(slot.id)}
               >
                 <Eye className="w-4 h-4 mr-2" />

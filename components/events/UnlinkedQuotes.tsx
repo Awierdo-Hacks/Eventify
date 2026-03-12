@@ -215,7 +215,7 @@ export function UnlinkedQuotes({ quotes, events, onLinkQuote }: UnlinkedQuotesPr
                             </div>
                             <Button
                               size="sm"
-                              className="gradient-brand rounded-xl"
+                              className="rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors shadow-sm"
                               onClick={() => handleLinkQuote(quote.id, slot.id)}
                               disabled={linkingQuote === quote.id}
                             >

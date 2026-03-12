@@ -314,7 +314,7 @@ function BrowseContent() {
                         {provider.description || 'Geen beschrijving beschikbaar'}
                       </p>
 
-                      <Button className="w-full gradient-brand hover:opacity-90 rounded-xl">
+                      <Button className="w-full rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors shadow-sm">
                         Bekijk Details
                       </Button>
                     </div>
