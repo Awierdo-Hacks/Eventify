@@ -392,9 +392,9 @@ export default function ProviderDashboardPage() {
   if (status === 'loading' || (status === 'authenticated' && user?.role !== 'PROVIDER')) {
     return (
       <main className="min-h-screen bg-gray-50">
-        <Container className="py-12">
+        <Container className="py-6 sm:py-12">
           <Skeleton className="h-12 w-64 mb-8" />
-          <div className="grid grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
             {[1, 2, 3, 4].map((i) => (
               <Skeleton key={i} className="h-32" />
             ))}
@@ -436,7 +436,7 @@ export default function ProviderDashboardPage() {
         )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
           {[
             {
               icon: FileText,
@@ -474,16 +474,16 @@ export default function ProviderDashboardPage() {
               transition={{ delay: index * 0.1 }}
             >
               <Card
-                className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md hover:-translate-y-1 transition-all cursor-pointer"
+                className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md hover:-translate-y-1 transition-all cursor-pointer"
                 onClick={stat.onClick}
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
-                    <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                    <p className="text-xs sm:text-sm text-gray-600 mb-1">{stat.label}</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-gray-900">{stat.value}</p>
                   </div>
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center`}>
-                    <stat.icon className="w-7 h-7 text-white" />
+                  <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center flex-shrink-0`}>
+                    <stat.icon className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
                   </div>
                 </div>
               </Card>
@@ -493,25 +493,25 @@ export default function ProviderDashboardPage() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-white border-2 border-gray-200 p-1 rounded-2xl">
-            <TabsTrigger value="requests" className="rounded-xl">
+          <TabsList className="bg-white border-2 border-gray-200 p-1 rounded-2xl w-full h-auto grid grid-cols-2 sm:flex gap-1">
+            <TabsTrigger value="requests" className="rounded-xl sm:flex-1 text-xs sm:text-sm py-2">
               Aanvragen
               {stats.pendingRequests > 0 && (
-                <Badge className="ml-2 bg-amber-500 text-white">{stats.pendingRequests}</Badge>
+                <Badge className="ml-1.5 bg-amber-500 text-white text-[10px] px-1.5 py-0 min-w-0 h-4">{stats.pendingRequests}</Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="quotes" className="rounded-xl">
-              Verzonden offertes
+            <TabsTrigger value="quotes" className="rounded-xl sm:flex-1 text-xs sm:text-sm py-2">
+              Offertes
               {stats.quotesWithUpdate > 0 && (
-                <Badge className="ml-2 bg-blue-500 text-white">
+                <Badge className="ml-1.5 bg-blue-500 text-white text-[10px] px-1.5 py-0 min-w-0 h-4">
                   {stats.quotesWithUpdate}
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="bookings" className="rounded-xl">Boekingen</TabsTrigger>
-            <TabsTrigger value="profile" className="rounded-xl">
-              <UserCircle className="w-4 h-4 mr-1" />
-              Mijn Profiel
+            <TabsTrigger value="bookings" className="rounded-xl sm:flex-1 text-xs sm:text-sm py-2">Boekingen</TabsTrigger>
+            <TabsTrigger value="profile" className="rounded-xl sm:flex-1 text-xs sm:text-sm py-2">
+              <UserCircle className="w-3.5 h-3.5 mr-1" />
+              Profiel
             </TabsTrigger>
           </TabsList>
 
@@ -523,7 +523,7 @@ export default function ProviderDashboardPage() {
                 <Skeleton className="h-48 w-full" />
               </div>
             ) : requests.length === 0 ? (
-              <Card className="p-12 border-2 border-gray-100 rounded-3xl text-center">
+              <Card className="p-6 md:p-12 border-2 border-gray-100 rounded-3xl text-center">
                 <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Geen aanvragen</h3>
                 <p className="text-gray-600">Je hebt nog geen service aanvragen ontvangen</p>
@@ -531,11 +531,11 @@ export default function ProviderDashboardPage() {
             ) : (
               <div className="grid gap-6">
                 {requests.map((request) => (
-                  <Card key={request.id} className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md transition-shadow">
-                    <div className="flex items-start justify-between mb-4">
+                  <Card key={request.id} className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md transition-shadow">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-2">
                       <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">{request.eventType}</h3>
-                        <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                        <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600 mb-3">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-4 h-4" />
                             {formatDate(request.eventDate)}
@@ -560,17 +560,17 @@ export default function ProviderDashboardPage() {
 
                     <div className="pt-4 border-t border-gray-200 mb-4">
                       <p className="text-sm font-semibold text-gray-700 mb-2">Klantgegevens</p>
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 text-sm text-gray-600">
                         <span>{request.customer.name}</span>
-                        <span>·</span>
+                        <span className="hidden sm:inline">·</span>
                         <span>{request.customer.email}</span>
-                        <span>·</span>
+                        <span className="hidden sm:inline">·</span>
                         <span>{request.customer.phone}</span>
                       </div>
                     </div>
 
                     {request.quotes.length === 0 ? (
-                      <div className="flex gap-3">
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <Button
                           onClick={() => setCreatingQuoteFor(request)}
                           className="flex-1 rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors shadow-sm"
@@ -618,7 +618,7 @@ export default function ProviderDashboardPage() {
                 <Skeleton className="h-40 w-full" />
               </div>
             ) : quotes.length === 0 ? (
-              <Card className="p-12 border-2 border-gray-100 rounded-3xl text-center">
+              <Card className="p-6 md:p-12 border-2 border-gray-100 rounded-3xl text-center">
                 <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Geen offertes</h3>
                 <p className="text-gray-600">Je hebt nog geen offertes verstuurd</p>
@@ -626,10 +626,10 @@ export default function ProviderDashboardPage() {
             ) : (
               <div className="grid gap-6">
                 {quotes.map((quote) => (
-                  <Card key={quote.id} className={`p-6 border-2 rounded-3xl ${
+                  <Card key={quote.id} className={`p-4 sm:p-6 border-2 rounded-3xl ${
                     quote.status === 'REJECTED' ? 'border-red-200 bg-red-50/30' : 'border-gray-100'
                   }`}>
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-2">
                       <div>
                         <h3 className="text-2xl font-bold text-gray-900 mb-1">
                           €{quote.totalPrice.toLocaleString()}
@@ -674,7 +674,7 @@ export default function ProviderDashboardPage() {
 
                     {/* Actions for Rejected Quotes */}
                     {quote.status === 'REJECTED' && (
-                      <div className="flex gap-3 pt-4 border-t border-gray-200">
+                      <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t border-gray-200">
                         <Button
                           onClick={() => {
                             // Pre-fill form with previous quote data
@@ -741,7 +741,7 @@ export default function ProviderDashboardPage() {
                 <Skeleton className="h-40 w-full" />
               </div>
             ) : bookings.length === 0 ? (
-              <Card className="p-12 border-2 border-gray-100 rounded-3xl text-center">
+              <Card className="p-6 md:p-12 border-2 border-gray-100 rounded-3xl text-center">
                 <CheckCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Geen boekingen</h3>
                 <p className="text-gray-600">Je hebt nog geen bevestigde boekingen</p>
@@ -749,8 +749,8 @@ export default function ProviderDashboardPage() {
             ) : (
               <div className="grid gap-6">
                 {bookings.map((booking) => (
-                  <Card key={booking.id} className="p-6 border-2 border-gray-100 rounded-3xl bg-gradient-to-br from-green-50 to-emerald-50">
-                    <div className="flex items-start justify-between mb-4">
+                  <Card key={booking.id} className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl bg-gradient-to-br from-green-50 to-emerald-50">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-2">
                       <div>
                         <h3 className="text-2xl font-bold text-gray-900 mb-1">
                           €{booking.finalPrice.toLocaleString()}
@@ -758,7 +758,7 @@ export default function ProviderDashboardPage() {
                         <p className="text-lg font-semibold text-gray-700 mb-2">
                           {booking.customer.name}
                         </p>
-                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                        <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-4 h-4" />
                             {formatDate(booking.eventDate)}
@@ -781,7 +781,7 @@ export default function ProviderDashboardPage() {
                       </div>
                     </div>
 
-                    <div className="pt-4 border-t border-gray-200 flex items-center justify-between">
+                    <div className="pt-4 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                       <div>
                         <p className="text-sm text-gray-600">Contact: {booking.customer.email}</p>
                         <p className="text-sm text-gray-600">Geboekt op: {formatDate(booking.createdAt)}</p>
@@ -828,7 +828,7 @@ export default function ProviderDashboardPage() {
                 onSave={() => fetchProfile()}
               />
             ) : (
-              <Card className="p-12 border-2 border-gray-100 rounded-3xl text-center">
+              <Card className="p-6 md:p-12 border-2 border-gray-100 rounded-3xl text-center">
                 <UserCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Profiel laden mislukt</h3>
                 <p className="text-gray-600 mb-4">Er is iets misgegaan bij het ophalen van je profiel</p>

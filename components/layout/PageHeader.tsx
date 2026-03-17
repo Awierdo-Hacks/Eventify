@@ -11,9 +11,9 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, subtitle, children, className, gradient = false }: PageHeaderProps) {
   return (
-    <div className={cn('mb-12', className)}>
+    <div className={cn('mb-6 md:mb-12', className)}>
       <h1 className={cn(
-        'text-4xl font-bold mb-4',
+        'text-2xl sm:text-3xl md:text-4xl font-bold mb-4',
         gradient && 'gradient-text'
       )}>
         {title}

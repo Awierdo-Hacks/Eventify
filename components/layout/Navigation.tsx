@@ -2,11 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSession } from '@/components/providers/SessionProvider';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Home, Search, LayoutDashboard, MessageSquare, Shield, LogOut, User, Plus } from 'lucide-react';
+import { Home, Search, LayoutDashboard, MessageSquare, Shield, LogOut, User, Plus, ChevronDown } from 'lucide-react';
 
 const navigation = [
   { name: 'Home', href: '/', icon: Home },
@@ -25,6 +25,19 @@ export function Navigation() {
   const { user, status, update } = useSession();
   const isLoading = status === 'loading';
   const [unreadCount, setUnreadCount] = useState(0);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  // Sluit profiel-menu bij klik buiten
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target as Node)) {
+        setProfileMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Poll for unread message count
   useEffect(() => {
@@ -87,7 +100,7 @@ export function Navigation() {
                 <circle cx="18.5" cy="15" r="0.5" fill="white" opacity="0.7"/>
                 <circle cx="13.5" cy="10" r="0.5" fill="white" opacity="0.7"/>
               </svg>
-              <span className="text-2xl font-bold gradient-text">
+              <span className="hidden sm:inline text-2xl font-bold gradient-text">
                 Eventiphy
               </span>
             </Link>
@@ -120,41 +133,47 @@ export function Navigation() {
               <div className="w-20 h-9 bg-gray-200 animate-pulse rounded-xl"></div>
             ) : user ? (
               <>
-                {/* + Nieuw Event knop - alleen voor customers */}
+                {/* + Nieuw Event knop - alleen voor customers, verborgen op mobiel */}
                 {user.role === 'CUSTOMER' && (
-                  <Link href="/events/new">
+                  <div className="hidden md:flex">
+                    <Link href="/events/new">
+                      <Button variant="outline" className="rounded-xl border-purple-200 text-purple-700 hover:bg-purple-50">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Nieuw Event
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+                <div className="hidden md:flex">
+                  <Link href={getDashboardLink(user.role)}>
                     <Button variant="outline" className="rounded-xl border-purple-200 text-purple-700 hover:bg-purple-50">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Nieuw Event
+                      <LayoutDashboard className="w-4 h-4 mr-2" />
+                      Dashboard
                     </Button>
                   </Link>
-                )}
-                <Link href={getDashboardLink(user.role)}>
-                  <Button variant="outline" className="rounded-xl border-purple-200 text-purple-700 hover:bg-purple-50">
-                    <LayoutDashboard className="w-4 h-4 mr-2" />
-                    Dashboard
-                  </Button>
-                </Link>
-                {/* Chat knop (icon-only) met ongelezen badge */}
-                <Link href="/messages">
-                  <Button
-                    variant={pathname.startsWith('/messages') ? 'default' : 'ghost'}
-                    size="icon"
-                    className={cn(
-                      'rounded-xl relative',
-                      pathname.startsWith('/messages')
-                        ? 'gradient-brand text-white'
-                        : 'text-gray-600 hover:text-purple-700 hover:bg-purple-50'
-                    )}
-                  >
-                    <MessageSquare className="w-5 h-5" />
-                    {unreadCount > 0 && (
-                      <span className="absolute -top-1 -right-1 w-4.5 h-4.5 bg-red-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold min-w-[18px] min-h-[18px]">
-                        {unreadCount > 9 ? '9+' : unreadCount}
-                      </span>
-                    )}
-                  </Button>
-                </Link>
+                </div>
+                {/* Chat knop (icon-only) met ongelezen badge — alleen desktop */}
+                <div className="hidden md:flex">
+                  <Link href="/messages">
+                    <Button
+                      variant={pathname.startsWith('/messages') ? 'default' : 'ghost'}
+                      size="icon"
+                      className={cn(
+                        'rounded-xl relative',
+                        pathname.startsWith('/messages')
+                          ? 'gradient-brand text-white'
+                          : 'text-gray-600 hover:text-purple-700 hover:bg-purple-50'
+                      )}
+                    >
+                      <MessageSquare className="w-5 h-5" />
+                      {unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 w-4.5 h-4.5 bg-red-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold min-w-[18px] min-h-[18px]">
+                          {unreadCount > 9 ? '9+' : unreadCount}
+                        </span>
+                      )}
+                    </Button>
+                  </Link>
+                </div>
                 <div className="hidden md:flex items-center space-x-2 text-sm">
                   <User className="w-4 h-4 text-gray-500" />
                   <span className="text-gray-700">{user.name}</span>
@@ -169,14 +188,50 @@ export function Navigation() {
                     </span>
                   )}
                 </div>
-                <Button
-                  variant="outline"
-                  className="rounded-xl"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Uitloggen
-                </Button>
+                <div className="hidden md:flex">
+                  <Button
+                    variant="outline"
+                    className="rounded-xl"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Uitloggen
+                  </Button>
+                </div>
+
+                {/* Mobiel profiel-menu */}
+                <div className="md:hidden relative" ref={profileMenuRef}>
+                  <button
+                    onClick={() => setProfileMenuOpen((o) => !o)}
+                    className="flex items-center gap-1.5 h-11 w-11 rounded-full gradient-brand text-white font-semibold text-sm justify-center focus:outline-none"
+                    aria-label="Profiel menu"
+                  >
+                    {user.name?.charAt(0).toUpperCase()}
+                  </button>
+                  {profileMenuOpen && (
+                    <div className="absolute right-0 top-12 w-56 bg-white rounded-2xl shadow-eventiphy-xl border border-gray-100 py-2 z-50">
+                      <div className="px-4 py-3 border-b border-gray-100">
+                        <p className="font-semibold text-gray-900 text-sm truncate">{user.name}</p>
+                        {user.role === 'ADMIN' && (
+                          <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded mt-1 inline-block">Admin</span>
+                        )}
+                        {user.role === 'PROVIDER' && (
+                          <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded mt-1 inline-block">Provider</span>
+                        )}
+                        {user.role === 'CUSTOMER' && (
+                          <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded mt-1 inline-block">Klant</span>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => { setProfileMenuOpen(false); handleLogout(); }}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 active:bg-red-50 transition-colors"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Uitloggen
+                      </button>
+                    </div>
+                  )}
+                </div>
               </>
             ) : (
               <Link href="/login">
@@ -194,7 +249,7 @@ export function Navigation() {
           {filteredNavigation.slice(0, 5).map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
-            
+
             return (
               <Link key={item.name} href={item.href}>
                 <Button
@@ -211,6 +266,22 @@ export function Navigation() {
               </Link>
             );
           })}
+          {/* Nieuw Event - alleen voor customers */}
+          {user?.role === 'CUSTOMER' && (
+            <Link href="/events/new">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  'flex flex-col items-center space-y-1',
+                  pathname === '/events/new' && 'text-purple-600'
+                )}
+              >
+                <Plus className="w-5 h-5" />
+                <span className="text-xs">Nieuw</span>
+              </Button>
+            </Link>
+          )}
           {/* Mobile Dashboard link - role-aware */}
           {user && (
             <Link href={getDashboardLink(user.role)}>

@@ -590,7 +590,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
-      <div className="bg-white border-b border-gray-100 sticky top-16 z-40">
+      <div className="bg-white border-b border-gray-100 sticky top-[120px] md:top-16 z-40">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3">
           <Button
             variant="ghost"

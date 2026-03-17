@@ -57,7 +57,7 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">
+            <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold mb-6">
               <span className="gradient-text">
                 Jouw Droomfeest
               </span>
@@ -74,7 +74,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <Card className="p-8 max-w-3xl mx-auto bg-white border-2 border-gray-100 rounded-3xl shadow-eventiphy-xl">
+              <Card className="p-4 sm:p-8 max-w-3xl mx-auto bg-white border-2 border-gray-100 rounded-3xl shadow-eventiphy-xl">
                 <div className="flex flex-col md:flex-row gap-4">
                   <select
                     value={selectedCategory}
@@ -113,7 +113,7 @@ export default function Home() {
       {/* Categories Section */}
       <Section>
         <Container>
-          <h2 className="text-4xl font-bold text-center mb-12">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 md:mb-12">
             Ontdek onze diensten
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
@@ -142,10 +142,10 @@ export default function Home() {
       {/* Features Section */}
       <Section background="gradient-feature">
         <Container>
-          <h2 className="text-4xl font-bold text-center mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4">
             Waarom <span className="gradient-text">Eventiphy</span>?
           </h2>
-          <p className="text-xl text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 text-center mb-6 md:mb-12 max-w-2xl mx-auto">
             De slimste manier om jouw evenement te organiseren
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -176,9 +176,9 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6 }}
-            className="text-center gradient-feature rounded-3xl p-12"
+            className="text-center gradient-feature rounded-3xl p-6 sm:p-12"
           >
-            <h2 className="text-4xl font-bold mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
               Klaar om te beginnen?
             </h2>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">

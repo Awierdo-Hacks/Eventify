@@ -104,7 +104,7 @@ function BrowseContent() {
       <Container className="py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
             <span className="gradient-text">Ontdek</span> Dienstverleners
           </h1>
           <p className="text-xl text-gray-600">
@@ -113,8 +113,8 @@ function BrowseContent() {
         </div>
 
         {/* Filters */}
-        <Card className="p-6 mb-8 bg-white border-2 border-gray-100 rounded-3xl shadow-eventiphy-lg">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="p-4 sm:p-6 mb-6 sm:mb-8 bg-white border-2 border-gray-100 rounded-3xl shadow-eventiphy-lg">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             {/* Search */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -175,7 +175,7 @@ function BrowseContent() {
                 {categories.find((c) => c.id === selectedCategory)?.name}
                 <button
                   onClick={() => setSelectedCategory('all')}
-                  className="ml-2 hover:text-purple-900"
+                  className="ml-2 p-1 -mr-1 rounded hover:text-purple-900 active:text-purple-900"
                 >
                   ×
                 </button>
@@ -186,7 +186,7 @@ function BrowseContent() {
                 {selectedLocation}
                 <button
                   onClick={() => setSelectedLocation('all')}
-                  className="ml-2 hover:text-purple-900"
+                  className="ml-2 p-1 -mr-1 rounded hover:text-purple-900 active:text-purple-900"
                 >
                   ×
                 </button>
@@ -195,7 +195,7 @@ function BrowseContent() {
             {priceRange !== 'all' && (
               <Badge variant="secondary" className="bg-purple-100 text-purple-700">
                 {priceRange}
-                <button onClick={() => setPriceRange('all')} className="ml-2 hover:text-purple-900">
+                <button onClick={() => setPriceRange('all')} className="ml-2 p-1 -mr-1 rounded hover:text-purple-900 active:text-purple-900">
                   ×
                 </button>
               </Badge>

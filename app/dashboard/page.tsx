@@ -497,7 +497,7 @@ function DashboardContent() {
       <Container className="py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
             <span className="gradient-text">Mijn Dashboard</span>
           </h1>
           <p className="text-xl text-gray-600">Welkom terug, {user.name}!</p>
@@ -530,7 +530,7 @@ function DashboardContent() {
         )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
@@ -541,7 +541,7 @@ function DashboardContent() {
                 transition={{ duration: 0.4, delay: index * 0.1 }}
               >
                 <Card
-                  className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md hover:-translate-y-1 transition-all cursor-pointer"
+                  className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md hover:-translate-y-1 transition-all cursor-pointer"
                   onClick={stat.onClick}
                 >
                   <div className={`w-12 h-12 ${stat.bgColor} rounded-2xl flex items-center justify-center mb-4`}>
@@ -557,7 +557,7 @@ function DashboardContent() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-white border-2 border-gray-100 p-1 rounded-2xl">
+          <TabsList className="bg-white border-2 border-gray-100 p-1 rounded-2xl w-full">
             <TabsTrigger value="events" className="rounded-xl">
               <PartyPopper className="w-4 h-4 mr-1" />
               Mijn Events
@@ -653,7 +653,7 @@ function DashboardContent() {
             ) : (
               <>
                 {/* Events Header */}
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900">Mijn Events</h2>
                     <p className="text-gray-600">Beheer al je events op één plek</p>
@@ -778,7 +778,7 @@ function DashboardContent() {
                     <div className="flex items-start justify-between mb-4">
                       <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">{request.eventType}</h3>
-                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                        <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-4 h-4" />
                             {formatDate(request.eventDate)}
@@ -856,7 +856,7 @@ function DashboardContent() {
                         {booking.quote && (
                           <p className="text-md font-semibold text-gray-700 mb-2">{booking.quote.packageName}</p>
                         )}
-                        <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                        <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600 mb-3">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-4 h-4" />
                             {formatDate(booking.eventDate)}

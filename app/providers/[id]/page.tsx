@@ -155,7 +155,7 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
       <main className="min-h-screen bg-gray-50">
         <Container className="py-8">
           <Skeleton className="h-10 w-48 mb-6" />
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
             <div className="lg:col-span-2 space-y-6">
               <Card className="overflow-hidden border-2 border-gray-100 rounded-3xl">
                 <Skeleton className="h-96 w-full" />
@@ -165,7 +165,7 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
                   ))}
                 </div>
               </Card>
-              <Card className="p-6 border-2 border-gray-100 rounded-3xl">
+              <Card className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl">
                 <Skeleton className="h-8 w-3/4 mb-4" />
                 <Skeleton className="h-4 w-1/2 mb-6" />
                 <Skeleton className="h-20 w-full mb-6" />
@@ -214,7 +214,7 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
           </Button>
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Image Gallery */}
@@ -258,11 +258,11 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
             </Card>
 
             {/* Info Card */}
-            <Card className="p-6 border-2 border-gray-100 rounded-3xl">
+            <Card className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h1 className="text-3xl font-bold mb-2 text-gray-900">{provider.businessName}</h1>
-                  <div className="flex items-center gap-4 text-gray-600">
+                  <h1 className="text-xl sm:text-3xl font-bold mb-2 text-gray-900">{provider.businessName}</h1>
+                  <div className="flex flex-wrap items-center gap-2 text-gray-600">
                     <div className="flex items-center gap-1">
                       <MapPin className="w-4 h-4" />
                       {provider.location}
@@ -317,7 +317,7 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
               )}
 
               {/* Quick Info */}
-              <div className="grid grid-cols-2 gap-4 p-4 gradient-feature rounded-2xl">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 p-3 sm:p-4 gradient-feature rounded-2xl">
                 {provider.responseTime && (
                   <div className="flex items-center gap-2">
                     <Clock className="w-5 h-5 text-purple-600" />
@@ -360,8 +360,8 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
             </Card>
 
             {/* Reviews Section */}
-            <Card className="p-6 border-2 border-gray-100 rounded-3xl">
-              <h2 className="text-2xl font-bold mb-6 text-gray-900">
+            <Card className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-900">
                 Reviews ({reviews.length})
               </h2>
               {reviews.length > 0 ? (
@@ -409,7 +409,7 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="p-6 border-2 border-gray-100 rounded-3xl sticky top-24">
+            <Card className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl lg:sticky lg:top-24">
               <h3 className="text-xl font-bold mb-4 text-gray-900">Aanvragen</h3>
               
               <div className="space-y-4 mb-6">

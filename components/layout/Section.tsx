@@ -10,7 +10,7 @@ interface SectionProps {
 export function Section({ children, className, background = 'white' }: SectionProps) {
   return (
     <section className={cn(
-      'py-20',
+      'py-12 md:py-20',
       background !== 'white' && background,
       className
     )}>

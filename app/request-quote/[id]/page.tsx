@@ -152,9 +152,9 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
       <main className="min-h-screen gradient-hero">
         <Container className="py-8">
           <Skeleton className="h-10 w-48 mb-6" />
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
             <div className="lg:col-span-2">
-              <Card className="p-8 border-2 border-gray-100 rounded-3xl bg-white">
+              <Card className="p-4 sm:p-8 border-2 border-gray-100 rounded-3xl bg-white">
                 <Skeleton className="h-8 w-3/4 mb-4" />
                 <Skeleton className="h-4 w-1/2 mb-8" />
                 <div className="space-y-6">
@@ -193,16 +193,16 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
           </Button>
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
           {/* Form */}
           <div className="lg:col-span-2">
-            <Card className="p-8 border-2 border-gray-100 rounded-3xl bg-white">
+            <Card className="p-4 sm:p-8 border-2 border-gray-100 rounded-3xl bg-white">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                <h1 className="text-3xl font-bold mb-2">
+                <h1 className="text-xl sm:text-3xl font-bold mb-2">
                   <span className="gradient-text">Offerte Aanvragen</span>
                 </h1>
                 <p className="text-gray-600 mb-8">
@@ -219,7 +219,7 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
                   </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                   {/* Event Details */}
                   <div>
                     <h3 className="font-semibold text-lg mb-4 text-gray-900">Event Details</h3>
@@ -330,15 +330,15 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
                   </div>
 
                   {/* Submit */}
-                  <div className="flex gap-4 pt-6">
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-6">
                     <Button
                       type="submit"
                       disabled={isSubmitting}
-                      className="flex-1 rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-12 shadow-sm"
+                      className="w-full sm:flex-1 rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-12 shadow-sm"
                     >
                       {isSubmitting ? 'Versturen...' : 'Offerte Aanvragen'}
                     </Button>
-                    <Link href={`/providers/${provider.id}`} className="flex-1">
+                    <Link href={`/providers/${provider.id}`} className="w-full sm:flex-1">
                       <Button type="button" variant="outline" className="w-full rounded-xl h-12">
                         Annuleren
                       </Button>
@@ -351,7 +351,7 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
 
           {/* Sidebar - Provider Info */}
           <div className="lg:col-span-1">
-            <Card className="p-6 border-2 border-gray-100 rounded-3xl bg-white sticky top-24">
+            <Card className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl bg-white lg:sticky lg:top-24">
               <h3 className="font-semibold text-lg mb-4 text-gray-900">Je vraagt offerte aan bij:</h3>
               
               <div className="mb-4">

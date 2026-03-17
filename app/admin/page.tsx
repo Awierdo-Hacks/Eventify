@@ -275,9 +275,9 @@ export default function AdminPage() {
   if (status === 'loading' || (status === 'authenticated' && user?.role !== 'ADMIN')) {
     return (
       <main className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
-        <Container className="py-12">
+        <Container className="py-6 sm:py-12">
           <Skeleton className="h-12 w-64 mb-8" />
-          <div className="grid grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
             {[1, 2, 3, 4].map((i) => (
               <Skeleton key={i} className="h-32" />
             ))}
@@ -289,9 +289,9 @@ export default function AdminPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
-      <Container className="py-12">
+      <Container className="py-6 sm:py-12">
         <PageHeader title="Admin Dashboard" />
-        <p className="text-gray-600 mb-8">Platform beheer en moderatie</p>
+        <p className="text-gray-600 mb-6 sm:mb-8">Platform beheer en moderatie</p>
 
         {/* Success/Error Messages */}
         {successMessage && (
@@ -317,7 +317,7 @@ export default function AdminPage() {
         )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
           {[
             {
               icon: Users,
@@ -352,14 +352,14 @@ export default function AdminPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <Card className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md transition-all">
+              <Card className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md transition-all">
                 <div className="flex items-center justify-between mb-3">
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center`}>
-                    <stat.icon className="w-7 h-7 text-white" />
+                  <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center flex-shrink-0`}>
+                    <stat.icon className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
                   </div>
                 </div>
-                <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
-                <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                <p className="text-xs sm:text-sm text-gray-600 mb-1">{stat.label}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900">{stat.value}</p>
                 {stat.subtext && (
                   <p className="text-xs text-gray-500 mt-1">{stat.subtext}</p>
                 )}
@@ -370,20 +370,20 @@ export default function AdminPage() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-white border-2 border-gray-200 p-1 rounded-2xl">
-            <TabsTrigger value="overview" className="rounded-xl">Overzicht</TabsTrigger>
-            <TabsTrigger value="providers" className="rounded-xl">
+          <TabsList className="bg-white border-2 border-gray-200 p-1 rounded-2xl w-full flex gap-1">
+            <TabsTrigger value="overview" className="rounded-xl flex-1 text-xs sm:text-sm">Overzicht</TabsTrigger>
+            <TabsTrigger value="providers" className="rounded-xl flex-1 text-xs sm:text-sm">
               Providers
               {stats.pendingProviders > 0 && (
-                <Badge className="ml-2 bg-amber-500 text-white">{stats.pendingProviders}</Badge>
+                <Badge className="ml-1.5 bg-amber-500 text-white text-[10px] px-1.5 py-0 min-w-0 h-4">{stats.pendingProviders}</Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="users" className="rounded-xl">Users</TabsTrigger>
+            <TabsTrigger value="users" className="rounded-xl flex-1 text-xs sm:text-sm">Users</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            <Card className="p-6 border-2 border-gray-100 rounded-3xl">
+            <Card className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl">
               <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <TrendingUp className="w-6 h-6 text-purple-600" />
                 Platform Status
@@ -395,7 +395,7 @@ export default function AdminPage() {
                     <Clock className="w-5 h-5 text-amber-600" />
                     <p className="font-semibold text-amber-900">Verificatie Wachtrij</p>
                   </div>
-                  <p className="text-3xl font-bold text-amber-900">{stats.pendingProviders}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-amber-900">{stats.pendingProviders}</p>
                   <p className="text-sm text-amber-700 mt-1">providers wachten op verificatie</p>
                 </div>
 
@@ -404,7 +404,7 @@ export default function AdminPage() {
                     <Shield className="w-5 h-5 text-green-600" />
                     <p className="font-semibold text-green-900">Actieve Providers</p>
                   </div>
-                  <p className="text-3xl font-bold text-green-900">{stats.verifiedProviders}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-green-900">{stats.verifiedProviders}</p>
                   <p className="text-sm text-green-700 mt-1">geverifieerde providers actief</p>
                 </div>
               </div>
@@ -419,7 +419,7 @@ export default function AdminPage() {
                 <Skeleton className="h-32 w-full" />
               </div>
             ) : providers.length === 0 ? (
-              <Card className="p-12 border-2 border-gray-100 rounded-3xl text-center">
+              <Card className="p-6 md:p-12 border-2 border-gray-100 rounded-3xl text-center">
                 <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Geen providers</h3>
                 <p className="text-gray-600">Er zijn nog geen providers geregistreerd</p>
@@ -427,11 +427,11 @@ export default function AdminPage() {
             ) : (
               <div className="grid gap-6">
                 {providers.map((provider) => (
-                  <Card key={provider.id} className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md transition-shadow">
-                    <div className="flex items-start justify-between mb-4">
+                  <Card key={provider.id} className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md transition-shadow">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-2">
                       <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">{provider.businessName}</h3>
-                        <div className="flex items-center gap-3 text-sm text-gray-600 mb-2">
+                        <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600 mb-2">
                           <Badge className="bg-purple-100 text-purple-800">{provider.category}</Badge>
                           <span>{provider.location}</span>
                         </div>
@@ -457,15 +457,15 @@ export default function AdminPage() {
                     <div className="pt-4 border-t border-gray-200 mb-4">
                       <div className="grid grid-cols-3 gap-4 text-center">
                         <div>
-                          <p className="text-2xl font-bold text-gray-900">{provider.stats.requests}</p>
+                          <p className="text-xl sm:text-2xl font-bold text-gray-900">{provider.stats.requests}</p>
                           <p className="text-xs text-gray-600">Aanvragen</p>
                         </div>
                         <div>
-                          <p className="text-2xl font-bold text-gray-900">{provider.stats.quotes}</p>
+                          <p className="text-xl sm:text-2xl font-bold text-gray-900">{provider.stats.quotes}</p>
                           <p className="text-xs text-gray-600">Offertes</p>
                         </div>
                         <div>
-                          <p className="text-2xl font-bold text-gray-900">{provider.stats.bookings}</p>
+                          <p className="text-xl sm:text-2xl font-bold text-gray-900">{provider.stats.bookings}</p>
                           <p className="text-xs text-gray-600">Boekingen</p>
                         </div>
                       </div>
@@ -494,91 +494,139 @@ export default function AdminPage() {
                 <Skeleton className="h-20 w-full" />
               </div>
             ) : users.length === 0 ? (
-              <Card className="p-12 border-2 border-gray-100 rounded-3xl text-center">
+              <Card className="p-6 md:p-12 border-2 border-gray-100 rounded-3xl text-center">
                 <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Geen users</h3>
                 <p className="text-gray-600">Er zijn nog geen users geregistreerd</p>
               </Card>
             ) : (
-              <Card className="border-2 border-gray-100 rounded-3xl overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-50 border-b-2 border-gray-100">
-                      <tr>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Naam</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Email</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Role</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Status</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Aangemaakt</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Acties</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {users.map((user) => (
-                        <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                          <td className="px-6 py-4 text-sm font-medium text-gray-900">{user.name}</td>
-                          <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
-                          <td className="px-6 py-4">{getRoleBadge(user.role)}</td>
-                          <td className="px-6 py-4">{getStatusBadge(user.status)}</td>
-                          <td className="px-6 py-4 text-sm text-gray-600">{formatDate(user.createdAt)}</td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-2">
-                              {user.status === 'ACTIVE' && (
-                                <>
+              <>
+                {/* Mobile: card list */}
+                <div className="md:hidden space-y-3">
+                  {users.map((user) => (
+                    <Card key={user.id} className="p-4 border-2 border-gray-100 rounded-2xl">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <p className="font-semibold text-gray-900 text-sm">{user.name}</p>
+                          <p className="text-xs text-gray-500 truncate max-w-[180px]">{user.email}</p>
+                        </div>
+                        <div className="flex flex-col items-end gap-1">
+                          {getRoleBadge(user.role)}
+                          {getStatusBadge(user.status)}
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-400 mb-3">{formatDate(user.createdAt)}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {user.status === 'ACTIVE' && (
+                          <>
+                            <Button
+                              onClick={() => { setModeratingUser(user); setModerationAction('suspend'); }}
+                              variant="outline"
+                              className="text-xs px-3 h-8 border-amber-300 text-amber-700 hover:bg-amber-50 rounded-lg"
+                            >
+                              Schorsen
+                            </Button>
+                            <Button
+                              onClick={() => { setModeratingUser(user); setModerationAction('ban'); }}
+                              variant="outline"
+                              className="text-xs px-3 h-8 border-red-300 text-red-700 hover:bg-red-50 rounded-lg"
+                            >
+                              Verbannen
+                            </Button>
+                          </>
+                        )}
+                        {(user.status === 'SUSPENDED' || user.status === 'BANNED') && (
+                          <Button
+                            onClick={() => { setModeratingUser(user); setModerationAction('activate'); }}
+                            variant="outline"
+                            className="text-xs px-3 h-8 border-green-300 text-green-700 hover:bg-green-50 rounded-lg"
+                          >
+                            Activeren
+                          </Button>
+                        )}
+                        {user.role !== 'ADMIN' && (
+                          <Button
+                            onClick={() => { setModeratingUser(user); setModerationAction('delete'); }}
+                            variant="outline"
+                            className="text-xs px-3 h-8 border-red-300 text-red-700 hover:bg-red-50 rounded-lg"
+                          >
+                            Verwijderen
+                          </Button>
+                        )}
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Desktop: table */}
+                <Card className="hidden md:block border-2 border-gray-100 rounded-3xl overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-gray-50 border-b-2 border-gray-100">
+                        <tr>
+                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Naam</th>
+                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Email</th>
+                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Role</th>
+                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Status</th>
+                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Aangemaakt</th>
+                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Acties</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {users.map((user) => (
+                          <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+                            <td className="px-6 py-4 text-sm font-medium text-gray-900">{user.name}</td>
+                            <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
+                            <td className="px-6 py-4">{getRoleBadge(user.role)}</td>
+                            <td className="px-6 py-4">{getStatusBadge(user.status)}</td>
+                            <td className="px-6 py-4 text-sm text-gray-600">{formatDate(user.createdAt)}</td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-2">
+                                {user.status === 'ACTIVE' && (
+                                  <>
+                                    <Button
+                                      onClick={() => { setModeratingUser(user); setModerationAction('suspend'); }}
+                                      variant="outline"
+                                      className="text-xs px-3 py-1 border-amber-300 text-amber-700 hover:bg-amber-50 rounded-lg"
+                                    >
+                                      Schorsen
+                                    </Button>
+                                    <Button
+                                      onClick={() => { setModeratingUser(user); setModerationAction('ban'); }}
+                                      variant="outline"
+                                      className="text-xs px-3 py-1 border-red-300 text-red-700 hover:bg-red-50 rounded-lg"
+                                    >
+                                      Verbannen
+                                    </Button>
+                                  </>
+                                )}
+                                {(user.status === 'SUSPENDED' || user.status === 'BANNED') && (
                                   <Button
-                                    onClick={() => {
-                                      setModeratingUser(user);
-                                      setModerationAction('suspend');
-                                    }}
+                                    onClick={() => { setModeratingUser(user); setModerationAction('activate'); }}
                                     variant="outline"
-                                    className="text-xs px-3 py-1 border-amber-300 text-amber-700 hover:bg-amber-50 rounded-lg"
+                                    className="text-xs px-3 py-1 border-green-300 text-green-700 hover:bg-green-50 rounded-lg"
                                   >
-                                    Schorsen
+                                    Activeren
                                   </Button>
+                                )}
+                                {user.role !== 'ADMIN' && (
                                   <Button
-                                    onClick={() => {
-                                      setModeratingUser(user);
-                                      setModerationAction('ban');
-                                    }}
+                                    onClick={() => { setModeratingUser(user); setModerationAction('delete'); }}
                                     variant="outline"
                                     className="text-xs px-3 py-1 border-red-300 text-red-700 hover:bg-red-50 rounded-lg"
                                   >
-                                    Verbannen
+                                    Verwijderen
                                   </Button>
-                                </>
-                              )}
-                              {(user.status === 'SUSPENDED' || user.status === 'BANNED') && (
-                                <Button
-                                  onClick={() => {
-                                    setModeratingUser(user);
-                                    setModerationAction('activate');
-                                  }}
-                                  variant="outline"
-                                  className="text-xs px-3 py-1 border-green-300 text-green-700 hover:bg-green-50 rounded-lg"
-                                >
-                                  Activeren
-                                </Button>
-                              )}
-                              {user.role !== 'ADMIN' && (
-                                <Button
-                                  onClick={() => {
-                                    setModeratingUser(user);
-                                    setModerationAction('delete');
-                                  }}
-                                  variant="outline"
-                                  className="text-xs px-3 py-1 border-red-300 text-red-700 hover:bg-red-50 rounded-lg"
-                                >
-                                  Verwijderen
-                                </Button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Card>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
+              </>
             )}
           </TabsContent>
         </Tabs>

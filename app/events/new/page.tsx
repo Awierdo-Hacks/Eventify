@@ -194,7 +194,7 @@ export default function NewEventPage() {
             Terug
           </Button>
           
-          <h1 className="text-4xl font-bold mb-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
             <span className="gradient-text">Nieuw Event</span>
           </h1>
           <p className="text-xl text-gray-600">
@@ -217,7 +217,7 @@ export default function NewEventPage() {
               </div>
               {step < 3 && (
                 <div
-                  className={`w-24 h-1 mx-2 rounded transition-colors ${
+                  className={`w-12 sm:w-24 h-1 mx-1 sm:mx-2 rounded transition-colors ${
                     currentStep > step ? 'bg-purple-500' : 'bg-gray-200'
                   }`}
                 />
@@ -304,7 +304,7 @@ export default function NewEventPage() {
                 </p>
               </div>
 
-              <Card className="p-8 border-2 border-gray-100 rounded-3xl max-w-3xl mx-auto">
+              <Card className="p-4 sm:p-8 border-2 border-gray-100 rounded-3xl max-w-3xl mx-auto">
                 {/* Selected Slots */}
                 <div className="mb-8">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -324,7 +324,7 @@ export default function NewEventPage() {
                         <span>{categoryNames[slot.category]}</span>
                         <button
                           onClick={() => handleRemoveSlot(slot.category)}
-                          className="ml-1 hover:text-red-600 transition-colors"
+                          className="ml-1 p-1 -mr-1 rounded-full hover:text-red-600 active:text-red-600 transition-colors"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -450,7 +450,7 @@ export default function NewEventPage() {
                 </p>
               </div>
 
-              <Card className="p-8 border-2 border-gray-100 rounded-3xl max-w-2xl mx-auto">
+              <Card className="p-4 sm:p-8 border-2 border-gray-100 rounded-3xl max-w-2xl mx-auto">
                 <div className="space-y-6">
                   {/* Event Name */}
                   <div>
@@ -514,7 +514,7 @@ export default function NewEventPage() {
                       <Euro className="w-4 h-4 inline mr-2" />
                       Budget indicatie (optioneel)
                     </label>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <Input
                         type="number"
                         value={eventDetails.budgetMin}

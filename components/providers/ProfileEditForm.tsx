@@ -366,7 +366,7 @@ export default function ProfileEditForm({ initialData, onSave }: ProfileEditForm
                   key={range.value}
                   type="button"
                   onClick={() => setPriceRange(range.value)}
-                  className={`p-3 rounded-xl border-2 text-sm font-medium transition-all ${
+                  className={`p-3 min-h-[44px] rounded-xl border-2 text-sm font-medium transition-all ${
                     priceRange === range.value
                       ? 'border-purple-500 bg-purple-50 text-purple-700'
                       : 'border-gray-100 text-gray-600 hover:border-purple-200'
@@ -530,7 +530,7 @@ export default function ProfileEditForm({ initialData, onSave }: ProfileEditForm
               <button
                 type="button"
                 onClick={() => removeImage(index)}
-                className="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                className="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center md:opacity-0 md:group-hover:opacity-100 transition-opacity hover:bg-red-600"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -607,7 +607,7 @@ export default function ProfileEditForm({ initialData, onSave }: ProfileEditForm
                 <button
                   type="button"
                   onClick={() => removeService(index)}
-                  className="ml-4 p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  className="ml-4 p-3 text-red-400 hover:text-red-600 active:text-red-600 hover:bg-red-50 active:bg-red-50 rounded-lg transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
