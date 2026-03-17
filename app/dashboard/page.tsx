@@ -473,7 +473,7 @@ function DashboardContent() {
         <Container className="py-8">
           <Skeleton className="h-12 w-64 mb-2" />
           <Skeleton className="h-6 w-96 mb-8" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
             {[1, 2, 3, 4].map((i) => (
               <Card key={i} className="p-6 border-2 border-gray-100 rounded-3xl">
                 <Skeleton className="h-8 w-8 mb-4" />
@@ -530,7 +530,7 @@ function DashboardContent() {
         )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (

@@ -155,7 +155,7 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
       <main className="min-h-screen bg-gray-50">
         <Container className="py-8">
           <Skeleton className="h-10 w-48 mb-6" />
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
             <div className="lg:col-span-2 space-y-6">
               <Card className="overflow-hidden border-2 border-gray-100 rounded-3xl">
                 <Skeleton className="h-96 w-full" />
@@ -214,7 +214,7 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
           </Button>
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Image Gallery */}
@@ -409,7 +409,7 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl lg:sticky lg:top-24">
+            <Card className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl md:sticky md:top-24">
               <h3 className="text-xl font-bold mb-4 text-gray-900">Aanvragen</h3>
               
               <div className="space-y-4 mb-6">

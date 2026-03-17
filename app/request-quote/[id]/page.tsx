@@ -152,7 +152,7 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
       <main className="min-h-screen gradient-hero">
         <Container className="py-8">
           <Skeleton className="h-10 w-48 mb-6" />
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
             <div className="lg:col-span-2">
               <Card className="p-4 sm:p-8 border-2 border-gray-100 rounded-3xl bg-white">
                 <Skeleton className="h-8 w-3/4 mb-4" />
@@ -193,7 +193,7 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
           </Button>
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
           {/* Form */}
           <div className="lg:col-span-2">
             <Card className="p-4 sm:p-8 border-2 border-gray-100 rounded-3xl bg-white">
@@ -351,7 +351,7 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
 
           {/* Sidebar - Provider Info */}
           <div className="lg:col-span-1">
-            <Card className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl bg-white lg:sticky lg:top-24">
+            <Card className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl bg-white md:sticky md:top-24">
               <h3 className="font-semibold text-lg mb-4 text-gray-900">Je vraagt offerte aan bij:</h3>
               
               <div className="mb-4">

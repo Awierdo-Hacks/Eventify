@@ -57,7 +57,7 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold mb-6">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6">
               <span className="gradient-text">
                 Jouw Droomfeest
               </span>
@@ -116,7 +116,7 @@ export default function Home() {
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 md:mb-12">
             Ontdek onze diensten
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
             {categories.map((category, index) => (
               <motion.div
                 key={category.name}

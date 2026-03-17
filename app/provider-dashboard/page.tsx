@@ -436,7 +436,7 @@ export default function ProviderDashboardPage() {
         )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
           {[
             {
               icon: FileText,
@@ -529,7 +529,7 @@ export default function ProviderDashboardPage() {
                 <p className="text-gray-600">Je hebt nog geen service aanvragen ontvangen</p>
               </Card>
             ) : (
-              <div className="grid gap-6">
+              <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
                 {requests.map((request) => (
                   <Card key={request.id} className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md transition-shadow">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-2">
@@ -624,7 +624,7 @@ export default function ProviderDashboardPage() {
                 <p className="text-gray-600">Je hebt nog geen offertes verstuurd</p>
               </Card>
             ) : (
-              <div className="grid gap-6">
+              <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
                 {quotes.map((quote) => (
                   <Card key={quote.id} className={`p-4 sm:p-6 border-2 rounded-3xl ${
                     quote.status === 'REJECTED' ? 'border-red-200 bg-red-50/30' : 'border-gray-100'
@@ -747,7 +747,7 @@ export default function ProviderDashboardPage() {
                 <p className="text-gray-600">Je hebt nog geen bevestigde boekingen</p>
               </Card>
             ) : (
-              <div className="grid gap-6">
+              <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
                 {bookings.map((booking) => (
                   <Card key={booking.id} className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl bg-gradient-to-br from-green-50 to-emerald-50">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-2">

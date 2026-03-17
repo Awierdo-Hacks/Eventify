@@ -317,7 +317,7 @@ export default function AdminPage() {
         )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
           {[
             {
               icon: Users,
@@ -425,7 +425,7 @@ export default function AdminPage() {
                 <p className="text-gray-600">Er zijn nog geen providers geregistreerd</p>
               </Card>
             ) : (
-              <div className="grid gap-6">
+              <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
                 {providers.map((provider) => (
                   <Card key={provider.id} className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md transition-shadow">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-2">
