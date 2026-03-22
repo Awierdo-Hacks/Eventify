@@ -8,9 +8,14 @@ const globalForPrisma = globalThis as unknown as {
 function createPrismaClient() {
   const connectionString = process.env.DATABASE_URL!;
   const isRemote = !connectionString.includes('localhost') && !connectionString.includes('127.0.0.1');
-  
+
+  // Add connection pool settings to URL
+  const pooledConnectionString = connectionString.includes('?')
+    ? `${connectionString}&connection_limit=10&pool_timeout=10`
+    : `${connectionString}?connection_limit=10&pool_timeout=10`;
+
   const adapter = new PrismaPg({
-    connectionString,
+    connectionString: pooledConnectionString,
     // Remote databases (Render, etc.) need SSL with relaxed cert validation
     ...(isRemote && { ssl: { rejectUnauthorized: false } }),
   });

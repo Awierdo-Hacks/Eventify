@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import { useState, useEffect, Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from '@/components/providers/SessionProvider';
@@ -19,8 +20,13 @@ import {
   DialogButton,
 } from '@/components/ui/confirmation-dialog';
 import { EventCard } from '@/components/events/EventCard';
-import { EventDetailView } from '@/components/events/EventDetailView';
 import { UnlinkedQuotes } from '@/components/events/UnlinkedQuotes';
+
+// Lazy load – alleen ingeladen wanneer gebruiker een evenement selecteert (936 regels)
+const EventDetailView = dynamic(
+  () => import('@/components/events/EventDetailView').then((m) => ({ default: m.EventDetailView })),
+  { ssr: false, loading: () => <Skeleton className="h-96 w-full rounded-3xl" /> }
+);
 import { eventTypeIcons, calculateEventProgress } from '@/lib/eventHelpers';
 import {
   FileText,

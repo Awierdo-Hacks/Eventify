@@ -174,22 +174,23 @@ export async function POST(request: Request) {
       },
     });
 
-    // Update provider's average rating and review count
-    const allReviews = await prisma.review.findMany({
-      where: { provider_id: providerId },
-      select: { rating: true },
-    });
+    // Update provider's average rating and review count using DB aggregation
+    const [reviewStats] = await Promise.all([
+      prisma.review.aggregate({
+        where: { provider_id: providerId },
+        _avg: { rating: true },
+        _count: { id: true },
+      }),
+    ]);
 
-    const totalRating = allReviews.reduce((sum, r) => sum + r.rating, 0);
-    const averageRating = allReviews.length > 0 
-      ? totalRating / allReviews.length 
-      : 0;
+    const averageRating = reviewStats._avg.rating ?? 0;
+    const reviewCount = reviewStats._count.id;
 
     await prisma.serviceProvider.update({
       where: { id: providerId },
       data: {
         rating_avg: averageRating,
-        review_count: allReviews.length,
+        review_count: reviewCount,
       },
     });
 

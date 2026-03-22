@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSession } from '@/components/providers/SessionProvider';
 import { Container } from '@/components/layout';
@@ -10,6 +12,11 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+
+const AvailabilityCalendar = dynamic(() => import('@/components/providers/AvailabilityCalendar'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-80 w-full rounded-3xl" />,
+});
 import {
   MapPin,
   Star,
@@ -221,10 +228,13 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
             <Card className="overflow-hidden border-2 border-gray-100 rounded-3xl">
               <div className="relative h-96 bg-gray-200">
                 {provider.images && provider.images.length > 0 ? (
-                  <img
+                  <Image
                     src={provider.images[selectedImage]}
                     alt={provider.businessName}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 66vw"
+                    priority
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -250,7 +260,7 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
                         selectedImage === idx ? 'border-purple-500 scale-105' : 'border-gray-200'
                       }`}
                     >
-                      <img src={img} alt={`${provider.businessName} ${idx + 1}`} className="w-full h-full object-cover" />
+                      <Image src={img} alt={`${provider.businessName} ${idx + 1}`} fill className="object-cover" sizes="80px" />
                     </button>
                   ))}
                 </div>
@@ -409,27 +419,18 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl md:sticky md:top-24">
-              <h3 className="text-xl font-bold mb-4 text-gray-900">Aanvragen</h3>
-              
-              <div className="space-y-4 mb-6">
-                <div className="p-4 gradient-feature rounded-2xl">
-                  <div className="text-sm text-gray-600 mb-1">Prijs indicatie</div>
-                  <div className="text-2xl font-bold gradient-text">
-                    {getPriceRangeDisplay(provider.priceRange)}
-                  </div>
-                </div>
-              </div>
+            <Card className="p-4 border-2 border-gray-100 rounded-3xl md:sticky md:top-4">
+              <h3 className="text-lg font-bold mb-3 text-gray-900">Aanvragen</h3>
 
               <Link href={`/request-quote/${provider.id}`}>
-                <Button className="w-full rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-12 text-base mb-3 shadow-sm">
+                <Button className="w-full rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-10 text-sm mb-2 shadow-sm">
                   Offerte Aanvragen
                 </Button>
               </Link>
 
-              <Button 
-                variant="outline" 
-                className="w-full rounded-xl h-12"
+              <Button
+                variant="outline"
+                className="w-full rounded-xl h-10 text-sm"
                 onClick={handleContact}
                 disabled={contactLoading}
               >
@@ -446,22 +447,12 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
                 )}
               </Button>
 
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <h4 className="font-semibold mb-3 text-gray-900">Waarom boeken via Eventiphy?</h4>
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-600">Veilige betalingen</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-600">24/7 klantenservice</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-600">Geverifieerde professionals</span>
-                  </div>
-                </div>
+              <div className="mt-3">
+                <h4 className="font-semibold mb-2 text-gray-900 flex items-center gap-2 text-sm">
+                  <Calendar className="w-3.5 h-3.5 text-purple-600" />
+                  Beschikbaarheid
+                </h4>
+                <AvailabilityCalendar providerId={provider.id} compact />
               </div>
             </Card>
           </div>

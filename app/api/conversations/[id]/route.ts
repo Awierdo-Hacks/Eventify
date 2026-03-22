@@ -97,6 +97,7 @@ export async function GET(
                 id: true,
                 event_type: true,
                 event_date: true,
+                booking: { select: { id: true } },
               },
             },
           },
@@ -147,6 +148,7 @@ export async function GET(
             accepted: msg.quote.accepted,
             rejected: !!msg.quote.rejected_at,
             linkedToEvent: !!msg.quote.event_slot_id,
+            requestHasBooking: !!msg.quote.request?.booking,
             provider: {
               id: msg.quote.provider.id,
               businessName: msg.quote.provider.business_name,

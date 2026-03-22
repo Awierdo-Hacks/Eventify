@@ -63,7 +63,8 @@ export const ModelName = {
   MessageAttachment: 'MessageAttachment',
   Event: 'Event',
   EventSlot: 'EventSlot',
-  ProviderService: 'ProviderService'
+  ProviderService: 'ProviderService',
+  BlockedDate: 'BlockedDate'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -297,6 +298,17 @@ export const ProviderServiceScalarFieldEnum = {
 } as const
 
 export type ProviderServiceScalarFieldEnum = (typeof ProviderServiceScalarFieldEnum)[keyof typeof ProviderServiceScalarFieldEnum]
+
+
+export const BlockedDateScalarFieldEnum = {
+  id: 'id',
+  provider_id: 'provider_id',
+  date: 'date',
+  reason: 'reason',
+  created_at: 'created_at'
+} as const
+
+export type BlockedDateScalarFieldEnum = (typeof BlockedDateScalarFieldEnum)[keyof typeof BlockedDateScalarFieldEnum]
 
 
 export const SortOrder = {

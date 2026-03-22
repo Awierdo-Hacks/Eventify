@@ -10,28 +10,18 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get all conversations the user is part of
-    const participants = await prisma.conversationParticipant.findMany({
-      where: { user_id: session.id },
-      select: {
-        conversation_id: true,
-        last_read_at: true,
-      },
-    });
+    // Count all unread messages across all conversations in a single query
+    const result = await prisma.$queryRaw<{ count: bigint }[]>`
+      SELECT COUNT(*) as count
+      FROM messages m
+      INNER JOIN conversation_participants cp
+        ON cp.conversation_id = m.conversation_id
+        AND cp.user_id = ${session.id}
+      WHERE m.sender_id != ${session.id}
+        AND m.created_at > cp.last_read_at
+    `;
 
-    // Count total unread messages across all conversations
-    let totalUnread = 0;
-    for (const participant of participants) {
-      const count = await prisma.message.count({
-        where: {
-          conversation_id: participant.conversation_id,
-          sender_id: { not: session.id },
-          created_at: { gt: participant.last_read_at },
-        },
-      });
-      totalUnread += count;
-    }
-
+    const totalUnread = Number(result[0]?.count ?? 0);
     return NextResponse.json({ unreadCount: totalUnread });
   } catch (error) {
     console.error('Unread count error:', error);

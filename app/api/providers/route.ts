@@ -52,26 +52,26 @@ export async function GET(request: Request) {
       where.verified = true;
     }
 
-    // Fetch providers
+    // Fetch providers – gebruik rating_avg uit DB, geen reviews laden nodig
     const providers = await prisma.serviceProvider.findMany({
       where,
-      include: {
+      select: {
+        id: true,
+        business_name: true,
+        category: true,
+        description: true,
+        location: true,
+        price_range: true,
+        images: true,
+        verified: true,
+        rating_avg: true,
+        review_count: true,
+        created_at: true,
         user: {
           select: {
             id: true,
             name: true,
             email: true,
-          },
-        },
-        reviews: {
-          select: {
-            id: true,
-            rating: true,
-          },
-        },
-        _count: {
-          select: {
-            reviews: true,
           },
         },
       },
@@ -80,37 +80,31 @@ export async function GET(request: Request) {
       },
     });
 
-    // Bereken average rating voor elke provider
-    const providersWithRating = providers.map((provider) => {
-      const totalRating = provider.reviews.reduce((sum, review) => sum + review.rating, 0);
-      const averageRating = provider.reviews.length > 0 
-        ? Math.round((totalRating / provider.reviews.length) * 10) / 10 
-        : 0;
+    const providersWithRating = providers.map((provider) => ({
+      id: provider.id,
+      businessName: provider.business_name,
+      category: provider.category,
+      description: provider.description,
+      location: provider.location,
+      priceRange: provider.price_range,
+      images: provider.images,
+      verified: provider.verified,
+      rating: Math.round(provider.rating_avg * 10) / 10,
+      reviewCount: provider.review_count,
+      createdAt: provider.created_at,
+      user: {
+        id: provider.user.id,
+        name: provider.user.name,
+        email: provider.user.email,
+      },
+    }));
 
-      return {
-        id: provider.id,
-        businessName: provider.business_name,
-        category: provider.category,
-        description: provider.description,
-        location: provider.location,
-        priceRange: provider.price_range,
-        images: provider.images,
-        verified: provider.verified,
-        rating: averageRating,
-        reviewCount: provider._count.reviews,
-        createdAt: provider.created_at,
-        user: {
-          id: provider.user.id,
-          name: provider.user.name,
-          email: provider.user.email,
-        },
-      };
-    });
-
-    return NextResponse.json({
+    const res = NextResponse.json({
       providers: providersWithRating,
       total: providersWithRating.length,
     });
+    res.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+    return res;
   } catch (error) {
     console.error('Providers API error:', error);
     return NextResponse.json(

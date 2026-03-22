@@ -67,6 +67,11 @@ export async function GET(
                   provider: {
                     select: { id: true, business_name: true, category: true },
                   },
+                  request: {
+                    select: {
+                      booking: { select: { id: true } },
+                    },
+                  },
                 },
               },
             },
@@ -103,6 +108,7 @@ export async function GET(
                       accepted: msg.quote.accepted,
                       rejected: !!msg.quote.rejected_at,
                       linkedToEvent: !!msg.quote.event_slot_id,
+                      requestHasBooking: !!msg.quote.request?.booking,
                       provider: {
                         id: msg.quote.provider.id,
                         businessName: msg.quote.provider.business_name,
@@ -139,9 +145,9 @@ export async function GET(
           return;
         }
 
-        // Poll every 3 seconds
+        // Poll every 8 seconds
         if (!closed) {
-          setTimeout(poll, 3000);
+          setTimeout(poll, 8000);
         }
       };
 

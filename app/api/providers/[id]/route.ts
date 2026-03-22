@@ -59,13 +59,7 @@ export async function GET(
       );
     }
 
-    // Bereken average rating
-    const totalRating = provider.reviews.reduce((sum, review) => sum + review.rating, 0);
-    const averageRating = provider.reviews.length > 0 
-      ? Math.round((totalRating / provider.reviews.length) * 10) / 10 
-      : 0;
-
-    // Format response
+    // Format response – gebruik rating_avg uit DB
     const response = {
       id: provider.id,
       businessName: provider.business_name,
@@ -80,7 +74,7 @@ export async function GET(
       maxGuests: provider.max_guests,
       responseTime: provider.response_time,
       verified: provider.verified,
-      rating: averageRating,
+      rating: Math.round(provider.rating_avg * 10) / 10,
       reviewCount: provider._count.reviews,
       bookingCount: provider._count.bookings,
       createdAt: provider.created_at,
@@ -101,7 +95,9 @@ export async function GET(
       })),
     };
 
-    return NextResponse.json(response);
+    const res = NextResponse.json(response);
+    res.headers.set('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=600');
+    return res;
   } catch (error) {
     console.error('Provider detail API error:', error);
     return NextResponse.json(

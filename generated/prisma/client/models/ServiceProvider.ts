@@ -358,6 +358,7 @@ export type ServiceProviderWhereInput = {
   bookings?: Prisma.BookingListRelationFilter
   reviews?: Prisma.ReviewListRelationFilter
   provider_services?: Prisma.ProviderServiceListRelationFilter
+  blocked_dates?: Prisma.BlockedDateListRelationFilter
 }
 
 export type ServiceProviderOrderByWithRelationInput = {
@@ -389,6 +390,7 @@ export type ServiceProviderOrderByWithRelationInput = {
   bookings?: Prisma.BookingOrderByRelationAggregateInput
   reviews?: Prisma.ReviewOrderByRelationAggregateInput
   provider_services?: Prisma.ProviderServiceOrderByRelationAggregateInput
+  blocked_dates?: Prisma.BlockedDateOrderByRelationAggregateInput
 }
 
 export type ServiceProviderWhereUniqueInput = Prisma.AtLeast<{
@@ -423,6 +425,7 @@ export type ServiceProviderWhereUniqueInput = Prisma.AtLeast<{
   bookings?: Prisma.BookingListRelationFilter
   reviews?: Prisma.ReviewListRelationFilter
   provider_services?: Prisma.ProviderServiceListRelationFilter
+  blocked_dates?: Prisma.BlockedDateListRelationFilter
 }, "id" | "user_id">
 
 export type ServiceProviderOrderByWithAggregationInput = {
@@ -511,6 +514,7 @@ export type ServiceProviderCreateInput = {
   bookings?: Prisma.BookingCreateNestedManyWithoutProviderInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutProviderInput
   provider_services?: Prisma.ProviderServiceCreateNestedManyWithoutProviderInput
+  blocked_dates?: Prisma.BlockedDateCreateNestedManyWithoutProviderInput
 }
 
 export type ServiceProviderUncheckedCreateInput = {
@@ -541,6 +545,7 @@ export type ServiceProviderUncheckedCreateInput = {
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutProviderInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutProviderInput
   provider_services?: Prisma.ProviderServiceUncheckedCreateNestedManyWithoutProviderInput
+  blocked_dates?: Prisma.BlockedDateUncheckedCreateNestedManyWithoutProviderInput
 }
 
 export type ServiceProviderUpdateInput = {
@@ -571,6 +576,7 @@ export type ServiceProviderUpdateInput = {
   bookings?: Prisma.BookingUpdateManyWithoutProviderNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutProviderNestedInput
   provider_services?: Prisma.ProviderServiceUpdateManyWithoutProviderNestedInput
+  blocked_dates?: Prisma.BlockedDateUpdateManyWithoutProviderNestedInput
 }
 
 export type ServiceProviderUncheckedUpdateInput = {
@@ -601,6 +607,7 @@ export type ServiceProviderUncheckedUpdateInput = {
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutProviderNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutProviderNestedInput
   provider_services?: Prisma.ProviderServiceUncheckedUpdateManyWithoutProviderNestedInput
+  blocked_dates?: Prisma.BlockedDateUncheckedUpdateManyWithoutProviderNestedInput
 }
 
 export type ServiceProviderCreateManyInput = {
@@ -941,6 +948,20 @@ export type ServiceProviderUpdateOneRequiredWithoutProvider_servicesNestedInput 
   update?: Prisma.XOR<Prisma.XOR<Prisma.ServiceProviderUpdateToOneWithWhereWithoutProvider_servicesInput, Prisma.ServiceProviderUpdateWithoutProvider_servicesInput>, Prisma.ServiceProviderUncheckedUpdateWithoutProvider_servicesInput>
 }
 
+export type ServiceProviderCreateNestedOneWithoutBlocked_datesInput = {
+  create?: Prisma.XOR<Prisma.ServiceProviderCreateWithoutBlocked_datesInput, Prisma.ServiceProviderUncheckedCreateWithoutBlocked_datesInput>
+  connectOrCreate?: Prisma.ServiceProviderCreateOrConnectWithoutBlocked_datesInput
+  connect?: Prisma.ServiceProviderWhereUniqueInput
+}
+
+export type ServiceProviderUpdateOneRequiredWithoutBlocked_datesNestedInput = {
+  create?: Prisma.XOR<Prisma.ServiceProviderCreateWithoutBlocked_datesInput, Prisma.ServiceProviderUncheckedCreateWithoutBlocked_datesInput>
+  connectOrCreate?: Prisma.ServiceProviderCreateOrConnectWithoutBlocked_datesInput
+  upsert?: Prisma.ServiceProviderUpsertWithoutBlocked_datesInput
+  connect?: Prisma.ServiceProviderWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ServiceProviderUpdateToOneWithWhereWithoutBlocked_datesInput, Prisma.ServiceProviderUpdateWithoutBlocked_datesInput>, Prisma.ServiceProviderUncheckedUpdateWithoutBlocked_datesInput>
+}
+
 export type ServiceProviderCreateWithoutUserInput = {
   id?: string
   business_name: string
@@ -968,6 +989,7 @@ export type ServiceProviderCreateWithoutUserInput = {
   bookings?: Prisma.BookingCreateNestedManyWithoutProviderInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutProviderInput
   provider_services?: Prisma.ProviderServiceCreateNestedManyWithoutProviderInput
+  blocked_dates?: Prisma.BlockedDateCreateNestedManyWithoutProviderInput
 }
 
 export type ServiceProviderUncheckedCreateWithoutUserInput = {
@@ -997,6 +1019,7 @@ export type ServiceProviderUncheckedCreateWithoutUserInput = {
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutProviderInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutProviderInput
   provider_services?: Prisma.ProviderServiceUncheckedCreateNestedManyWithoutProviderInput
+  blocked_dates?: Prisma.BlockedDateUncheckedCreateNestedManyWithoutProviderInput
 }
 
 export type ServiceProviderCreateOrConnectWithoutUserInput = {
@@ -1042,6 +1065,7 @@ export type ServiceProviderUpdateWithoutUserInput = {
   bookings?: Prisma.BookingUpdateManyWithoutProviderNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutProviderNestedInput
   provider_services?: Prisma.ProviderServiceUpdateManyWithoutProviderNestedInput
+  blocked_dates?: Prisma.BlockedDateUpdateManyWithoutProviderNestedInput
 }
 
 export type ServiceProviderUncheckedUpdateWithoutUserInput = {
@@ -1071,6 +1095,7 @@ export type ServiceProviderUncheckedUpdateWithoutUserInput = {
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutProviderNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutProviderNestedInput
   provider_services?: Prisma.ProviderServiceUncheckedUpdateManyWithoutProviderNestedInput
+  blocked_dates?: Prisma.BlockedDateUncheckedUpdateManyWithoutProviderNestedInput
 }
 
 export type ServiceProviderCreateWithoutService_requestsInput = {
@@ -1100,6 +1125,7 @@ export type ServiceProviderCreateWithoutService_requestsInput = {
   bookings?: Prisma.BookingCreateNestedManyWithoutProviderInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutProviderInput
   provider_services?: Prisma.ProviderServiceCreateNestedManyWithoutProviderInput
+  blocked_dates?: Prisma.BlockedDateCreateNestedManyWithoutProviderInput
 }
 
 export type ServiceProviderUncheckedCreateWithoutService_requestsInput = {
@@ -1129,6 +1155,7 @@ export type ServiceProviderUncheckedCreateWithoutService_requestsInput = {
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutProviderInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutProviderInput
   provider_services?: Prisma.ProviderServiceUncheckedCreateNestedManyWithoutProviderInput
+  blocked_dates?: Prisma.BlockedDateUncheckedCreateNestedManyWithoutProviderInput
 }
 
 export type ServiceProviderCreateOrConnectWithoutService_requestsInput = {
@@ -1174,6 +1201,7 @@ export type ServiceProviderUpdateWithoutService_requestsInput = {
   bookings?: Prisma.BookingUpdateManyWithoutProviderNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutProviderNestedInput
   provider_services?: Prisma.ProviderServiceUpdateManyWithoutProviderNestedInput
+  blocked_dates?: Prisma.BlockedDateUpdateManyWithoutProviderNestedInput
 }
 
 export type ServiceProviderUncheckedUpdateWithoutService_requestsInput = {
@@ -1203,6 +1231,7 @@ export type ServiceProviderUncheckedUpdateWithoutService_requestsInput = {
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutProviderNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutProviderNestedInput
   provider_services?: Prisma.ProviderServiceUncheckedUpdateManyWithoutProviderNestedInput
+  blocked_dates?: Prisma.BlockedDateUncheckedUpdateManyWithoutProviderNestedInput
 }
 
 export type ServiceProviderCreateWithoutQuotesInput = {
@@ -1232,6 +1261,7 @@ export type ServiceProviderCreateWithoutQuotesInput = {
   bookings?: Prisma.BookingCreateNestedManyWithoutProviderInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutProviderInput
   provider_services?: Prisma.ProviderServiceCreateNestedManyWithoutProviderInput
+  blocked_dates?: Prisma.BlockedDateCreateNestedManyWithoutProviderInput
 }
 
 export type ServiceProviderUncheckedCreateWithoutQuotesInput = {
@@ -1261,6 +1291,7 @@ export type ServiceProviderUncheckedCreateWithoutQuotesInput = {
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutProviderInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutProviderInput
   provider_services?: Prisma.ProviderServiceUncheckedCreateNestedManyWithoutProviderInput
+  blocked_dates?: Prisma.BlockedDateUncheckedCreateNestedManyWithoutProviderInput
 }
 
 export type ServiceProviderCreateOrConnectWithoutQuotesInput = {
@@ -1306,6 +1337,7 @@ export type ServiceProviderUpdateWithoutQuotesInput = {
   bookings?: Prisma.BookingUpdateManyWithoutProviderNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutProviderNestedInput
   provider_services?: Prisma.ProviderServiceUpdateManyWithoutProviderNestedInput
+  blocked_dates?: Prisma.BlockedDateUpdateManyWithoutProviderNestedInput
 }
 
 export type ServiceProviderUncheckedUpdateWithoutQuotesInput = {
@@ -1335,6 +1367,7 @@ export type ServiceProviderUncheckedUpdateWithoutQuotesInput = {
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutProviderNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutProviderNestedInput
   provider_services?: Prisma.ProviderServiceUncheckedUpdateManyWithoutProviderNestedInput
+  blocked_dates?: Prisma.BlockedDateUncheckedUpdateManyWithoutProviderNestedInput
 }
 
 export type ServiceProviderCreateWithoutBookingsInput = {
@@ -1364,6 +1397,7 @@ export type ServiceProviderCreateWithoutBookingsInput = {
   quotes?: Prisma.QuoteCreateNestedManyWithoutProviderInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutProviderInput
   provider_services?: Prisma.ProviderServiceCreateNestedManyWithoutProviderInput
+  blocked_dates?: Prisma.BlockedDateCreateNestedManyWithoutProviderInput
 }
 
 export type ServiceProviderUncheckedCreateWithoutBookingsInput = {
@@ -1393,6 +1427,7 @@ export type ServiceProviderUncheckedCreateWithoutBookingsInput = {
   quotes?: Prisma.QuoteUncheckedCreateNestedManyWithoutProviderInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutProviderInput
   provider_services?: Prisma.ProviderServiceUncheckedCreateNestedManyWithoutProviderInput
+  blocked_dates?: Prisma.BlockedDateUncheckedCreateNestedManyWithoutProviderInput
 }
 
 export type ServiceProviderCreateOrConnectWithoutBookingsInput = {
@@ -1438,6 +1473,7 @@ export type ServiceProviderUpdateWithoutBookingsInput = {
   quotes?: Prisma.QuoteUpdateManyWithoutProviderNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutProviderNestedInput
   provider_services?: Prisma.ProviderServiceUpdateManyWithoutProviderNestedInput
+  blocked_dates?: Prisma.BlockedDateUpdateManyWithoutProviderNestedInput
 }
 
 export type ServiceProviderUncheckedUpdateWithoutBookingsInput = {
@@ -1467,6 +1503,7 @@ export type ServiceProviderUncheckedUpdateWithoutBookingsInput = {
   quotes?: Prisma.QuoteUncheckedUpdateManyWithoutProviderNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutProviderNestedInput
   provider_services?: Prisma.ProviderServiceUncheckedUpdateManyWithoutProviderNestedInput
+  blocked_dates?: Prisma.BlockedDateUncheckedUpdateManyWithoutProviderNestedInput
 }
 
 export type ServiceProviderCreateWithoutReviewsInput = {
@@ -1496,6 +1533,7 @@ export type ServiceProviderCreateWithoutReviewsInput = {
   quotes?: Prisma.QuoteCreateNestedManyWithoutProviderInput
   bookings?: Prisma.BookingCreateNestedManyWithoutProviderInput
   provider_services?: Prisma.ProviderServiceCreateNestedManyWithoutProviderInput
+  blocked_dates?: Prisma.BlockedDateCreateNestedManyWithoutProviderInput
 }
 
 export type ServiceProviderUncheckedCreateWithoutReviewsInput = {
@@ -1525,6 +1563,7 @@ export type ServiceProviderUncheckedCreateWithoutReviewsInput = {
   quotes?: Prisma.QuoteUncheckedCreateNestedManyWithoutProviderInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutProviderInput
   provider_services?: Prisma.ProviderServiceUncheckedCreateNestedManyWithoutProviderInput
+  blocked_dates?: Prisma.BlockedDateUncheckedCreateNestedManyWithoutProviderInput
 }
 
 export type ServiceProviderCreateOrConnectWithoutReviewsInput = {
@@ -1570,6 +1609,7 @@ export type ServiceProviderUpdateWithoutReviewsInput = {
   quotes?: Prisma.QuoteUpdateManyWithoutProviderNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutProviderNestedInput
   provider_services?: Prisma.ProviderServiceUpdateManyWithoutProviderNestedInput
+  blocked_dates?: Prisma.BlockedDateUpdateManyWithoutProviderNestedInput
 }
 
 export type ServiceProviderUncheckedUpdateWithoutReviewsInput = {
@@ -1599,6 +1639,7 @@ export type ServiceProviderUncheckedUpdateWithoutReviewsInput = {
   quotes?: Prisma.QuoteUncheckedUpdateManyWithoutProviderNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutProviderNestedInput
   provider_services?: Prisma.ProviderServiceUncheckedUpdateManyWithoutProviderNestedInput
+  blocked_dates?: Prisma.BlockedDateUncheckedUpdateManyWithoutProviderNestedInput
 }
 
 export type ServiceProviderCreateWithoutProvider_servicesInput = {
@@ -1628,6 +1669,7 @@ export type ServiceProviderCreateWithoutProvider_servicesInput = {
   quotes?: Prisma.QuoteCreateNestedManyWithoutProviderInput
   bookings?: Prisma.BookingCreateNestedManyWithoutProviderInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutProviderInput
+  blocked_dates?: Prisma.BlockedDateCreateNestedManyWithoutProviderInput
 }
 
 export type ServiceProviderUncheckedCreateWithoutProvider_servicesInput = {
@@ -1657,6 +1699,7 @@ export type ServiceProviderUncheckedCreateWithoutProvider_servicesInput = {
   quotes?: Prisma.QuoteUncheckedCreateNestedManyWithoutProviderInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutProviderInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutProviderInput
+  blocked_dates?: Prisma.BlockedDateUncheckedCreateNestedManyWithoutProviderInput
 }
 
 export type ServiceProviderCreateOrConnectWithoutProvider_servicesInput = {
@@ -1702,6 +1745,7 @@ export type ServiceProviderUpdateWithoutProvider_servicesInput = {
   quotes?: Prisma.QuoteUpdateManyWithoutProviderNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutProviderNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutProviderNestedInput
+  blocked_dates?: Prisma.BlockedDateUpdateManyWithoutProviderNestedInput
 }
 
 export type ServiceProviderUncheckedUpdateWithoutProvider_servicesInput = {
@@ -1731,6 +1775,143 @@ export type ServiceProviderUncheckedUpdateWithoutProvider_servicesInput = {
   quotes?: Prisma.QuoteUncheckedUpdateManyWithoutProviderNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutProviderNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutProviderNestedInput
+  blocked_dates?: Prisma.BlockedDateUncheckedUpdateManyWithoutProviderNestedInput
+}
+
+export type ServiceProviderCreateWithoutBlocked_datesInput = {
+  id?: string
+  business_name: string
+  category: string
+  location: string
+  price_range?: $Enums.PriceRange
+  description?: string | null
+  services?: Prisma.ServiceProviderCreateservicesInput | string[]
+  images?: Prisma.ServiceProviderCreateimagesInput | string[]
+  portfolio_images?: Prisma.ServiceProviderCreateportfolio_imagesInput | string[]
+  phone?: string | null
+  website?: string | null
+  availability?: string | null
+  min_guests?: number | null
+  max_guests?: number | null
+  response_time?: string | null
+  verified?: boolean
+  is_active?: boolean
+  rating_avg?: number
+  review_count?: number
+  created_at?: Date | string
+  updated_at?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutProviderInput
+  service_requests?: Prisma.ServiceRequestCreateNestedManyWithoutProviderInput
+  quotes?: Prisma.QuoteCreateNestedManyWithoutProviderInput
+  bookings?: Prisma.BookingCreateNestedManyWithoutProviderInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutProviderInput
+  provider_services?: Prisma.ProviderServiceCreateNestedManyWithoutProviderInput
+}
+
+export type ServiceProviderUncheckedCreateWithoutBlocked_datesInput = {
+  id?: string
+  user_id: string
+  business_name: string
+  category: string
+  location: string
+  price_range?: $Enums.PriceRange
+  description?: string | null
+  services?: Prisma.ServiceProviderCreateservicesInput | string[]
+  images?: Prisma.ServiceProviderCreateimagesInput | string[]
+  portfolio_images?: Prisma.ServiceProviderCreateportfolio_imagesInput | string[]
+  phone?: string | null
+  website?: string | null
+  availability?: string | null
+  min_guests?: number | null
+  max_guests?: number | null
+  response_time?: string | null
+  verified?: boolean
+  is_active?: boolean
+  rating_avg?: number
+  review_count?: number
+  created_at?: Date | string
+  updated_at?: Date | string
+  service_requests?: Prisma.ServiceRequestUncheckedCreateNestedManyWithoutProviderInput
+  quotes?: Prisma.QuoteUncheckedCreateNestedManyWithoutProviderInput
+  bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutProviderInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutProviderInput
+  provider_services?: Prisma.ProviderServiceUncheckedCreateNestedManyWithoutProviderInput
+}
+
+export type ServiceProviderCreateOrConnectWithoutBlocked_datesInput = {
+  where: Prisma.ServiceProviderWhereUniqueInput
+  create: Prisma.XOR<Prisma.ServiceProviderCreateWithoutBlocked_datesInput, Prisma.ServiceProviderUncheckedCreateWithoutBlocked_datesInput>
+}
+
+export type ServiceProviderUpsertWithoutBlocked_datesInput = {
+  update: Prisma.XOR<Prisma.ServiceProviderUpdateWithoutBlocked_datesInput, Prisma.ServiceProviderUncheckedUpdateWithoutBlocked_datesInput>
+  create: Prisma.XOR<Prisma.ServiceProviderCreateWithoutBlocked_datesInput, Prisma.ServiceProviderUncheckedCreateWithoutBlocked_datesInput>
+  where?: Prisma.ServiceProviderWhereInput
+}
+
+export type ServiceProviderUpdateToOneWithWhereWithoutBlocked_datesInput = {
+  where?: Prisma.ServiceProviderWhereInput
+  data: Prisma.XOR<Prisma.ServiceProviderUpdateWithoutBlocked_datesInput, Prisma.ServiceProviderUncheckedUpdateWithoutBlocked_datesInput>
+}
+
+export type ServiceProviderUpdateWithoutBlocked_datesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  business_name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  services?: Prisma.ServiceProviderUpdateservicesInput | string[]
+  images?: Prisma.ServiceProviderUpdateimagesInput | string[]
+  portfolio_images?: Prisma.ServiceProviderUpdateportfolio_imagesInput | string[]
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  min_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  max_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  response_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rating_avg?: Prisma.FloatFieldUpdateOperationsInput | number
+  review_count?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutProviderNestedInput
+  service_requests?: Prisma.ServiceRequestUpdateManyWithoutProviderNestedInput
+  quotes?: Prisma.QuoteUpdateManyWithoutProviderNestedInput
+  bookings?: Prisma.BookingUpdateManyWithoutProviderNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutProviderNestedInput
+  provider_services?: Prisma.ProviderServiceUpdateManyWithoutProviderNestedInput
+}
+
+export type ServiceProviderUncheckedUpdateWithoutBlocked_datesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  user_id?: Prisma.StringFieldUpdateOperationsInput | string
+  business_name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  services?: Prisma.ServiceProviderUpdateservicesInput | string[]
+  images?: Prisma.ServiceProviderUpdateimagesInput | string[]
+  portfolio_images?: Prisma.ServiceProviderUpdateportfolio_imagesInput | string[]
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  min_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  max_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  response_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rating_avg?: Prisma.FloatFieldUpdateOperationsInput | number
+  review_count?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  service_requests?: Prisma.ServiceRequestUncheckedUpdateManyWithoutProviderNestedInput
+  quotes?: Prisma.QuoteUncheckedUpdateManyWithoutProviderNestedInput
+  bookings?: Prisma.BookingUncheckedUpdateManyWithoutProviderNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutProviderNestedInput
+  provider_services?: Prisma.ProviderServiceUncheckedUpdateManyWithoutProviderNestedInput
 }
 
 
@@ -1744,6 +1925,7 @@ export type ServiceProviderCountOutputType = {
   bookings: number
   reviews: number
   provider_services: number
+  blocked_dates: number
 }
 
 export type ServiceProviderCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1752,6 +1934,7 @@ export type ServiceProviderCountOutputTypeSelect<ExtArgs extends runtime.Types.E
   bookings?: boolean | ServiceProviderCountOutputTypeCountBookingsArgs
   reviews?: boolean | ServiceProviderCountOutputTypeCountReviewsArgs
   provider_services?: boolean | ServiceProviderCountOutputTypeCountProvider_servicesArgs
+  blocked_dates?: boolean | ServiceProviderCountOutputTypeCountBlocked_datesArgs
 }
 
 /**
@@ -1799,6 +1982,13 @@ export type ServiceProviderCountOutputTypeCountProvider_servicesArgs<ExtArgs ext
   where?: Prisma.ProviderServiceWhereInput
 }
 
+/**
+ * ServiceProviderCountOutputType without action
+ */
+export type ServiceProviderCountOutputTypeCountBlocked_datesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BlockedDateWhereInput
+}
+
 
 export type ServiceProviderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1829,6 +2019,7 @@ export type ServiceProviderSelect<ExtArgs extends runtime.Types.Extensions.Inter
   bookings?: boolean | Prisma.ServiceProvider$bookingsArgs<ExtArgs>
   reviews?: boolean | Prisma.ServiceProvider$reviewsArgs<ExtArgs>
   provider_services?: boolean | Prisma.ServiceProvider$provider_servicesArgs<ExtArgs>
+  blocked_dates?: boolean | Prisma.ServiceProvider$blocked_datesArgs<ExtArgs>
   _count?: boolean | Prisma.ServiceProviderCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["serviceProvider"]>
 
@@ -1917,6 +2108,7 @@ export type ServiceProviderInclude<ExtArgs extends runtime.Types.Extensions.Inte
   bookings?: boolean | Prisma.ServiceProvider$bookingsArgs<ExtArgs>
   reviews?: boolean | Prisma.ServiceProvider$reviewsArgs<ExtArgs>
   provider_services?: boolean | Prisma.ServiceProvider$provider_servicesArgs<ExtArgs>
+  blocked_dates?: boolean | Prisma.ServiceProvider$blocked_datesArgs<ExtArgs>
   _count?: boolean | Prisma.ServiceProviderCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ServiceProviderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1935,6 +2127,7 @@ export type $ServiceProviderPayload<ExtArgs extends runtime.Types.Extensions.Int
     bookings: Prisma.$BookingPayload<ExtArgs>[]
     reviews: Prisma.$ReviewPayload<ExtArgs>[]
     provider_services: Prisma.$ProviderServicePayload<ExtArgs>[]
+    blocked_dates: Prisma.$BlockedDatePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2359,6 +2552,7 @@ export interface Prisma__ServiceProviderClient<T, Null = never, ExtArgs extends 
   bookings<T extends Prisma.ServiceProvider$bookingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ServiceProvider$bookingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BookingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reviews<T extends Prisma.ServiceProvider$reviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ServiceProvider$reviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   provider_services<T extends Prisma.ServiceProvider$provider_servicesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ServiceProvider$provider_servicesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProviderServicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  blocked_dates<T extends Prisma.ServiceProvider$blocked_datesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ServiceProvider$blocked_datesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BlockedDatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2923,6 +3117,30 @@ export type ServiceProvider$provider_servicesArgs<ExtArgs extends runtime.Types.
   take?: number
   skip?: number
   distinct?: Prisma.ProviderServiceScalarFieldEnum | Prisma.ProviderServiceScalarFieldEnum[]
+}
+
+/**
+ * ServiceProvider.blocked_dates
+ */
+export type ServiceProvider$blocked_datesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the BlockedDate
+   */
+  select?: Prisma.BlockedDateSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the BlockedDate
+   */
+  omit?: Prisma.BlockedDateOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BlockedDateInclude<ExtArgs> | null
+  where?: Prisma.BlockedDateWhereInput
+  orderBy?: Prisma.BlockedDateOrderByWithRelationInput | Prisma.BlockedDateOrderByWithRelationInput[]
+  cursor?: Prisma.BlockedDateWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BlockedDateScalarFieldEnum | Prisma.BlockedDateScalarFieldEnum[]
 }
 
 /**

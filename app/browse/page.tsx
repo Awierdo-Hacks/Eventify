@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { Container } from '@/components/layout';
 import { Card } from '@/components/ui/card';
@@ -262,10 +263,12 @@ function BrowseContent() {
                     {/* Image */}
                     <div className="relative h-48 overflow-hidden bg-gray-200">
                       {provider.images && provider.images.length > 0 ? (
-                        <img
+                        <Image
                           src={provider.images[0]}
                           alt={provider.businessName}
-                          className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                          fill
+                          className="object-cover hover:scale-110 transition-transform duration-300"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-400">

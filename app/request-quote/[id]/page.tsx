@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSession } from '@/components/providers/SessionProvider';
 import { Container } from '@/components/layout';
@@ -11,7 +12,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { ArrowLeft, Calendar, Users, Euro, MessageSquare, CheckCircle, AlertCircle } from 'lucide-react';
+import { format, isSameDay, isBefore, startOfDay, startOfMonth, endOfMonth, addMonths } from 'date-fns';
+import { nl } from 'date-fns/locale';
 
 interface Provider {
   id: string;
@@ -39,6 +43,25 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
     budget_range: 'MEDIUM',
     description: '',
   });
+  const [unavailableDates, setUnavailableDates] = useState<string[]>([]);
+  const [calendarMonth, setCalendarMonth] = useState(new Date());
+  const selectedDate = formData.event_date ? new Date(formData.event_date + 'T00:00:00') : undefined;
+
+  const fetchAvailability = useCallback(async (month: Date, provId: string) => {
+    try {
+      const from = startOfMonth(month).toISOString().split('T')[0];
+      const to = endOfMonth(addMonths(month, 1)).toISOString().split('T')[0];
+      const res = await fetch(`/api/providers/${provId}/availability?from=${from}&to=${to}`);
+      if (res.ok) {
+        const data = await res.json();
+        setUnavailableDates(data.unavailableDates || []);
+      }
+    } catch { /* stil falen */ }
+  }, []);
+
+  useEffect(() => {
+    if (providerId) fetchAvailability(calendarMonth, providerId);
+  }, [calendarMonth, providerId, fetchAvailability]);
 
   // Handle async params
   useEffect(() => {
@@ -244,38 +267,56 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
                         </select>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            <Calendar className="w-4 h-4 inline mr-1" />
-                            Event datum *
-                          </label>
-                          <Input
-                            type="date"
-                            name="event_date"
-                            value={formData.event_date}
-                            onChange={handleChange}
-                            required
-                            min={new Date().toISOString().split('T')[0]}
-                            className="rounded-xl border-2 border-gray-100 h-12"
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <Calendar className="w-4 h-4 inline mr-1" />
+                          Event datum *
+                        </label>
+                        <div className="border-2 border-gray-100 rounded-xl p-2 flex justify-center">
+                          <CalendarComponent
+                            mode="single"
+                            selected={selectedDate}
+                            onSelect={(date) => {
+                              if (date) {
+                                setFormData({ ...formData, event_date: format(date, 'yyyy-MM-dd') });
+                              }
+                            }}
+                            month={calendarMonth}
+                            onMonthChange={setCalendarMonth}
+                            disabled={(date) =>
+                              isBefore(date, startOfDay(new Date())) ||
+                              unavailableDates.some((ud) => isSameDay(new Date(ud + 'T00:00:00'), date))
+                            }
+                            modifiers={{
+                              unavailable: unavailableDates.map((d) => new Date(d + 'T00:00:00')),
+                            }}
+                            modifiersClassNames={{
+                              unavailable: '!bg-red-50 !text-red-400 !line-through',
+                            }}
                           />
                         </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            <Users className="w-4 h-4 inline mr-1" />
-                            Aantal gasten *
-                          </label>
-                          <Input
-                            type="number"
-                            name="guest_count"
-                            value={formData.guest_count}
-                            onChange={handleChange}
-                            placeholder="Bijv. 50"
-                            required
-                            min={1}
-                            className="rounded-xl border-2 border-gray-100 h-12"
-                          />
-                        </div>
+                        {selectedDate && (
+                          <p className="text-sm text-purple-600 font-medium mt-2">
+                            Geselecteerd: {format(selectedDate, 'd MMMM yyyy', { locale: nl })}
+                          </p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <Users className="w-4 h-4 inline mr-1" />
+                          Aantal gasten *
+                        </label>
+                        <Input
+                          type="number"
+                          name="guest_count"
+                          value={formData.guest_count}
+                          onChange={handleChange}
+                          placeholder="Bijv. 50"
+                          required
+                          min={1}
+                          className="rounded-xl border-2 border-gray-100 h-12"
+                        />
                       </div>
 
                       <div>
@@ -356,11 +397,15 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
               
               <div className="mb-4">
                 {provider.images && provider.images.length > 0 ? (
-                  <img
-                    src={provider.images[0]}
-                    alt={provider.businessName}
-                    className="w-full h-32 object-cover rounded-2xl mb-3"
-                  />
+                  <div className="relative w-full h-32 rounded-2xl mb-3 overflow-hidden">
+                    <Image
+                      src={provider.images[0]}
+                      alt={provider.businessName}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 400px"
+                    />
+                  </div>
                 ) : (
                   <div className="w-full h-32 bg-gray-200 rounded-2xl mb-3 flex items-center justify-center">
                     <CheckCircle className="w-12 h-12 text-gray-400" />

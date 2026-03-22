@@ -142,6 +142,7 @@ model ServiceProvider {
   bookings          Booking[]
   reviews           Review[]
   provider_services ProviderService[]
+  blocked_dates     BlockedDate[]
 
   @@map("service_providers")
 }
@@ -171,6 +172,9 @@ model ServiceRequest {
   quotes   Quote[]
   booking  Booking?
 
+  @@index([customer_id])
+  @@index([provider_id])
+  @@index([created_at])
   @@map("service_requests")
 }
 
@@ -197,6 +201,8 @@ model Quote {
   booked_for_slot EventSlot?      @relation("BookedQuote")
   chat_messages   Message[]
 
+  @@index([request_id])
+  @@index([provider_id])
   @@map("quotes")
 }
 
@@ -220,6 +226,9 @@ model Booking {
   customer User            @relation(fields: [customer_id], references: [id], onDelete: Cascade)
   provider ServiceProvider @relation(fields: [provider_id], references: [id], onDelete: Cascade)
 
+  @@index([customer_id])
+  @@index([provider_id])
+  @@index([created_at])
   @@map("bookings")
 }
 
@@ -239,6 +248,8 @@ model Review {
   provider ServiceProvider @relation(fields: [provider_id], references: [id], onDelete: Cascade)
   customer User            @relation(fields: [customer_id], references: [id], onDelete: Cascade)
 
+  @@index([provider_id])
+  @@index([rating])
   @@map("reviews")
 }
 
@@ -273,6 +284,7 @@ model ConversationParticipant {
   user         User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([conversation_id, user_id])
+  @@index([user_id])
   @@map("conversation_participants")
 }
 
@@ -292,6 +304,7 @@ model Message {
   attachments  MessageAttachment[]
 
   @@index([conversation_id, created_at])
+  @@index([sender_id])
   @@map("messages")
 }
 
@@ -364,4 +377,20 @@ model ProviderService {
   provider ServiceProvider @relation(fields: [provider_id], references: [id], onDelete: Cascade)
 
   @@map("provider_services")
+}
+
+model BlockedDate {
+  id          String   @id @default(cuid())
+  provider_id String
+  date        DateTime @db.Date
+  reason      String?
+  created_at  DateTime @default(now())
+
+  // Relations
+  provider ServiceProvider @relation(fields: [provider_id], references: [id], onDelete: Cascade)
+
+  @@unique([provider_id, date])
+  @@index([provider_id])
+  @@index([date])
+  @@map("blocked_dates")
 }

@@ -116,7 +116,7 @@ export async function PATCH(
         );
       }
 
-      // Accept quote - create booking and update statuses
+      // Accept quote - create booking and update statuses atomically
       const [updatedQuote, booking] = await prisma.$transaction([
         // Update quote accepted status
         prisma.quote.update({
@@ -137,13 +137,12 @@ export async function PATCH(
             payment_status: 'UNPAID',
           },
         }),
+        // Update service request status
+        prisma.serviceRequest.update({
+          where: { id: quote.request_id },
+          data: { status: 'ACCEPTED' },
+        }),
       ]);
-
-      // Update service request status separately
-      await prisma.serviceRequest.update({
-        where: { id: quote.request_id },
-        data: { status: 'ACCEPTED' },
-      });
 
       // If quote is linked to an event slot, update slot status to BOOKED
       if (quote.event_slot_id) {

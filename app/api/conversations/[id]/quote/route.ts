@@ -155,7 +155,12 @@ export async function POST(
               select: { id: true, business_name: true, category: true },
             },
             request: {
-              select: { id: true, event_type: true, event_date: true },
+              select: {
+                id: true,
+                event_type: true,
+                event_date: true,
+                booking: { select: { id: true } },
+              },
             },
           },
         },
@@ -189,6 +194,7 @@ export async function POST(
               accepted: chatMsg.quote.accepted,
               rejected: !!chatMsg.quote.rejected_at,
               linkedToEvent: !!chatMsg.quote.event_slot_id,
+              requestHasBooking: !!chatMsg.quote.request?.booking,
               provider: {
                 id: chatMsg.quote.provider.id,
                 businessName: chatMsg.quote.provider.business_name,

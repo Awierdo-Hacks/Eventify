@@ -47,6 +47,7 @@ interface QuoteData {
   accepted: boolean;
   rejected: boolean;
   linkedToEvent: boolean;
+  requestHasBooking?: boolean;
   provider: {
     id: string;
     businessName: string;
@@ -120,6 +121,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
   const [loadingEvents, setLoadingEvents] = useState(false);
   const [acceptingQuote, setAcceptingQuote] = useState(false);
+  const [acceptError, setAcceptError] = useState<string | null>(null);
 
   // Quote form state
   const [quotePrice, setQuotePrice] = useState('');
@@ -127,6 +129,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
   const [quoteTerms, setQuoteTerms] = useState('');
   const [quoteServices, setQuoteServices] = useState<string[]>(['']);
   const [sendingQuote, setSendingQuote] = useState(false);
+  const [quoteError, setQuoteError] = useState<string | null>(null);
 
   // Resolve params
   useEffect(() => {
@@ -306,6 +309,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
     if (!quotePrice || !quoteDescription || !conversationId) return;
 
     setSendingQuote(true);
+    setQuoteError(null);
 
     try {
       const res = await fetch(`/api/conversations/${conversationId}/quote`, {
@@ -330,9 +334,10 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
         setQuoteDescription('');
         setQuoteTerms('');
         setQuoteServices(['']);
+        setQuoteError(null);
       } else {
         const err = await res.json();
-        console.error('Quote error:', err.error);
+        setQuoteError(err.error || 'Er ging iets mis bij het versturen van de offerte.');
       }
     } catch (error) {
       console.error('Error sending quote:', error);
@@ -394,6 +399,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
           {quote.accepted && <Badge className="bg-green-100 text-green-800">Geaccepteerd</Badge>}
           {quote.rejected && <Badge className="bg-red-100 text-red-800">Afgewezen</Badge>}
           {quote.linkedToEvent && <Badge className="bg-blue-100 text-blue-800">Gekoppeld</Badge>}
+          {quote.requestHasBooking && !quote.accepted && <Badge className="bg-gray-100 text-gray-600">Aanvraag al geboekt</Badge>}
         </div>
 
         <div className="text-3xl font-bold gradient-text mb-3">
@@ -426,7 +432,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
       </div>
 
       {/* Quote actions for customer */}
-      {!isOwn && !quote.accepted && !quote.rejected && (
+      {!isOwn && !quote.accepted && !quote.rejected && !quote.requestHasBooking && (
         <div className="border-t-2 border-purple-100 p-3 flex gap-2">
           <Button
             size="sm"
@@ -487,6 +493,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
     if (!acceptingQuoteId) return;
     
     setAcceptingQuote(true);
+    setAcceptError(null);
     try {
       // If event slot selected, link the quote first so accept can book it
       if (selectedSlotId) {
@@ -498,7 +505,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
 
         if (!linkRes.ok) {
           const err = await linkRes.json();
-          console.error('Error linking quote:', err.error || err);
+          setAcceptError(err.error || 'Er ging iets mis bij het koppelen aan het event.');
           return;
         }
       }
@@ -512,21 +519,21 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
 
       if (!res.ok) {
         const err = await res.json();
-        console.error('Error accepting quote:', err.error || err);
+        setAcceptError(err.error || 'Er ging iets mis bij het accepteren van de offerte.');
         return;
       }
 
-  // Remove the accepted quote card from the chat view
-  setMessages((prev) => prev.filter((msg) => msg.quote?.id !== acceptingQuoteId));
-  // Refresh messages to ensure latest status
-  fetchMessages();
-  setShowAcceptQuoteDialog(false);
-  setAcceptingQuoteId(null);
-  setAcceptingQuoteCategory(null);
-  setSelectedEventId(null);
-  setSelectedSlotId(null);
+      // Refresh messages to get the latest status for all quotes
+      fetchMessages();
+      setShowAcceptQuoteDialog(false);
+      setAcceptingQuoteId(null);
+      setAcceptingQuoteCategory(null);
+      setSelectedEventId(null);
+      setSelectedSlotId(null);
+      setAcceptError(null);
     } catch (error) {
       console.error('Error accepting quote:', error);
+      setAcceptError('Er ging iets mis. Probeer het opnieuw.');
     } finally {
       setAcceptingQuote(false);
     }
@@ -833,7 +840,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
       )}
 
       {/* Send Quote Dialog (Provider only) */}
-      <Dialog open={showQuoteDialog} onOpenChange={setShowQuoteDialog}>
+      <Dialog open={showQuoteDialog} onOpenChange={(open) => { setShowQuoteDialog(open); if (!open) setQuoteError(null); }}>
         <DialogContent className="sm:max-w-lg border border-gray-100 bg-white rounded-3xl p-0">
           <DialogHeader>
             <VisuallyHidden>
@@ -908,6 +915,12 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
                 />
               </div>
 
+              {quoteError && (
+                <div className="text-sm text-red-600 bg-red-50 p-3 rounded-xl">
+                  {quoteError}
+                </div>
+              )}
+
               <div className="pt-2">
                 <Button
                   className="w-full rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-12 text-base shadow-sm"
@@ -937,6 +950,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
           setAcceptingQuoteCategory(null);
           setSelectedEventId(null);
           setSelectedSlotId(null);
+          setAcceptError(null);
         }
       }}>
         <DialogContent className="sm:max-w-md">
@@ -1036,6 +1050,13 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
                   </div>
                 )}
               </>
+            )}
+
+            {/* Error feedback */}
+            {acceptError && (
+              <div className="text-sm text-red-600 bg-red-50 p-3 rounded-xl">
+                {acceptError}
+              </div>
             )}
 
             {/* Actions */}

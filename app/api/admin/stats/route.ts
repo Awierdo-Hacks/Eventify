@@ -9,36 +9,31 @@ export async function GET() {
     if (error) return error;
 
     // Get platform statistics
+    const now = new Date();
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
     const [
       totalUsers,
       totalProviders,
       verifiedProviders,
       totalBookings,
-      bookingsWithRevenue,
+      totalRevenueResult,
+      monthlyRevenueResult,
     ] = await Promise.all([
       prisma.user.count(),
       prisma.serviceProvider.count(),
       prisma.serviceProvider.count({ where: { verified: true } }),
       prisma.booking.count(),
-      prisma.booking.findMany({
-        select: {
-          final_price: true,
-          created_at: true,
-        },
+      prisma.booking.aggregate({ _sum: { final_price: true } }),
+      prisma.booking.aggregate({
+        _sum: { final_price: true },
+        where: { created_at: { gte: firstDayOfMonth } },
       }),
     ]);
 
     const pendingProviders = totalProviders - verifiedProviders;
-
-    // Calculate total revenue
-    const totalRevenue = bookingsWithRevenue.reduce((sum, booking) => sum + booking.final_price, 0);
-
-    // Calculate monthly revenue (current month)
-    const now = new Date();
-    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const monthlyRevenue = bookingsWithRevenue
-      .filter(booking => new Date(booking.created_at) >= firstDayOfMonth)
-      .reduce((sum, booking) => sum + booking.final_price, 0);
+    const totalRevenue = totalRevenueResult._sum.final_price ?? 0;
+    const monthlyRevenue = monthlyRevenueResult._sum.final_price ?? 0;
 
     return NextResponse.json({
       totalUsers,

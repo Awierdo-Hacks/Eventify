@@ -106,3 +106,8 @@ export type EventSlot = Prisma.EventSlotModel
  * 
  */
 export type ProviderService = Prisma.ProviderServiceModel
+/**
+ * Model BlockedDate
+ * 
+ */
+export type BlockedDate = Prisma.BlockedDateModel

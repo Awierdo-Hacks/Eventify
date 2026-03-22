@@ -1,12 +1,30 @@
-- registratie syteem ontwerpen voor zowel klant als provider x
-- optimalisatie voor smartphones (deftige layout , geen elementen uit of reach etc) 
-- messaging systeem in orde brengen tussen klant en provider (chatten en fotosen videos doorsturen)
--qr code systeem voor de applicatie 
+# Eventify Todo
 
-- kleur offerte maken chat aangepast worden  
+## Afgerond ✅
+- Registratiesysteem ontworpen voor zowel klant als provider.
+- De flow aangepast.
+- Overzicht-knop in dashboard verwijderd.
+- Performance nagekeken (trage laadtijd/compiletijd van pagina’s).
 
- de flow moet anders x
- -overzicht knop in dashboard mag wegx
- -
-  optimalisatie voor smartphones (deftige layout , geen elementen uit of reach etc) 
-  zorg dat het clean en seamless is voor op een gsm 
+## In uitvoering 🔄
+- Smartphone-optimalisatie: nette layout, geen elementen buiten beeld, clean en seamless op gsm.
+- Messaging-systeem verbeteren tussen klant en provider (chat + foto/video versturen).
+
+## Openstaand 📌
+
+### Product & Functionaliteit
+- QR-code systeem voor de applicatie.
+- Functioneel reviewsysteem bouwen.
+- Agenda-systeem: providers plannen beschikbaarheid in; klant ziet direct of provider beschikbaar is voor het evenement.
+- Wachtlijst aanmaken + mail sturen wanneer de app actief is.
+- Actie/status `geboekt` verduidelijken zodat dit niet overkomt als “betaald”.
+
+### Accounts & Security
+- Cookies toevoegen voor informatieverzameling.
+- Nakijken dat meerdere gebruikers tegelijk met meerdere accounts op de website kunnen zijn.
+- Controleren of een user zijn account kan verwijderen.
+- Uitwerken wat er exact moet gebeuren wanneer een provider een account maakt.
+
+### UI/UX
+- Kleur van offerte/chat consistent maken en aanpassen.
+- Te veel lege ruimte op dashboards verminderen tussen titel (bv. “Provider, welkom…”) en de functies zodat alles compacter oogt.

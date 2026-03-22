@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useSession } from '@/components/providers/SessionProvider';
 import { Container, PageHeader } from '@/components/layout';
@@ -34,7 +35,18 @@ import {
   UserCircle,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import ProfileEditForm from '@/components/providers/ProfileEditForm';
+
+// Lazy load – alleen ingeladen wanneer gebruiker het profiel tab opent (699 regels)
+const ProfileEditForm = dynamic(() => import('@/components/providers/ProfileEditForm'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-96 w-full rounded-3xl" />,
+});
+
+// Lazy load – alleen ingeladen wanneer gebruiker het agenda tab opent
+const AgendaCalendar = dynamic(() => import('@/components/providers/AgendaCalendar'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-96 w-full rounded-3xl" />,
+});
 
 interface ServiceRequest {
   id: string;
@@ -493,7 +505,7 @@ export default function ProviderDashboardPage() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-white border-2 border-gray-200 p-1 rounded-2xl w-full h-auto grid grid-cols-2 sm:flex gap-1">
+          <TabsList className="bg-white border-2 border-gray-200 p-1 rounded-2xl w-full h-auto grid grid-cols-3 sm:flex gap-1">
             <TabsTrigger value="requests" className="rounded-xl sm:flex-1 text-xs sm:text-sm py-2">
               Aanvragen
               {stats.pendingRequests > 0 && (
@@ -509,6 +521,10 @@ export default function ProviderDashboardPage() {
               )}
             </TabsTrigger>
             <TabsTrigger value="bookings" className="rounded-xl sm:flex-1 text-xs sm:text-sm py-2">Boekingen</TabsTrigger>
+            <TabsTrigger value="agenda" className="rounded-xl sm:flex-1 text-xs sm:text-sm py-2">
+              <Calendar className="w-3.5 h-3.5 mr-1" />
+              Agenda
+            </TabsTrigger>
             <TabsTrigger value="profile" className="rounded-xl sm:flex-1 text-xs sm:text-sm py-2">
               <UserCircle className="w-3.5 h-3.5 mr-1" />
               Profiel
@@ -799,6 +815,11 @@ export default function ProviderDashboardPage() {
                 ))}
               </div>
             )}
+          </TabsContent>
+
+          {/* Agenda Tab */}
+          <TabsContent value="agenda" className="space-y-6">
+            <AgendaCalendar />
           </TabsContent>
 
           {/* Profile Tab */}
