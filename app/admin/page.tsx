@@ -423,7 +423,7 @@ export default function AdminPage() {
 
   if (status === 'loading' || (status === 'authenticated' && user?.role !== 'ADMIN')) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+      <main className="min-h-screen bg-gradient-to-br bg-gray-50">
         <Container className="py-4 sm:py-8">
           <Skeleton className="h-8 w-48 mb-6" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">

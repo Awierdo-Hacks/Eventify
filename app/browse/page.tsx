@@ -358,7 +358,7 @@ function BrowseContent() {
 export default function BrowsePage() {
   return (
     <Suspense fallback={
-      <main className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-8">
+      <main className="min-h-screen bg-gradient-to-br bg-gray-50 py-8">
         <Container>
           <div className="mb-8">
             <Skeleton className="h-12 w-64 mb-4" />

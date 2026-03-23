@@ -78,6 +78,12 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
   const [error, setError] = useState<string | null>(null);
   const [providerId, setProviderId] = useState<string | null>(null);
   const [contactLoading, setContactLoading] = useState(false);
+  const [showAllReviews, setShowAllReviews] = useState(false);
+  const collapsedDesktopReviewCount = 3;
+
+  const visibleReviews = showAllReviews
+    ? reviews
+    : reviews.slice(0, collapsedDesktopReviewCount);
 
   // Handle async params for Next.js 15+
   useEffect(() => {
@@ -160,12 +166,12 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
   if (loading) {
     return (
       <main className="min-h-screen bg-gray-50">
-        <Container className="py-8">
+        <Container className="py-6 sm:py-8">
           <Skeleton className="h-10 w-48 mb-6" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
-            <div className="lg:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
+            <div className="lg:col-span-2 space-y-4 sm:space-y-6">
               <Card className="overflow-hidden border-2 border-gray-100 rounded-3xl">
-                <Skeleton className="h-96 w-full" />
+                <Skeleton className="h-64 sm:h-80 lg:h-96 w-full" />
                 <div className="p-4 flex gap-2">
                   {[1, 2, 3, 4].map((i) => (
                     <Skeleton key={i} className="h-20 w-20 rounded-xl" />
@@ -212,21 +218,21 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <Container className="py-8">
+      <Container className="py-6 sm:py-8">
         {/* Back Button */}
         <Link href="/browse">
-          <Button variant="ghost" className="mb-6 rounded-xl">
+          <Button variant="ghost" className="mb-4 sm:mb-6 rounded-xl">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Terug naar overzicht
           </Button>
         </Link>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Image Gallery */}
             <Card className="overflow-hidden border-2 border-gray-100 rounded-3xl">
-              <div className="relative h-96 bg-gray-200">
+              <div className="relative h-64 sm:h-80 lg:h-96 bg-gray-200">
                 {provider.images && provider.images.length > 0 ? (
                   <Image
                     src={provider.images[selectedImage]}
@@ -375,13 +381,15 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
                 Reviews ({reviews.length})
               </h2>
               {reviews.length > 0 ? (
-                <div className="space-y-6">
-                  {reviews.map((review) => (
+                <div className="space-y-4 sm:space-y-6">
+                  {visibleReviews.map((review, index) => (
                     <motion.div
                       key={review.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="pb-6 border-b border-gray-200 last:border-0"
+                      className={`pb-4 sm:pb-6 border-b border-gray-200 last:border-0 ${
+                        index >= 1 && !showAllReviews ? 'hidden sm:block' : ''
+                      }`}
                     >
                       <div className="flex items-start justify-between mb-2">
                         <div>
@@ -404,9 +412,20 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
                         </div>
                       </div>
                       <h5 className="font-medium text-gray-900 mb-2">{review.title}</h5>
-                      <p className="text-gray-600">{review.comment}</p>
+                      <p className={`text-gray-600 ${!showAllReviews ? 'line-clamp-2 sm:line-clamp-3' : ''}`}>{review.comment}</p>
                     </motion.div>
                   ))}
+                  {reviews.length > 1 && (
+                    <Button
+                      variant="ghost"
+                      className="w-full mt-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded-xl"
+                      onClick={() => setShowAllReviews(!showAllReviews)}
+                    >
+                      {showAllReviews
+                        ? 'Minder reviews tonen'
+                        : `Bekijk alle reviews (${reviews.length})`}
+                    </Button>
+                  )}
                 </div>
               ) : (
                 <div className="text-center py-8">
@@ -419,7 +438,7 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="p-4 border-2 border-gray-100 rounded-3xl md:sticky md:top-4">
+            <Card className="p-3 sm:p-4 border-2 border-gray-100 rounded-3xl lg:sticky lg:top-4">
               <h3 className="text-lg font-bold mb-3 text-gray-900">Aanvragen</h3>
 
               <Link href={`/request-quote/${provider.id}`}>

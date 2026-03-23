@@ -503,7 +503,7 @@ function DashboardContent() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+    <main className="min-h-screen bg-gradient-to-br bg-gray-50">
       <Container className="py-4 sm:py-6">
         {/* Header */}
         <div className="mb-4">
@@ -1040,7 +1040,7 @@ function DashboardContent() {
 export default function DashboardPage() {
   return (
     <Suspense fallback={
-      <main className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+      <main className="min-h-screen bg-gradient-to-br bg-gray-50">
         <Container className="py-12">
           <Skeleton className="h-12 w-64 mb-8" />
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">

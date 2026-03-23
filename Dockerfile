@@ -34,6 +34,7 @@ RUN echo 'export * from "./client";' > ./generated/prisma/client/index.ts
 # Set environment variables voor build
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+ENV NEXT_OUTPUT_STANDALONE=1
 
 # Build Next.js applicatie
 RUN npm run build
