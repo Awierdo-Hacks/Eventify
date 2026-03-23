@@ -119,6 +119,7 @@ export async function POST(request: Request) {
         profileImage,
         portfolioImages,
         services,
+        btwNumber,
       } = body;
 
       // Validaties
@@ -165,6 +166,7 @@ export async function POST(request: Request) {
             images: allImages,
             portfolio_images: portfolioImages || [],
             phone: phone || null,
+            btw_number: btwNumber || null,
             services: services?.map((s: { name: string }) => s.name) || [],
           },
         });

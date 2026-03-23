@@ -123,6 +123,7 @@ model ServiceProvider {
   images         String[]
   portfolio_images String[]   @default([])
   phone          String?
+  btw_number     String?
   website        String?
   availability   String?
   min_guests     Int?

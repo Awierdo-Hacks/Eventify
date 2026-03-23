@@ -16,10 +16,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Valideer bestandstype
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml', 'image/gif', 'image/bmp', 'image/tiff'];
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
-        { error: 'Alleen JPG, PNG en WebP bestanden zijn toegestaan' },
+        { error: 'Alleen JPG, PNG, WebP, SVG, GIF, BMP en TIFF bestanden zijn toegestaan' },
         { status: 400 }
       );
     }

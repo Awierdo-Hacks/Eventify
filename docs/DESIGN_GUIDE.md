@@ -1,4 +1,4 @@
-zorg dat deze markdown tekst correct ingelezen en gerender kan worden 
+
 
 
 # 🎨 Eventiphy Design Guide  

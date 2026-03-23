@@ -49,6 +49,7 @@ export type ServiceProviderMinAggregateOutputType = {
   price_range: $Enums.PriceRange | null
   description: string | null
   phone: string | null
+  btw_number: string | null
   website: string | null
   availability: string | null
   min_guests: number | null
@@ -71,6 +72,7 @@ export type ServiceProviderMaxAggregateOutputType = {
   price_range: $Enums.PriceRange | null
   description: string | null
   phone: string | null
+  btw_number: string | null
   website: string | null
   availability: string | null
   min_guests: number | null
@@ -96,6 +98,7 @@ export type ServiceProviderCountAggregateOutputType = {
   images: number
   portfolio_images: number
   phone: number
+  btw_number: number
   website: number
   availability: number
   min_guests: number
@@ -134,6 +137,7 @@ export type ServiceProviderMinAggregateInputType = {
   price_range?: true
   description?: true
   phone?: true
+  btw_number?: true
   website?: true
   availability?: true
   min_guests?: true
@@ -156,6 +160,7 @@ export type ServiceProviderMaxAggregateInputType = {
   price_range?: true
   description?: true
   phone?: true
+  btw_number?: true
   website?: true
   availability?: true
   min_guests?: true
@@ -181,6 +186,7 @@ export type ServiceProviderCountAggregateInputType = {
   images?: true
   portfolio_images?: true
   phone?: true
+  btw_number?: true
   website?: true
   availability?: true
   min_guests?: true
@@ -293,6 +299,7 @@ export type ServiceProviderGroupByOutputType = {
   images: string[]
   portfolio_images: string[]
   phone: string | null
+  btw_number: string | null
   website: string | null
   availability: string | null
   min_guests: number | null
@@ -341,6 +348,7 @@ export type ServiceProviderWhereInput = {
   images?: Prisma.StringNullableListFilter<"ServiceProvider">
   portfolio_images?: Prisma.StringNullableListFilter<"ServiceProvider">
   phone?: Prisma.StringNullableFilter<"ServiceProvider"> | string | null
+  btw_number?: Prisma.StringNullableFilter<"ServiceProvider"> | string | null
   website?: Prisma.StringNullableFilter<"ServiceProvider"> | string | null
   availability?: Prisma.StringNullableFilter<"ServiceProvider"> | string | null
   min_guests?: Prisma.IntNullableFilter<"ServiceProvider"> | number | null
@@ -373,6 +381,7 @@ export type ServiceProviderOrderByWithRelationInput = {
   images?: Prisma.SortOrder
   portfolio_images?: Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  btw_number?: Prisma.SortOrderInput | Prisma.SortOrder
   website?: Prisma.SortOrderInput | Prisma.SortOrder
   availability?: Prisma.SortOrderInput | Prisma.SortOrder
   min_guests?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -408,6 +417,7 @@ export type ServiceProviderWhereUniqueInput = Prisma.AtLeast<{
   images?: Prisma.StringNullableListFilter<"ServiceProvider">
   portfolio_images?: Prisma.StringNullableListFilter<"ServiceProvider">
   phone?: Prisma.StringNullableFilter<"ServiceProvider"> | string | null
+  btw_number?: Prisma.StringNullableFilter<"ServiceProvider"> | string | null
   website?: Prisma.StringNullableFilter<"ServiceProvider"> | string | null
   availability?: Prisma.StringNullableFilter<"ServiceProvider"> | string | null
   min_guests?: Prisma.IntNullableFilter<"ServiceProvider"> | number | null
@@ -440,6 +450,7 @@ export type ServiceProviderOrderByWithAggregationInput = {
   images?: Prisma.SortOrder
   portfolio_images?: Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  btw_number?: Prisma.SortOrderInput | Prisma.SortOrder
   website?: Prisma.SortOrderInput | Prisma.SortOrder
   availability?: Prisma.SortOrderInput | Prisma.SortOrder
   min_guests?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -473,6 +484,7 @@ export type ServiceProviderScalarWhereWithAggregatesInput = {
   images?: Prisma.StringNullableListFilter<"ServiceProvider">
   portfolio_images?: Prisma.StringNullableListFilter<"ServiceProvider">
   phone?: Prisma.StringNullableWithAggregatesFilter<"ServiceProvider"> | string | null
+  btw_number?: Prisma.StringNullableWithAggregatesFilter<"ServiceProvider"> | string | null
   website?: Prisma.StringNullableWithAggregatesFilter<"ServiceProvider"> | string | null
   availability?: Prisma.StringNullableWithAggregatesFilter<"ServiceProvider"> | string | null
   min_guests?: Prisma.IntNullableWithAggregatesFilter<"ServiceProvider"> | number | null
@@ -497,6 +509,7 @@ export type ServiceProviderCreateInput = {
   images?: Prisma.ServiceProviderCreateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderCreateportfolio_imagesInput | string[]
   phone?: string | null
+  btw_number?: string | null
   website?: string | null
   availability?: string | null
   min_guests?: number | null
@@ -529,6 +542,7 @@ export type ServiceProviderUncheckedCreateInput = {
   images?: Prisma.ServiceProviderCreateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderCreateportfolio_imagesInput | string[]
   phone?: string | null
+  btw_number?: string | null
   website?: string | null
   availability?: string | null
   min_guests?: number | null
@@ -559,6 +573,7 @@ export type ServiceProviderUpdateInput = {
   images?: Prisma.ServiceProviderUpdateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderUpdateportfolio_imagesInput | string[]
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  btw_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   min_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -591,6 +606,7 @@ export type ServiceProviderUncheckedUpdateInput = {
   images?: Prisma.ServiceProviderUpdateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderUpdateportfolio_imagesInput | string[]
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  btw_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   min_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -622,6 +638,7 @@ export type ServiceProviderCreateManyInput = {
   images?: Prisma.ServiceProviderCreateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderCreateportfolio_imagesInput | string[]
   phone?: string | null
+  btw_number?: string | null
   website?: string | null
   availability?: string | null
   min_guests?: number | null
@@ -646,6 +663,7 @@ export type ServiceProviderUpdateManyMutationInput = {
   images?: Prisma.ServiceProviderUpdateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderUpdateportfolio_imagesInput | string[]
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  btw_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   min_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -671,6 +689,7 @@ export type ServiceProviderUncheckedUpdateManyInput = {
   images?: Prisma.ServiceProviderUpdateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderUpdateportfolio_imagesInput | string[]
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  btw_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   min_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -709,6 +728,7 @@ export type ServiceProviderCountOrderByAggregateInput = {
   images?: Prisma.SortOrder
   portfolio_images?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  btw_number?: Prisma.SortOrder
   website?: Prisma.SortOrder
   availability?: Prisma.SortOrder
   min_guests?: Prisma.SortOrder
@@ -738,6 +758,7 @@ export type ServiceProviderMaxOrderByAggregateInput = {
   price_range?: Prisma.SortOrder
   description?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  btw_number?: Prisma.SortOrder
   website?: Prisma.SortOrder
   availability?: Prisma.SortOrder
   min_guests?: Prisma.SortOrder
@@ -760,6 +781,7 @@ export type ServiceProviderMinOrderByAggregateInput = {
   price_range?: Prisma.SortOrder
   description?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  btw_number?: Prisma.SortOrder
   website?: Prisma.SortOrder
   availability?: Prisma.SortOrder
   min_guests?: Prisma.SortOrder
@@ -973,6 +995,7 @@ export type ServiceProviderCreateWithoutUserInput = {
   images?: Prisma.ServiceProviderCreateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderCreateportfolio_imagesInput | string[]
   phone?: string | null
+  btw_number?: string | null
   website?: string | null
   availability?: string | null
   min_guests?: number | null
@@ -1003,6 +1026,7 @@ export type ServiceProviderUncheckedCreateWithoutUserInput = {
   images?: Prisma.ServiceProviderCreateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderCreateportfolio_imagesInput | string[]
   phone?: string | null
+  btw_number?: string | null
   website?: string | null
   availability?: string | null
   min_guests?: number | null
@@ -1049,6 +1073,7 @@ export type ServiceProviderUpdateWithoutUserInput = {
   images?: Prisma.ServiceProviderUpdateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderUpdateportfolio_imagesInput | string[]
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  btw_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   min_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1079,6 +1104,7 @@ export type ServiceProviderUncheckedUpdateWithoutUserInput = {
   images?: Prisma.ServiceProviderUpdateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderUpdateportfolio_imagesInput | string[]
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  btw_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   min_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1109,6 +1135,7 @@ export type ServiceProviderCreateWithoutService_requestsInput = {
   images?: Prisma.ServiceProviderCreateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderCreateportfolio_imagesInput | string[]
   phone?: string | null
+  btw_number?: string | null
   website?: string | null
   availability?: string | null
   min_guests?: number | null
@@ -1140,6 +1167,7 @@ export type ServiceProviderUncheckedCreateWithoutService_requestsInput = {
   images?: Prisma.ServiceProviderCreateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderCreateportfolio_imagesInput | string[]
   phone?: string | null
+  btw_number?: string | null
   website?: string | null
   availability?: string | null
   min_guests?: number | null
@@ -1185,6 +1213,7 @@ export type ServiceProviderUpdateWithoutService_requestsInput = {
   images?: Prisma.ServiceProviderUpdateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderUpdateportfolio_imagesInput | string[]
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  btw_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   min_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1216,6 +1245,7 @@ export type ServiceProviderUncheckedUpdateWithoutService_requestsInput = {
   images?: Prisma.ServiceProviderUpdateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderUpdateportfolio_imagesInput | string[]
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  btw_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   min_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1245,6 +1275,7 @@ export type ServiceProviderCreateWithoutQuotesInput = {
   images?: Prisma.ServiceProviderCreateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderCreateportfolio_imagesInput | string[]
   phone?: string | null
+  btw_number?: string | null
   website?: string | null
   availability?: string | null
   min_guests?: number | null
@@ -1276,6 +1307,7 @@ export type ServiceProviderUncheckedCreateWithoutQuotesInput = {
   images?: Prisma.ServiceProviderCreateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderCreateportfolio_imagesInput | string[]
   phone?: string | null
+  btw_number?: string | null
   website?: string | null
   availability?: string | null
   min_guests?: number | null
@@ -1321,6 +1353,7 @@ export type ServiceProviderUpdateWithoutQuotesInput = {
   images?: Prisma.ServiceProviderUpdateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderUpdateportfolio_imagesInput | string[]
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  btw_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   min_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1352,6 +1385,7 @@ export type ServiceProviderUncheckedUpdateWithoutQuotesInput = {
   images?: Prisma.ServiceProviderUpdateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderUpdateportfolio_imagesInput | string[]
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  btw_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   min_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1381,6 +1415,7 @@ export type ServiceProviderCreateWithoutBookingsInput = {
   images?: Prisma.ServiceProviderCreateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderCreateportfolio_imagesInput | string[]
   phone?: string | null
+  btw_number?: string | null
   website?: string | null
   availability?: string | null
   min_guests?: number | null
@@ -1412,6 +1447,7 @@ export type ServiceProviderUncheckedCreateWithoutBookingsInput = {
   images?: Prisma.ServiceProviderCreateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderCreateportfolio_imagesInput | string[]
   phone?: string | null
+  btw_number?: string | null
   website?: string | null
   availability?: string | null
   min_guests?: number | null
@@ -1457,6 +1493,7 @@ export type ServiceProviderUpdateWithoutBookingsInput = {
   images?: Prisma.ServiceProviderUpdateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderUpdateportfolio_imagesInput | string[]
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  btw_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   min_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1488,6 +1525,7 @@ export type ServiceProviderUncheckedUpdateWithoutBookingsInput = {
   images?: Prisma.ServiceProviderUpdateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderUpdateportfolio_imagesInput | string[]
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  btw_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   min_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1517,6 +1555,7 @@ export type ServiceProviderCreateWithoutReviewsInput = {
   images?: Prisma.ServiceProviderCreateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderCreateportfolio_imagesInput | string[]
   phone?: string | null
+  btw_number?: string | null
   website?: string | null
   availability?: string | null
   min_guests?: number | null
@@ -1548,6 +1587,7 @@ export type ServiceProviderUncheckedCreateWithoutReviewsInput = {
   images?: Prisma.ServiceProviderCreateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderCreateportfolio_imagesInput | string[]
   phone?: string | null
+  btw_number?: string | null
   website?: string | null
   availability?: string | null
   min_guests?: number | null
@@ -1593,6 +1633,7 @@ export type ServiceProviderUpdateWithoutReviewsInput = {
   images?: Prisma.ServiceProviderUpdateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderUpdateportfolio_imagesInput | string[]
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  btw_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   min_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1624,6 +1665,7 @@ export type ServiceProviderUncheckedUpdateWithoutReviewsInput = {
   images?: Prisma.ServiceProviderUpdateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderUpdateportfolio_imagesInput | string[]
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  btw_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   min_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1653,6 +1695,7 @@ export type ServiceProviderCreateWithoutProvider_servicesInput = {
   images?: Prisma.ServiceProviderCreateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderCreateportfolio_imagesInput | string[]
   phone?: string | null
+  btw_number?: string | null
   website?: string | null
   availability?: string | null
   min_guests?: number | null
@@ -1684,6 +1727,7 @@ export type ServiceProviderUncheckedCreateWithoutProvider_servicesInput = {
   images?: Prisma.ServiceProviderCreateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderCreateportfolio_imagesInput | string[]
   phone?: string | null
+  btw_number?: string | null
   website?: string | null
   availability?: string | null
   min_guests?: number | null
@@ -1729,6 +1773,7 @@ export type ServiceProviderUpdateWithoutProvider_servicesInput = {
   images?: Prisma.ServiceProviderUpdateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderUpdateportfolio_imagesInput | string[]
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  btw_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   min_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1760,6 +1805,7 @@ export type ServiceProviderUncheckedUpdateWithoutProvider_servicesInput = {
   images?: Prisma.ServiceProviderUpdateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderUpdateportfolio_imagesInput | string[]
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  btw_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   min_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1789,6 +1835,7 @@ export type ServiceProviderCreateWithoutBlocked_datesInput = {
   images?: Prisma.ServiceProviderCreateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderCreateportfolio_imagesInput | string[]
   phone?: string | null
+  btw_number?: string | null
   website?: string | null
   availability?: string | null
   min_guests?: number | null
@@ -1820,6 +1867,7 @@ export type ServiceProviderUncheckedCreateWithoutBlocked_datesInput = {
   images?: Prisma.ServiceProviderCreateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderCreateportfolio_imagesInput | string[]
   phone?: string | null
+  btw_number?: string | null
   website?: string | null
   availability?: string | null
   min_guests?: number | null
@@ -1865,6 +1913,7 @@ export type ServiceProviderUpdateWithoutBlocked_datesInput = {
   images?: Prisma.ServiceProviderUpdateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderUpdateportfolio_imagesInput | string[]
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  btw_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   min_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1896,6 +1945,7 @@ export type ServiceProviderUncheckedUpdateWithoutBlocked_datesInput = {
   images?: Prisma.ServiceProviderUpdateimagesInput | string[]
   portfolio_images?: Prisma.ServiceProviderUpdateportfolio_imagesInput | string[]
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  btw_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   min_guests?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2002,6 +2052,7 @@ export type ServiceProviderSelect<ExtArgs extends runtime.Types.Extensions.Inter
   images?: boolean
   portfolio_images?: boolean
   phone?: boolean
+  btw_number?: boolean
   website?: boolean
   availability?: boolean
   min_guests?: boolean
@@ -2035,6 +2086,7 @@ export type ServiceProviderSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   images?: boolean
   portfolio_images?: boolean
   phone?: boolean
+  btw_number?: boolean
   website?: boolean
   availability?: boolean
   min_guests?: boolean
@@ -2061,6 +2113,7 @@ export type ServiceProviderSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   images?: boolean
   portfolio_images?: boolean
   phone?: boolean
+  btw_number?: boolean
   website?: boolean
   availability?: boolean
   min_guests?: boolean
@@ -2087,6 +2140,7 @@ export type ServiceProviderSelectScalar = {
   images?: boolean
   portfolio_images?: boolean
   phone?: boolean
+  btw_number?: boolean
   website?: boolean
   availability?: boolean
   min_guests?: boolean
@@ -2100,7 +2154,7 @@ export type ServiceProviderSelectScalar = {
   updated_at?: boolean
 }
 
-export type ServiceProviderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "business_name" | "category" | "location" | "price_range" | "description" | "services" | "images" | "portfolio_images" | "phone" | "website" | "availability" | "min_guests" | "max_guests" | "response_time" | "verified" | "is_active" | "rating_avg" | "review_count" | "created_at" | "updated_at", ExtArgs["result"]["serviceProvider"]>
+export type ServiceProviderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "business_name" | "category" | "location" | "price_range" | "description" | "services" | "images" | "portfolio_images" | "phone" | "btw_number" | "website" | "availability" | "min_guests" | "max_guests" | "response_time" | "verified" | "is_active" | "rating_avg" | "review_count" | "created_at" | "updated_at", ExtArgs["result"]["serviceProvider"]>
 export type ServiceProviderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   service_requests?: boolean | Prisma.ServiceProvider$service_requestsArgs<ExtArgs>
@@ -2141,6 +2195,7 @@ export type $ServiceProviderPayload<ExtArgs extends runtime.Types.Extensions.Int
     images: string[]
     portfolio_images: string[]
     phone: string | null
+    btw_number: string | null
     website: string | null
     availability: string | null
     min_guests: number | null
@@ -2593,6 +2648,7 @@ export interface ServiceProviderFieldRefs {
   readonly images: Prisma.FieldRef<"ServiceProvider", 'String[]'>
   readonly portfolio_images: Prisma.FieldRef<"ServiceProvider", 'String[]'>
   readonly phone: Prisma.FieldRef<"ServiceProvider", 'String'>
+  readonly btw_number: Prisma.FieldRef<"ServiceProvider", 'String'>
   readonly website: Prisma.FieldRef<"ServiceProvider", 'String'>
   readonly availability: Prisma.FieldRef<"ServiceProvider", 'String'>
   readonly min_guests: Prisma.FieldRef<"ServiceProvider", 'Int'>

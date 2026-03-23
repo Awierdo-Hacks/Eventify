@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
         hostname: '**',
       },
     ],
+    dangerouslyAllowSVG: true,
   },
   
   // Disable telemetry in production

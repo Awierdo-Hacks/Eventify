@@ -442,32 +442,36 @@ function DashboardContent() {
       label: 'Mijn Events',
       value: events.filter((e) => e.status === 'PLANNING' || e.status === 'ACTIVE').length,
       icon: PartyPopper,
-      color: 'text-pink-600',
-      bgColor: 'bg-pink-100',
+      iconColor: 'text-pink-600',
+      iconBg: 'bg-pink-100',
+      borderColor: 'border-pink-400',
       onClick: () => setActiveTab('events'),
     },
     {
       label: 'Actieve Aanvragen',
       value: requests.filter((r) => r.status === 'PENDING').length,
       icon: FileText,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-100',
+      iconColor: 'text-blue-600',
+      iconBg: 'bg-blue-100',
+      borderColor: 'border-blue-400',
       onClick: () => setActiveTab('requests'),
     },
     {
       label: 'Ongelezen Berichten',
       value: unreadCount,
       icon: MessageSquare,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-100',
+      iconColor: 'text-purple-600',
+      iconBg: 'bg-purple-100',
+      borderColor: 'border-purple-400',
       onClick: () => router.push('/messages'),
     },
     {
       label: 'Bevestigde Boekingen',
       value: bookings.filter((b) => b.status === 'CONFIRMED').length,
       icon: CheckCircle,
-      color: 'text-green-600',
-      bgColor: 'bg-green-100',
+      iconColor: 'text-green-600',
+      iconBg: 'bg-green-100',
+      borderColor: 'border-green-400',
       onClick: () => setActiveTab('bookings'),
     },
   ];
@@ -475,16 +479,16 @@ function DashboardContent() {
   // Loading state
   if (loading || status === 'loading') {
     return (
-      <main className="min-h-screen bg-gray-50">
-        <Container className="py-8">
-          <Skeleton className="h-12 w-64 mb-2" />
-          <Skeleton className="h-6 w-96 mb-8" />
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+      <main className="min-h-screen bg-gradient-to-br bg-gray-50">
+        <Container className="py-4 sm:py-6">
+          <Skeleton className="h-8 w-48 mb-1" />
+          <Skeleton className="h-5 w-64 mb-4" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
             {[1, 2, 3, 4].map((i) => (
-              <Card key={i} className="p-6 border-2 border-gray-100 rounded-3xl">
-                <Skeleton className="h-8 w-8 mb-4" />
-                <Skeleton className="h-8 w-24 mb-2" />
-                <Skeleton className="h-4 w-32" />
+              <Card key={i} className="p-4 rounded-2xl">
+                <Skeleton className="h-8 w-8 mb-3" />
+                <Skeleton className="h-4 w-20 mb-1" />
+                <Skeleton className="h-6 w-16" />
               </Card>
             ))}
           </div>
@@ -499,14 +503,14 @@ function DashboardContent() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <Container className="py-8">
+    <main className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+      <Container className="py-4 sm:py-6">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
+        <div className="mb-4">
+          <h1 className="text-xl sm:text-2xl font-bold mb-0.5">
             <span className="gradient-text">Mijn Dashboard</span>
           </h1>
-          <p className="text-xl text-gray-600">Welkom terug, {user.name}!</p>
+          <p className="text-sm text-gray-600">Welkom terug, {user.name}!</p>
         </div>
 
         {/* Success Message */}
@@ -536,7 +540,7 @@ function DashboardContent() {
         )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
@@ -547,14 +551,14 @@ function DashboardContent() {
                 transition={{ duration: 0.4, delay: index * 0.1 }}
               >
                 <Card
-                  className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md hover:-translate-y-1 transition-all cursor-pointer"
+                  className={`p-4 border-t-4 ${stat.borderColor} rounded-2xl hover:shadow-md transition-all cursor-pointer`}
                   onClick={stat.onClick}
                 >
-                  <div className={`w-12 h-12 ${stat.bgColor} rounded-2xl flex items-center justify-center mb-4`}>
-                    <Icon className={`w-6 h-6 ${stat.color}`} />
+                  <div className={`w-10 h-10 ${stat.iconBg} rounded-xl flex items-center justify-center mb-3`}>
+                    <Icon className={`w-5 h-5 ${stat.iconColor}`} />
                   </div>
-                  <p className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</p>
-                  <p className="text-sm text-gray-600">{stat.label}</p>
+                  <p className="text-xs text-gray-500 mb-0.5">{stat.label}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{stat.value}</p>
                 </Card>
               </motion.div>
             );
@@ -563,13 +567,13 @@ function DashboardContent() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-white border-2 border-gray-100 p-1 rounded-2xl w-full">
-            <TabsTrigger value="events" className="rounded-xl">
+          <TabsList className="bg-white border border-gray-200 p-1 rounded-full w-full max-w-lg mx-auto flex gap-1 mb-6">
+            <TabsTrigger value="events" className="rounded-full flex-1 text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white">
               <PartyPopper className="w-4 h-4 mr-1" />
               Mijn Events
             </TabsTrigger>
-            <TabsTrigger value="requests" className="rounded-xl">Aanvragen</TabsTrigger>
-            <TabsTrigger value="bookings" className="rounded-xl">Boekingen</TabsTrigger>
+            <TabsTrigger value="requests" className="rounded-full flex-1 text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white">Aanvragen</TabsTrigger>
+            <TabsTrigger value="bookings" className="rounded-full flex-1 text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white">Boekingen</TabsTrigger>
           </TabsList>
 
           {/* Events Tab */}

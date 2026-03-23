@@ -27,6 +27,7 @@ interface ProviderBusinessData {
   description: string;
   location: string;
   priceRange: string;
+  btwNumber: string;
 }
 
 interface ProviderContactData {
@@ -74,6 +75,7 @@ export default function RegistrationWizard() {
     description: '',
     location: '',
     priceRange: '',
+    btwNumber: '',
   });
 
   const [providerContact, setProviderContact] = useState<ProviderContactData>({
@@ -235,6 +237,7 @@ export default function RegistrationWizard() {
             description: providerBusiness.description,
             location: providerBusiness.location,
             priceRange: providerBusiness.priceRange,
+            btwNumber: providerBusiness.btwNumber || null,
             contactName: providerContact.contactName,
             email: providerContact.email,
             phone: providerContact.phone,

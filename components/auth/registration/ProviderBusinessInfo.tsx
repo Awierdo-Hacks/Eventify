@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Building2, MapPin, Tag, FileText } from 'lucide-react';
+import { Building2, MapPin, Tag, FileText, Hash } from 'lucide-react';
 
 const CATEGORIES = [
   { value: 'catering', label: '🍽️ Catering & Food' },
@@ -29,6 +29,7 @@ interface ProviderBusinessData {
   description: string;
   location: string;
   priceRange: string;
+  btwNumber: string;
 }
 
 interface ProviderBusinessInfoProps {
@@ -109,6 +110,22 @@ export default function ProviderBusinessInfo({ data, onChange, errors }: Provide
             />
           </div>
           {errors.location && <p className="text-xs text-red-500">{errors.location}</p>}
+        </div>
+
+        {/* BTW Nummer */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">BTW Nummer</label>
+          <div className="relative">
+            <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              value={data.btwNumber}
+              onChange={(e) => updateField('btwNumber', e.target.value)}
+              placeholder="Bijv. NL123456789B01"
+              className={inputClass('btwNumber')}
+            />
+          </div>
+          {errors.btwNumber && <p className="text-xs text-red-500">{errors.btwNumber}</p>}
         </div>
 
         {/* Prijsklasse */}

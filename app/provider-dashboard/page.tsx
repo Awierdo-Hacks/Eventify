@@ -403,12 +403,12 @@ export default function ProviderDashboardPage() {
 
   if (status === 'loading' || (status === 'authenticated' && user?.role !== 'PROVIDER')) {
     return (
-      <main className="min-h-screen bg-gray-50">
-        <Container className="py-6 sm:py-12">
-          <Skeleton className="h-12 w-64 mb-8" />
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+      <main className="min-h-screen bg-gradient-to-br bg-gray-50">
+        <Container className="py-4 sm:py-6">
+          <Skeleton className="h-8 w-48 mb-4" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
             {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-32" />
+              <Skeleton key={i} className="h-24 rounded-2xl" />
             ))}
           </div>
         </Container>
@@ -417,12 +417,9 @@ export default function ProviderDashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <Container className="py-12">
-        <PageHeader
-          title="Provider Dashboard"
-        />
-        <p className="text-gray-600 mb-8">{`Welkom terug, ${user?.name}! Beheer je aanvragen, offertes en boekingen.`}</p>
+    <main className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+      <Container className="py-4 sm:py-6">
+        <p className="text-gray-600 text-sm mb-4">{`Welkom terug, ${user?.name}! Beheer je aanvragen, offertes en boekingen.`}</p>
 
         {/* Success/Error Messages */}
         {successMessage && (
@@ -448,71 +445,69 @@ export default function ProviderDashboardPage() {
         )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
           {[
             {
               icon: FileText,
               label: 'Nieuwe Aanvragen',
               value: stats.pendingRequests,
-              color: 'from-amber-500 to-orange-500',
+              borderColor: 'border-t-amber-400',
+              iconBg: 'bg-amber-100',
+              iconColor: 'text-amber-600',
               onClick: () => setActiveTab('requests'),
             },
             {
               icon: MessageSquare,
               label: 'Verzonden Offertes',
               value: stats.sentQuotes,
-              color: 'from-blue-500 to-cyan-500',
+              borderColor: 'border-t-blue-400',
+              iconBg: 'bg-blue-100',
+              iconColor: 'text-blue-600',
               onClick: () => setActiveTab('quotes'),
             },
             {
               icon: CheckCircle,
               label: 'Actieve Boekingen',
               value: stats.activeBookings,
-              color: 'from-green-500 to-emerald-500',
+              borderColor: 'border-t-green-400',
+              iconBg: 'bg-green-100',
+              iconColor: 'text-green-600',
               onClick: () => setActiveTab('bookings'),
             },
             {
               icon: DollarSign,
               label: 'Totale Omzet',
               value: `€${stats.totalRevenue.toLocaleString()}`,
-              color: 'from-purple-500 to-pink-500',
+              borderColor: 'border-t-purple-400',
+              iconBg: 'bg-purple-100',
+              iconColor: 'text-purple-600',
               onClick: () => setActiveTab('bookings'),
             },
-          ].map((stat, index) => (
-            <motion.div
+          ].map((stat) => (
+            <Card
               key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
+              className={`p-4 border-t-4 ${stat.borderColor} rounded-2xl hover:shadow-eventiphy-md transition-all cursor-pointer`}
+              onClick={stat.onClick}
             >
-              <Card
-                className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md hover:-translate-y-1 transition-all cursor-pointer"
-                onClick={stat.onClick}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs sm:text-sm text-gray-600 mb-1">{stat.label}</p>
-                    <p className="text-2xl sm:text-3xl font-bold text-gray-900">{stat.value}</p>
-                  </div>
-                  <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center flex-shrink-0`}>
-                    <stat.icon className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
+              <div className={`w-10 h-10 ${stat.iconBg} rounded-xl flex items-center justify-center mb-3`}>
+                <stat.icon className={`w-5 h-5 ${stat.iconColor}`} />
+              </div>
+              <p className="text-xs text-gray-500 mb-0.5">{stat.label}</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{stat.value}</p>
+            </Card>
           ))}
         </div>
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-white border-2 border-gray-200 p-1 rounded-2xl w-full h-auto grid grid-cols-3 sm:flex gap-1">
-            <TabsTrigger value="requests" className="rounded-xl sm:flex-1 text-xs sm:text-sm py-2">
+          <TabsList className="bg-white border border-gray-200 p-1 rounded-full w-full max-w-2xl mx-auto flex gap-1 mb-6">
+            <TabsTrigger value="requests" className="rounded-full flex-1 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white">
               Aanvragen
               {stats.pendingRequests > 0 && (
                 <Badge className="ml-1.5 bg-amber-500 text-white text-[10px] px-1.5 py-0 min-w-0 h-4">{stats.pendingRequests}</Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="quotes" className="rounded-xl sm:flex-1 text-xs sm:text-sm py-2">
+            <TabsTrigger value="quotes" className="rounded-full flex-1 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white">
               Offertes
               {stats.quotesWithUpdate > 0 && (
                 <Badge className="ml-1.5 bg-blue-500 text-white text-[10px] px-1.5 py-0 min-w-0 h-4">
@@ -520,12 +515,12 @@ export default function ProviderDashboardPage() {
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="bookings" className="rounded-xl sm:flex-1 text-xs sm:text-sm py-2">Boekingen</TabsTrigger>
-            <TabsTrigger value="agenda" className="rounded-xl sm:flex-1 text-xs sm:text-sm py-2">
+            <TabsTrigger value="bookings" className="rounded-full flex-1 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white">Boekingen</TabsTrigger>
+            <TabsTrigger value="agenda" className="rounded-full flex-1 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white">
               <Calendar className="w-3.5 h-3.5 mr-1" />
               Agenda
             </TabsTrigger>
-            <TabsTrigger value="profile" className="rounded-xl sm:flex-1 text-xs sm:text-sm py-2">
+            <TabsTrigger value="profile" className="rounded-full flex-1 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white">
               <UserCircle className="w-3.5 h-3.5 mr-1" />
               Profiel
             </TabsTrigger>

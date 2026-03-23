@@ -47,9 +47,10 @@ export async function GET(request: Request) {
       ];
     }
 
-    // Default: alleen verified providers tonen (geen is_active veld in schema)
+    // Default: alleen verified en actieve providers tonen
     if (isActive !== 'false') {
       where.verified = true;
+      where.is_active = true;
     }
 
     // Fetch providers – gebruik rating_avg uit DB, geen reviews laden nodig

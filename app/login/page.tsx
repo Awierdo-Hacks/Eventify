@@ -164,7 +164,7 @@ export default function LoginPage() {
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-10 text-sm shadow-sm" disabled={loading}>
               {loading ? 'Bezig met inloggen...' : 'Inloggen'}
             </Button>
           </form>
@@ -212,7 +212,7 @@ export default function LoginPage() {
 
           <div className="mt-6 text-center text-sm text-gray-600">
             Nog geen account?{' '}
-            <Link href="/register" className="text-purple-600 hover:text-purple-700 font-medium">
+            <Link href="/register" className="inline-block rounded-lg border border-purple-200 px-4 py-1.5 text-purple-600 hover:text-purple-700 hover:bg-purple-50 font-medium transition-colors">
               Registreer hier
             </Link>
           </div>

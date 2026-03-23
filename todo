@@ -28,3 +28,10 @@
 ### UI/UX
 - Kleur van offerte/chat consistent maken en aanpassen.
 - Te veel lege ruimte op dashboards verminderen tussen titel (bv. “Provider, welkom…”) en de functies zodat alles compacter oogt.
+
+er zijn nog wat mobile optimalizaties die uitgevoerd moeten worden er moet gebeuren , bekijk wat er beter kan ik geef je al een paar voorbeelden wanneer een provider wordt bekeken vindt ik de review card te veel plaats in te pakken het is beter om gewoon maar bijvoorbeeld de eerste paar zinnen van de eerste review  en dan een gedeelte van de card die zegt bijvoorbeeld "bekijk de reviews" dit zorgt er voor dat wanneer een provider veel reviews heeft ze niet allemaal getoond hoeven te worden., 
+
+bij het provider dashboard mist dezelfde gradient font voor "Provider dashboard" als mijn dashboard er is ook voor het provider dashboard veel witruimte tussen de title "provider dashboard welkom..." en de functies/navigatie van het dashboard verklein deze leeg ruimte zodat het wat compacter en overzichtelijker is
+
+
+wachtlijst maken die ik ook kan omzetten in een excel 

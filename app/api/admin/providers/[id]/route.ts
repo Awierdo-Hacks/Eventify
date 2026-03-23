@@ -13,18 +13,22 @@ export async function PATCH(
 
     const { id: providerId } = await params;
     const body = await request.json();
-    const { verified } = body;
+    const { verified, is_active } = body;
 
-    if (typeof verified !== 'boolean') {
+    if (typeof verified !== 'boolean' && typeof is_active !== 'boolean') {
       return NextResponse.json(
-        { error: 'Verified moet een boolean zijn' },
+        { error: 'Verified of is_active moet een boolean zijn' },
         { status: 400 }
       );
     }
 
+    const updateData: Record<string, boolean> = {};
+    if (typeof verified === 'boolean') updateData.verified = verified;
+    if (typeof is_active === 'boolean') updateData.is_active = is_active;
+
     const provider = await prisma.serviceProvider.update({
       where: { id: providerId },
-      data: { verified },
+      data: updateData,
       include: {
         user: {
           select: {
@@ -38,7 +42,9 @@ export async function PATCH(
 
     return NextResponse.json({
       success: true,
-      message: verified ? 'Provider geverifieerd' : 'Verificatie ingetrokken',
+      message: typeof verified === 'boolean'
+        ? (verified ? 'Provider geverifieerd' : 'Verificatie ingetrokken')
+        : (is_active ? 'Provider zichtbaar op browse' : 'Provider verborgen van browse'),
       provider: {
         id: provider.id,
         businessName: provider.business_name,

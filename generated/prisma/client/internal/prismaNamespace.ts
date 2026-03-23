@@ -1522,6 +1522,7 @@ export const ServiceProviderScalarFieldEnum = {
   images: 'images',
   portfolio_images: 'portfolio_images',
   phone: 'phone',
+  btw_number: 'btw_number',
   website: 'website',
   availability: 'availability',
   min_guests: 'min_guests',

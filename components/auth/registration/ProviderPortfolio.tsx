@@ -242,7 +242,7 @@ export default function ProviderPortfolio({
               <input
                 ref={profileInputRef}
                 type="file"
-                accept="image/jpeg,image/png,image/webp"
+                accept="image/jpeg,image/png,image/webp,image/svg+xml,image/gif,image/bmp,image/tiff"
                 className="hidden"
                 onChange={handleProfileImage}
               />
@@ -288,7 +288,7 @@ export default function ProviderPortfolio({
               <input
                 ref={portfolioInputRef}
                 type="file"
-                accept="image/jpeg,image/png,image/webp"
+                accept="image/jpeg,image/png,image/webp,image/svg+xml,image/gif,image/bmp,image/tiff"
                 multiple
                 className="hidden"
                 onChange={handlePortfolioImages}
@@ -297,7 +297,7 @@ export default function ProviderPortfolio({
                 <p className="text-xs text-red-500">{errors.portfolioImages}</p>
               )}
               <p className="text-xs text-gray-400">
-                JPG, PNG of WebP. Max 5MB per foto.
+                JPG, PNG, WebP, SVG, GIF, BMP of TIFF. Max 5MB per foto.
               </p>
             </div>
           </div>
