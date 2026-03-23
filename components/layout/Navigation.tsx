@@ -6,11 +6,12 @@ import { useState, useEffect, useRef } from 'react';
 import { useSession } from '@/components/providers/SessionProvider';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Home, Search, LayoutDashboard, MessageSquare, Shield, LogOut, User, Plus, ChevronDown } from 'lucide-react';
+import { Home, Search, LayoutDashboard, MessageSquare, Shield, LogOut, User, Plus, ChevronDown, Info } from 'lucide-react';
 
 const navigation = [
   { name: 'Home', href: '/', icon: Home },
   { name: 'Browse', href: '/browse', icon: Search },
+  { name: 'Over Ons', href: '/about', icon: Info },
 ];
 
 const getDashboardLink = (role?: string) => {

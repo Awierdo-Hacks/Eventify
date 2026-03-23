@@ -111,3 +111,8 @@ export type ProviderService = Prisma.ProviderServiceModel
  * 
  */
 export type BlockedDate = Prisma.BlockedDateModel
+/**
+ * Model WaitlistEntry
+ * 
+ */
+export type WaitlistEntry = Prisma.WaitlistEntryModel

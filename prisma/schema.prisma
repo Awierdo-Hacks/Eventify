@@ -395,3 +395,16 @@ model BlockedDate {
   @@index([date])
   @@map("blocked_dates")
 }
+
+model WaitlistEntry {
+  id         String   @id @default(cuid())
+  type       String   // "CUSTOMER" | "PROVIDER"
+  name       String
+  email      String
+  phone      String?
+  categories String[] // ProviderCategory values, only for providers
+  message    String?
+  created_at DateTime @default(now())
+
+  @@map("waitlist_entries")
+}
