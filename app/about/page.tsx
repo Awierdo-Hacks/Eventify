@@ -4,7 +4,7 @@ import { Container, PageHeader, Section } from '@/components/layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Mail, Phone, MapPin, Instagram, Target, Users, Sparkles, Shield } from 'lucide-react';
+import { Mail, Phone, MapPin, Instagram, Target, Users, Sparkles, Shield, FileText } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Over Ons - Eventiphy',
@@ -185,7 +185,7 @@ export default function AboutPage() {
           </div>
 
           <Card className="p-6 bg-white border-2 border-gray-100 rounded-3xl">
-            <h3 className="text-xl font-semibold text-gray-900 mb-3 text-center">Volg ons</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-3 text-center">Volg ons op</h3>
             <div className="flex items-center justify-center gap-3 mb-6">
               {socialItems.map((social) => {
                 const Icon = social.icon;
@@ -209,6 +209,20 @@ export default function AboutPage() {
               </Link>
             </div>
           </Card>
+        </Container>
+      </Section>
+
+      <Section className="py-6 md:py-8">
+        <Container className="py-0">
+          <div className="flex items-center justify-center gap-2 text-gray-500">
+            <FileText className="w-4 h-4" />
+            <Link
+              href="/voorwaarden"
+              className="text-purple-700 hover:text-purple-800 font-medium underline underline-offset-4"
+            >
+              Algemene Voorwaarden &amp; Privacyverklaring
+            </Link>
+          </div>
         </Container>
       </Section>
     </main>
