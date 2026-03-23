@@ -885,6 +885,7 @@ export default function AdminPage() {
                     fill
                     className="object-cover"
                     sizes="(max-width: 672px) 100vw, 672px"
+                    priority
                   />
                 </div>
                 {selectedProvider.images.length > 1 && (

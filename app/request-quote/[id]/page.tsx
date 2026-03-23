@@ -404,6 +404,7 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, 400px"
+                      priority
                     />
                   </div>
                 ) : (

@@ -269,6 +269,7 @@ function BrowseContent() {
                           fill
                           className="object-cover hover:scale-110 transition-transform duration-300"
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          priority={index < 6}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-400">
