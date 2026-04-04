@@ -143,7 +143,8 @@ model ServiceProvider {
   bookings          Booking[]
   reviews           Review[]
   provider_services ProviderService[]
-  blocked_dates     BlockedDate[]
+  blocked_dates         BlockedDate[]
+  calendar_integrations CalendarIntegration[]
 
   @@map("service_providers")
 }
@@ -394,6 +395,61 @@ model BlockedDate {
   @@index([provider_id])
   @@index([date])
   @@map("blocked_dates")
+}
+
+enum CalendarSyncType {
+  GOOGLE
+  ICAL
+}
+
+model CalendarIntegration {
+  id                   String           @id @default(cuid())
+  provider_id          String
+  type                 CalendarSyncType
+  is_active            Boolean          @default(true)
+
+  // Google OAuth fields
+  google_account_email String?
+  access_token         String?
+  refresh_token        String?
+  token_expires_at     DateTime?
+
+  // iCal fields
+  ical_url             String?
+  ical_last_etag       String?
+
+  last_synced_at       DateTime?
+  sync_error           String?
+  created_at           DateTime         @default(now())
+  updated_at           DateTime         @updatedAt
+
+  // Relations
+  provider      ServiceProvider         @relation(fields: [provider_id], references: [id], onDelete: Cascade)
+  synced_events ExternalCalendarEvent[]
+
+  @@unique([provider_id, type])
+  @@index([provider_id])
+  @@map("calendar_integrations")
+}
+
+model ExternalCalendarEvent {
+  id             String   @id @default(cuid())
+  integration_id String
+  external_uid   String
+  title          String?
+  start_date     DateTime @db.Date
+  end_date       DateTime @db.Date
+  is_all_day     Boolean  @default(true)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  // Relations
+  integration CalendarIntegration @relation(fields: [integration_id], references: [id], onDelete: Cascade)
+
+  @@unique([integration_id, external_uid])
+  @@index([integration_id])
+  @@index([start_date])
+  @@map("external_calendar_events")
 }
 
 model WaitlistEntry {

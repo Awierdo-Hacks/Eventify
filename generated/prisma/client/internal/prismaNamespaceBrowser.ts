@@ -65,6 +65,8 @@ export const ModelName = {
   EventSlot: 'EventSlot',
   ProviderService: 'ProviderService',
   BlockedDate: 'BlockedDate',
+  CalendarIntegration: 'CalendarIntegration',
+  ExternalCalendarEvent: 'ExternalCalendarEvent',
   WaitlistEntry: 'WaitlistEntry'
 } as const
 
@@ -311,6 +313,41 @@ export const BlockedDateScalarFieldEnum = {
 } as const
 
 export type BlockedDateScalarFieldEnum = (typeof BlockedDateScalarFieldEnum)[keyof typeof BlockedDateScalarFieldEnum]
+
+
+export const CalendarIntegrationScalarFieldEnum = {
+  id: 'id',
+  provider_id: 'provider_id',
+  type: 'type',
+  is_active: 'is_active',
+  google_account_email: 'google_account_email',
+  access_token: 'access_token',
+  refresh_token: 'refresh_token',
+  token_expires_at: 'token_expires_at',
+  ical_url: 'ical_url',
+  ical_last_etag: 'ical_last_etag',
+  last_synced_at: 'last_synced_at',
+  sync_error: 'sync_error',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type CalendarIntegrationScalarFieldEnum = (typeof CalendarIntegrationScalarFieldEnum)[keyof typeof CalendarIntegrationScalarFieldEnum]
+
+
+export const ExternalCalendarEventScalarFieldEnum = {
+  id: 'id',
+  integration_id: 'integration_id',
+  external_uid: 'external_uid',
+  title: 'title',
+  start_date: 'start_date',
+  end_date: 'end_date',
+  is_all_day: 'is_all_day',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type ExternalCalendarEventScalarFieldEnum = (typeof ExternalCalendarEventScalarFieldEnum)[keyof typeof ExternalCalendarEventScalarFieldEnum]
 
 
 export const WaitlistEntryScalarFieldEnum = {

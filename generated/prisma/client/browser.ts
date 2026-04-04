@@ -88,6 +88,16 @@ export type ProviderService = Prisma.ProviderServiceModel
  */
 export type BlockedDate = Prisma.BlockedDateModel
 /**
+ * Model CalendarIntegration
+ * 
+ */
+export type CalendarIntegration = Prisma.CalendarIntegrationModel
+/**
+ * Model ExternalCalendarEvent
+ * 
+ */
+export type ExternalCalendarEvent = Prisma.ExternalCalendarEventModel
+/**
  * Model WaitlistEntry
  * 
  */
