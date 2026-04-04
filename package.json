@@ -8,8 +8,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build"
+    "prisma:generate": "prisma generate && node -e \"require('node:fs').writeFileSync('generated/prisma/client/index.ts', 'export * from \\\"./client\\\";\\n')\"",
+    "postinstall": "npm run prisma:generate",
+    "vercel-build": "npm run prisma:generate && prisma migrate deploy && next build"
   },
   "keywords": [],
   "author": "",

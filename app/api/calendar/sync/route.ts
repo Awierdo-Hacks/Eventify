@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireProvider } from '@/lib/middleware/auth';
 import { prisma } from '@/lib/prisma';
-import { syncGoogleCalendar } from '@/lib/googleCalendarSync';
-import { syncIcalCalendar } from '@/lib/icalSync';
 import { addMonths, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 
 const SYNC_COOLDOWN_MS = 30 * 60 * 1000; // 30 minutes
@@ -41,8 +39,10 @@ export async function POST(request: NextRequest) {
 
     try {
       if (integration.type === 'GOOGLE') {
+        const { syncGoogleCalendar } = await import('@/lib/googleCalendarSync');
         await syncGoogleCalendar(integration.id, from, to);
       } else if (integration.type === 'ICAL') {
+        const { syncIcalCalendar } = await import('@/lib/icalSync');
         await syncIcalCalendar(integration.id, from, to);
       }
       results.push({ type: integration.type, success: true });

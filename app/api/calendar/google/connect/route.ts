@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { requireProvider } from '@/lib/middleware/auth';
-import { getGoogleAuthUrl } from '@/lib/googleCalendarSync';
 
 export async function GET() {
   const { error, session } = await requireProvider();
@@ -14,6 +13,7 @@ export async function GET() {
   }
 
   const state = session!.providerId!;
+  const { getGoogleAuthUrl } = await import('@/lib/googleCalendarSync');
   const url = getGoogleAuthUrl(state);
   return NextResponse.redirect(url);
 }

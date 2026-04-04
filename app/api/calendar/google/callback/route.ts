@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { exchangeGoogleCode, syncGoogleCalendar } from '@/lib/googleCalendarSync';
 import { addMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { prisma } from '@/lib/prisma';
 
@@ -18,6 +17,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    const { exchangeGoogleCode, syncGoogleCalendar } = await import('@/lib/googleCalendarSync');
     await exchangeGoogleCode(code, state);
 
     // Trigger initial sync for the next 3 months
