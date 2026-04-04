@@ -119,3 +119,11 @@ export const MessageType = {
 } as const
 
 export type MessageType = (typeof MessageType)[keyof typeof MessageType]
+
+
+export const CalendarSyncType = {
+  GOOGLE: 'GOOGLE',
+  ICAL: 'ICAL'
+} as const
+
+export type CalendarSyncType = (typeof CalendarSyncType)[keyof typeof CalendarSyncType]

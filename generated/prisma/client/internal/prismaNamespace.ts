@@ -398,6 +398,8 @@ export const ModelName = {
   EventSlot: 'EventSlot',
   ProviderService: 'ProviderService',
   BlockedDate: 'BlockedDate',
+  CalendarIntegration: 'CalendarIntegration',
+  ExternalCalendarEvent: 'ExternalCalendarEvent',
   WaitlistEntry: 'WaitlistEntry'
 } as const
 
@@ -414,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "serviceProvider" | "serviceRequest" | "quote" | "booking" | "review" | "conversation" | "conversationParticipant" | "message" | "messageAttachment" | "event" | "eventSlot" | "providerService" | "blockedDate" | "waitlistEntry"
+    modelProps: "user" | "serviceProvider" | "serviceRequest" | "quote" | "booking" | "review" | "conversation" | "conversationParticipant" | "message" | "messageAttachment" | "event" | "eventSlot" | "providerService" | "blockedDate" | "calendarIntegration" | "externalCalendarEvent" | "waitlistEntry"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1454,6 +1456,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CalendarIntegration: {
+      payload: Prisma.$CalendarIntegrationPayload<ExtArgs>
+      fields: Prisma.CalendarIntegrationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CalendarIntegrationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarIntegrationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CalendarIntegrationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarIntegrationPayload>
+        }
+        findFirst: {
+          args: Prisma.CalendarIntegrationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarIntegrationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CalendarIntegrationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarIntegrationPayload>
+        }
+        findMany: {
+          args: Prisma.CalendarIntegrationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarIntegrationPayload>[]
+        }
+        create: {
+          args: Prisma.CalendarIntegrationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarIntegrationPayload>
+        }
+        createMany: {
+          args: Prisma.CalendarIntegrationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CalendarIntegrationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarIntegrationPayload>[]
+        }
+        delete: {
+          args: Prisma.CalendarIntegrationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarIntegrationPayload>
+        }
+        update: {
+          args: Prisma.CalendarIntegrationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarIntegrationPayload>
+        }
+        deleteMany: {
+          args: Prisma.CalendarIntegrationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CalendarIntegrationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CalendarIntegrationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarIntegrationPayload>[]
+        }
+        upsert: {
+          args: Prisma.CalendarIntegrationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarIntegrationPayload>
+        }
+        aggregate: {
+          args: Prisma.CalendarIntegrationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCalendarIntegration>
+        }
+        groupBy: {
+          args: Prisma.CalendarIntegrationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CalendarIntegrationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CalendarIntegrationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CalendarIntegrationCountAggregateOutputType> | number
+        }
+      }
+    }
+    ExternalCalendarEvent: {
+      payload: Prisma.$ExternalCalendarEventPayload<ExtArgs>
+      fields: Prisma.ExternalCalendarEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ExternalCalendarEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalCalendarEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ExternalCalendarEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalCalendarEventPayload>
+        }
+        findFirst: {
+          args: Prisma.ExternalCalendarEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalCalendarEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ExternalCalendarEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalCalendarEventPayload>
+        }
+        findMany: {
+          args: Prisma.ExternalCalendarEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalCalendarEventPayload>[]
+        }
+        create: {
+          args: Prisma.ExternalCalendarEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalCalendarEventPayload>
+        }
+        createMany: {
+          args: Prisma.ExternalCalendarEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ExternalCalendarEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalCalendarEventPayload>[]
+        }
+        delete: {
+          args: Prisma.ExternalCalendarEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalCalendarEventPayload>
+        }
+        update: {
+          args: Prisma.ExternalCalendarEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalCalendarEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.ExternalCalendarEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ExternalCalendarEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ExternalCalendarEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalCalendarEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.ExternalCalendarEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExternalCalendarEventPayload>
+        }
+        aggregate: {
+          args: Prisma.ExternalCalendarEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateExternalCalendarEvent>
+        }
+        groupBy: {
+          args: Prisma.ExternalCalendarEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ExternalCalendarEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ExternalCalendarEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ExternalCalendarEventCountAggregateOutputType> | number
+        }
+      }
+    }
     WaitlistEntry: {
       payload: Prisma.$WaitlistEntryPayload<ExtArgs>
       fields: Prisma.WaitlistEntryFieldRefs
@@ -1796,6 +1946,41 @@ export const BlockedDateScalarFieldEnum = {
 export type BlockedDateScalarFieldEnum = (typeof BlockedDateScalarFieldEnum)[keyof typeof BlockedDateScalarFieldEnum]
 
 
+export const CalendarIntegrationScalarFieldEnum = {
+  id: 'id',
+  provider_id: 'provider_id',
+  type: 'type',
+  is_active: 'is_active',
+  google_account_email: 'google_account_email',
+  access_token: 'access_token',
+  refresh_token: 'refresh_token',
+  token_expires_at: 'token_expires_at',
+  ical_url: 'ical_url',
+  ical_last_etag: 'ical_last_etag',
+  last_synced_at: 'last_synced_at',
+  sync_error: 'sync_error',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type CalendarIntegrationScalarFieldEnum = (typeof CalendarIntegrationScalarFieldEnum)[keyof typeof CalendarIntegrationScalarFieldEnum]
+
+
+export const ExternalCalendarEventScalarFieldEnum = {
+  id: 'id',
+  integration_id: 'integration_id',
+  external_uid: 'external_uid',
+  title: 'title',
+  start_date: 'start_date',
+  end_date: 'end_date',
+  is_all_day: 'is_all_day',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type ExternalCalendarEventScalarFieldEnum = (typeof ExternalCalendarEventScalarFieldEnum)[keyof typeof ExternalCalendarEventScalarFieldEnum]
+
+
 export const WaitlistEntryScalarFieldEnum = {
   id: 'id',
   type: 'type',
@@ -2042,6 +2227,20 @@ export type EnumSlotStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
 export type ListEnumSlotStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SlotStatus[]'>
     
 
+
+/**
+ * Reference to a field of type 'CalendarSyncType'
+ */
+export type EnumCalendarSyncTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CalendarSyncType'>
+    
+
+
+/**
+ * Reference to a field of type 'CalendarSyncType[]'
+ */
+export type ListEnumCalendarSyncTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CalendarSyncType[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -2151,6 +2350,8 @@ export type GlobalOmitConfig = {
   eventSlot?: Prisma.EventSlotOmit
   providerService?: Prisma.ProviderServiceOmit
   blockedDate?: Prisma.BlockedDateOmit
+  calendarIntegration?: Prisma.CalendarIntegrationOmit
+  externalCalendarEvent?: Prisma.ExternalCalendarEventOmit
   waitlistEntry?: Prisma.WaitlistEntryOmit
 }
 

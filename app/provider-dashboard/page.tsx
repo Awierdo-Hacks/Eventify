@@ -48,6 +48,12 @@ const AgendaCalendar = dynamic(() => import('@/components/providers/AgendaCalend
   loading: () => <Skeleton className="h-96 w-full rounded-3xl" />,
 });
 
+// Lazy load – kalender-koppelingen instellingen
+const CalendarSyncSettings = dynamic(() => import('@/components/providers/CalendarSyncSettings'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-40 w-full rounded-3xl" />,
+});
+
 interface ServiceRequest {
   id: string;
   eventType: string;
@@ -815,6 +821,15 @@ export default function ProviderDashboardPage() {
           {/* Agenda Tab */}
           <TabsContent value="agenda" className="space-y-6">
             <AgendaCalendar />
+
+            {/* Kalender-koppelingen */}
+            <div className="rounded-3xl border-2 border-gray-100 bg-white p-5 sm:p-6">
+              <h3 className="text-base font-semibold text-gray-900 mb-1">Kalender-koppelingen</h3>
+              <p className="text-sm text-gray-500 mb-4">
+                Koppel je Google Calendar of iCal (iPhone/Outlook) zodat je beschikbaarheid automatisch gesynchroniseerd wordt.
+              </p>
+              <CalendarSyncSettings />
+            </div>
           </TabsContent>
 
           {/* Profile Tab */}
