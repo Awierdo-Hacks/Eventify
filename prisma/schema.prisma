@@ -16,6 +16,16 @@ enum UserRole {
   ADMIN
 }
 
+enum PaymentStatus {
+  UNPAID
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+  EXPIRED
+  REFUNDED
+}
+
 enum UserStatus {
   ACTIVE
   SUSPENDED
@@ -217,8 +227,10 @@ model Booking {
   guest_count     Int
   final_price     Float
   status          BookingStatus @default(PENDING)
-  payment_status  String?
-  special_requests String?
+  payment_status       PaymentStatus @default(UNPAID)
+  agreement_accepted_at DateTime?
+  agreement_ip         String?
+  special_requests     String?
   created_at      DateTime      @default(now())
   updated_at      DateTime      @updatedAt
 
@@ -226,11 +238,49 @@ model Booking {
   request  ServiceRequest  @relation(fields: [request_id], references: [id], onDelete: Cascade)
   customer User            @relation(fields: [customer_id], references: [id], onDelete: Cascade)
   provider ServiceProvider @relation(fields: [provider_id], references: [id], onDelete: Cascade)
+  payments Payment[]
 
   @@index([customer_id])
   @@index([provider_id])
   @@index([created_at])
   @@map("bookings")
+}
+
+model Payment {
+  id                  String        @id @default(cuid())
+  booking_id          String
+  mollie_payment_id   String        @unique
+  amount              Float
+  currency            String        @default("EUR")
+  method              String?
+  status              PaymentStatus @default(PENDING)
+  idempotency_key     String        @unique
+  checkout_url        String?
+  webhook_received_at DateTime?
+  paid_at             DateTime?
+  failed_at           DateTime?
+  created_at          DateTime      @default(now())
+  updated_at          DateTime      @updatedAt
+
+  booking Booking @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+
+  @@index([booking_id])
+  @@map("payments")
+}
+
+model PaymentAuditLog {
+  id         String   @id @default(cuid())
+  booking_id String
+  payment_id String?
+  user_id    String?
+  event      String
+  metadata   Json?
+  ip_address String?
+  created_at DateTime @default(now())
+
+  @@index([booking_id])
+  @@index([created_at])
+  @@map("payment_audit_logs")
 }
 
 model Review {
