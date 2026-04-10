@@ -4,9 +4,12 @@ import { Container, PageHeader, Section } from '@/components/layout';
 import { FileText, ShieldCheck } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Algemene Voorwaarden & Privacyverklaring - Eventiphy',
+  title: 'Algemene Voorwaarden & Privacyverklaring',
   description:
     'Lees de algemene voorwaarden en het privacybeleid van Eventiphy. Transparantie en bescherming voor klanten en dienstverleners.',
+  alternates: {
+    canonical: 'https://eventiphy.be/voorwaarden',
+  },
 };
 
 export default function VoorwaardenPage() {

@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+Allow: /browse
+Allow: /providers/
+Allow: /about
+Allow: /waitlist
+Allow: /voorwaarden
+
+# Private/authenticated routes — not useful in search results
+Disallow: /dashboard
+Disallow: /provider-dashboard
+Disallow: /admin
+Disallow: /messages
+Disallow: /events/new
+Disallow: /request-quote
+Disallow: /login
+Disallow: /register
+Disallow: /analyse
+Disallow: /api/
+
+Sitemap: https://eventiphy.be/sitemap.xml
