@@ -1,12 +1,13 @@
 import { PrismaClient } from '@/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { getDatabaseUrl } from "@/lib/database-url";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
 function createPrismaClient() {
-  const connectionString = process.env.DATABASE_URL!;
+  const connectionString = getDatabaseUrl();
   const isRemote = !connectionString.includes('localhost') && !connectionString.includes('127.0.0.1');
 
   // Add connection pool settings to URL

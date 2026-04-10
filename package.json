@@ -11,6 +11,7 @@
     "prisma:generate": "prisma generate && node -e \"require('node:fs').writeFileSync('generated/prisma/client/index.ts', 'export * from \\\"./client\\\";\\n')\"",
     "postinstall": "npm run prisma:generate",
     "db:migrate:deploy": "prisma migrate deploy",
+    "db:copy:render-to-prisma": "tsx scripts/dev/copy-render-data-to-prisma.ts",
     "vercel-build": "npm run prisma:generate && next build"
   },
   "keywords": [],
@@ -28,6 +29,7 @@
     "@types/node": "^24.10.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
+    "@vercel/speed-insights": "^2.0.0",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
