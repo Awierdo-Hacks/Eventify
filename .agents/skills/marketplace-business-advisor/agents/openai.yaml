@@ -1,0 +1,4 @@
+interface:
+  display_name: "Marketplace Business Advisor"
+  short_description: "Business audits for marketplace webapps"
+  default_prompt: "Use $marketplace-business-advisor to audit my marketplace business, funnel, monetization, and Belgium/EU setup."
