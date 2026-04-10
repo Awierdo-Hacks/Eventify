@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireProvider } from '@/lib/middleware/auth';
 import { prisma } from '@/lib/prisma';
-import { validateIcalUrl, syncIcalCalendar, disconnectIcalCalendar } from '@/lib/icalSync';
 import { addMonths, startOfMonth, endOfMonth } from 'date-fns';
 
 // POST - iCal URL koppelen
@@ -27,6 +26,7 @@ export async function POST(request: NextRequest) {
 
   // Test if URL is reachable
   try {
+    const { validateIcalUrl } = await import('@/lib/icalSync');
     await validateIcalUrl(trimmedUrl);
   } catch (err) {
     return NextResponse.json(
@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
 
   // Initial sync
   try {
+    const { syncIcalCalendar } = await import('@/lib/icalSync');
     const from = startOfMonth(new Date());
     const to = endOfMonth(addMonths(new Date(), 3));
     await syncIcalCalendar(integration.id, from, to);
@@ -73,6 +74,7 @@ export async function DELETE() {
   if (error) return error;
 
   try {
+    const { disconnectIcalCalendar } = await import('@/lib/icalSync');
     await disconnectIcalCalendar(session!.providerId!);
     return NextResponse.json({ success: true });
   } catch (err) {
