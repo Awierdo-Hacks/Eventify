@@ -395,8 +395,8 @@ export default function ProviderDashboardClient({
           </div>
         )}
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+        {/* Stats Grid - only visible on the Aanvragen tab */}
+        {activeTab === 'requests' && <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
           {[
             {
               icon: FileText,
@@ -447,7 +447,7 @@ export default function ProviderDashboardClient({
               <p className="text-xl sm:text-2xl font-bold text-gray-900">{stat.value}</p>
             </Card>
           ))}
-        </div>
+        </div>}
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">

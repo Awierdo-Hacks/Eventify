@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Eventiphy Agenda - Mobile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --bg-main: #cfcfd3;
+            --bg-nav: #e9e8ed;
+            --bg-card: #dadae0;
+            --primary: #7c3aed;
+            --primary-light: #dccff1;
+            --available: #10b981;
+            --booked: #fb923c;
+            --sync: #3b82f6;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .calendar-cell-available {
+            border-left: 2px solid var(--available);
+        }
+        .calendar-cell-booked {
+            border-left: 2px solid var(--booked);
+            background-color: rgba(251, 146, 60, 0.05);
+        }
+        .calendar-cell-sync {
+            border-left: 2px solid var(--sync);
+        }
+        .donut-segment {
+            stroke-dasharray: 0 100;
+        }.mobile-calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+<header class="sticky top-0 z-50 bg-[#e9e8ed] px-4 py-3 flex items-center justify-between border-b border-gray-300 shadow-sm" data-purpose="top-navigation">
+<div class="flex items-center gap-2">
+<div class="bg-purple-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">
+<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" fill-rule="evenodd"></path>
+</svg>
+</div>
+<span class="font-bold text-lg text-gray-800">Eventiphy</span>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-1 text-gray-600">
+<span class="material-symbols-outlined">chat_bubble</span>
+</button>
+<button class="p-1 text-gray-600">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto">
+<div class="px-4 py-4 flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-gray-500 text-sm">person</span>
+</div>
+<div>
+<p class="text-[10px] text-gray-500 font-medium leading-none">Welkom terug,</p>
+<p class="text-sm font-bold text-gray-800 leading-tight">Culinaire Creaties</p>
+</div>
+</div>
+<span class="bg-[#f0d8a8] text-[#8c6b24] text-[10px] font-bold px-2 py-0.5 rounded">Provider</span>
+</div>
+<div class="flex overflow-x-auto no-scrollbar gap-2 py-1 -mx-4 px-4">
+<button class="shrink-0 px-4 py-2 rounded-full text-xs font-semibold text-gray-600 bg-[#e4e3e8] border border-gray-300">Aanvragen</button>
+<button class="shrink-0 px-4 py-2 rounded-full text-xs font-semibold text-gray-600 bg-[#e4e3e8] border border-gray-300 flex items-center gap-1">
+                Offertes <span class="bg-blue-600 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">2</span>
+</button>
+<button class="shrink-0 px-4 py-2 rounded-full text-xs font-semibold text-gray-600 bg-[#e4e3e8] border border-gray-300">Boekingen</button>
+<button class="shrink-0 px-5 py-2 rounded-full text-xs font-semibold bg-purple-700 text-white shadow-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">calendar_today</span>
+                Agenda
+            </button>
+<button class="shrink-0 px-4 py-2 rounded-full text-xs font-semibold text-gray-600 bg-[#e4e3e8] border border-gray-300 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">account_circle</span>
+                Profiel
+            </button>
+</div>
+</div>
+<div class="px-4 pb-12 flex flex-col gap-6">
+<div class="bg-[#dadae0] rounded-2xl p-4 shadow-sm border border-gray-200">
+<div class="flex flex-col gap-4 mb-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-purple-600">calendar_month</span>
+<h2 class="text-lg font-bold text-gray-800">April 2026</h2>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-1 hover:bg-gray-300 rounded"><span class="material-symbols-outlined text-gray-600">chevron_left</span></button>
+<button class="p-1 hover:bg-gray-300 rounded"><span class="material-symbols-outlined text-gray-600">chevron_right</span></button>
+</div>
+</div>
+<div class="flex items-center justify-between gap-2">
+<button class="flex-1 flex items-center justify-center gap-1 border border-gray-400 bg-white rounded-lg py-2 text-[10px] font-bold shadow-sm">
+<span class="material-symbols-outlined text-xs">sync</span> Sync
+                    </button>
+<div class="flex items-center bg-[#c3c3c9] rounded-lg p-0.5">
+<button class="px-3 py-1.5 rounded-md bg-[#2d3748] text-white text-[10px] font-bold">Maand</button>
+<button class="px-3 py-1.5 rounded-md text-gray-700 text-[10px] font-bold">Week</button>
+</div>
+</div>
+</div>
+<div class="border border-gray-300 rounded-lg overflow-hidden bg-[#e3e3e8]">
+<div class="mobile-calendar-grid border-b border-gray-300 bg-[#e3e3e8]">
+<div class="py-1.5 text-center text-[10px] font-bold text-gray-600">M</div>
+<div class="py-1.5 text-center text-[10px] font-bold text-gray-600">D</div>
+<div class="py-1.5 text-center text-[10px] font-bold text-gray-600">W</div>
+<div class="py-1.5 text-center text-[10px] font-bold text-gray-600">D</div>
+<div class="py-1.5 text-center text-[10px] font-bold text-gray-600">V</div>
+<div class="py-1.5 text-center text-[10px] font-bold text-gray-600">Z</div>
+<div class="py-1.5 text-center text-[10px] font-bold text-gray-600">Z</div>
+</div>
+<div class="mobile-calendar-grid text-[11px]">
+<div class="aspect-square border-r border-b border-gray-300 p-1 flex justify-end items-start text-gray-400">30</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 flex justify-end items-start text-gray-400">31</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-available">
+<span class="absolute top-1 right-1">1</span>
+<div class="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5">
+<span class="w-1.5 h-1.5 rounded-full bg-purple-600"></span>
+</div>
+</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-available">
+<span class="absolute top-1 right-1">2</span>
+</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-booked">
+<span class="absolute top-1 right-1">3</span>
+<div class="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5">
+<span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+</div>
+</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-available">
+<span class="absolute top-1 right-1">4</span>
+</div>
+<div class="aspect-square border-b border-gray-300 p-1 relative calendar-cell-available">
+<span class="absolute top-1 right-1">5</span>
+</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-available">6</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-available">7</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-available">8</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-booked">
+                        9
+                        <div class="absolute bottom-1 left-1/2 -translate-x-1/2"><span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span></div>
+</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-available">10</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-sync">
+                        11
+                        <div class="absolute bottom-1 left-1/2 -translate-x-1/2"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span></div>
+</div>
+<div class="aspect-square border-b border-gray-300 p-1 relative calendar-cell-available">12</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-available">13</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-available">14</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-available">15</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-available">16</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-available">17</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-available">18</div>
+<div class="aspect-square border-b border-gray-300 p-1 relative calendar-cell-available">19</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-available">20</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-available">
+                        21
+                        <div class="absolute bottom-1 left-1/2 -translate-x-1/2"><span class="w-1.5 h-1.5 rounded-full bg-purple-600"></span></div>
+</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-available">22</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-available">23</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-available">24</div>
+<div class="aspect-square border-r border-b border-gray-300 p-1 relative calendar-cell-available">25</div>
+<div class="aspect-square border-b border-gray-300 p-1 relative calendar-cell-available">26</div>
+<div class="aspect-square border-r border-gray-300 p-1 relative calendar-cell-available">27</div>
+<div class="aspect-square border-r border-gray-300 p-1 relative calendar-cell-available">28</div>
+<div class="aspect-square border-r border-gray-300 p-1 relative calendar-cell-available">29</div>
+<div class="aspect-square border-r border-gray-300 p-1 relative calendar-cell-available">30</div>
+<div class="aspect-square border-r border-gray-300 p-1 flex justify-end items-start text-gray-400">1</div>
+<div class="aspect-square border-r border-gray-300 p-1 flex justify-end items-start text-gray-400">2</div>
+<div class="aspect-square p-1 flex justify-end items-start text-gray-400">3</div>
+</div>
+</div>
+<div class="mt-4 grid grid-cols-2 gap-2 text-[10px] text-gray-700">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+<span>Beschikbaar</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-orange-400"></span>
+<span>Geboekt</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-blue-300"></span>
+<span>Extern Sync</span>
+</div>
+</div>
+</div>
+<div class="bg-[#dadae0] rounded-2xl p-6 border border-gray-200 shadow-sm">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-purple-600">bar_chart</span>
+<h2 class="font-bold text-gray-800">Bezetting april 2026</h2>
+</div>
+<div class="flex items-center justify-around">
+<div class="relative w-24 h-24">
+<svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+<path class="text-gray-300" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"></path>
+<circle cx="18" cy="2.0845" fill="#7c3aed" r="1.5"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-xl font-bold text-gray-800 leading-none">0%</span>
+<span class="text-[9px] text-gray-500">bezetting</span>
+</div>
+</div>
+<ul class="space-y-2 text-[11px] font-medium">
+<li class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="w-16">Vrij</span>
+<span class="font-bold">30</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-orange-400"></span>
+<span class="w-16">Geboekt</span>
+<span class="font-bold">0</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-red-500"></span>
+<span class="w-16">Niet bez.</span>
+<span class="font-bold">0</span>
+</li>
+</ul>
+</div>
+</div>
+<div class="bg-[#dadae0] rounded-2xl p-6 border border-gray-200 shadow-sm">
+<div class="flex items-center gap-2 text-gray-600 mb-2">
+<span class="material-symbols-outlined text-orange-500 text-sm">schedule</span>
+<span class="text-xs font-bold uppercase tracking-wider">Volgende boeking</span>
+</div>
+<p class="font-bold text-lg text-gray-800">20 mei 2026</p>
+<p class="text-xs text-gray-600">Sarah Jansen - <span class="text-purple-600 font-bold">Verjaardag</span></p>
+</div>
+<div class="bg-[#dadae0] rounded-2xl p-6 border border-gray-200 shadow-sm mb-8">
+<div class="flex items-center gap-2 text-green-600 mb-4">
+<span class="material-symbols-outlined">trending_up</span>
+<span class="font-bold text-sm">Inzichten</span>
+</div>
+<ul class="space-y-3 text-xs text-gray-700">
+<li class="flex justify-between border-b border-gray-300 pb-1.5">
+<span>Werkdagen</span>
+<span class="font-bold text-gray-900">22</span>
+</li>
+<li class="flex justify-between border-b border-gray-300 pb-1.5">
+<span>Drukste maand</span>
+<span class="font-bold text-gray-900">mei 2026</span>
+</li>
+<li class="flex justify-between">
+<span>Vrije dagen</span>
+<span class="font-bold text-gray-900">30</span>
+</li>
+</ul>
+</div>
+</div>
+</main>
+<div class="fixed inset-0 bg-black/40 z-[60] flex items-end">
+<div class="bg-white w-full rounded-t-3xl p-6 shadow-2xl animate-slide-up">
+<div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-6"></div>
+<div class="flex items-start justify-between mb-6">
+<div>
+<h3 class="text-xl font-bold text-gray-800">Vrijdag 3 April 2026</h3>
+<p class="text-sm text-gray-500">Status: <span class="text-orange-500 font-bold">Geboekt</span></p>
+</div>
+<button class="text-gray-400 p-2"><span class="material-symbols-outlined">close</span></button>
+</div>
+<div class="bg-[#fcdbb0]/30 border-l-4 border-orange-400 p-4 rounded-xl mb-6">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-sm text-orange-600">event_busy</span>
+<span class="text-xs font-bold text-orange-800">Bedrijfsuitje Catering</span>
+</div>
+<p class="text-sm font-bold text-gray-800 ml-6">09:00 - 12:00</p>
+</div>
+<div class="space-y-3">
+<button class="w-full py-3 bg-white text-available border border-green-200 rounded-xl text-sm font-bold shadow-sm hover:bg-green-50 transition-colors">
+                Zet op beschikbaar
+            </button>
+<button class="w-full py-3 bg-purple-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-purple-200">
+                Details bewerken
+            </button>
+</div>
+</div>
+</div>
+
+</body></html>
