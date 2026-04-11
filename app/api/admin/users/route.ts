@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { requireRole } from '@/lib/middleware/auth';
+import { getAdminUsers } from '@/lib/page-data';
 
 // GET - List all users (admin only)
 export async function GET(request: Request) {
@@ -9,69 +9,19 @@ export async function GET(request: Request) {
     if (error) return error;
 
     const { searchParams } = new URL(request.url);
-    const role = searchParams.get('role');
-    const search = searchParams.get('search');
-
-    const where: any = {};
-
-    if (role) {
-      where.role = role;
-    }
-
-    if (search) {
-      where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } },
-      ];
-    }
-
-    const users = await prisma.user.findMany({
-      where,
-      include: {
-        provider: {
-          select: {
-            id: true,
-            business_name: true,
-            verified: true,
-          },
-        },
-        _count: {
-          select: {
-            service_requests: true,
-            bookings: true,
-            reviews: true,
-          },
-        },
-      },
-      orderBy: {
-        created_at: 'desc',
-      },
+    const result = await getAdminUsers({
+      role: searchParams.get('role'),
+      search: searchParams.get('search'),
+      page: searchParams.get('page'),
+      pageSize: searchParams.get('pageSize'),
     });
 
-    const formattedUsers = users.map((user) => ({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      status: user.status,
-      createdAt: user.created_at,
-      provider: user.provider
-        ? {
-            id: user.provider.id,
-            businessName: user.provider.business_name,
-            verified: user.provider.verified,
-          }
-        : null,
-      stats: {
-        requests: user._count.service_requests,
-        bookings: user._count.bookings,
-        reviews: user._count.reviews,
-      },
-    }));
-
     return NextResponse.json({
-      users: formattedUsers,
-      total: formattedUsers.length,
+      users: result.items,
+      total: result.total,
+      page: result.page,
+      pageSize: result.pageSize,
+      hasMore: result.hasMore,
     });
   } catch (error) {
     console.error('Admin users API error:', error);

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -117,12 +116,7 @@ export function UnlinkedQuotes({ quotes, events, onLinkQuote }: UnlinkedQuotesPr
         const isExpanded = expandedQuote === quote.id;
 
         return (
-          <motion.div
-            key={quote.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05 }}
-          >
+          <div key={quote.id}>
             <Card
               className={`border-2 rounded-2xl overflow-hidden transition-all ${
                 isExpanded ? 'border-purple-200' : 'border-gray-100'
@@ -177,12 +171,7 @@ export function UnlinkedQuotes({ quotes, events, onLinkQuote }: UnlinkedQuotesPr
 
               {/* Expanded Content */}
               {isExpanded && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="border-t border-gray-100"
-                >
+                <div className="border-t border-gray-100">
                   <div className="p-4 bg-gray-50">
                     <h5 className="text-sm font-medium text-gray-700 mb-3">
                       Koppel aan een event slot:
@@ -260,10 +249,10 @@ export function UnlinkedQuotes({ quotes, events, onLinkQuote }: UnlinkedQuotesPr
                       </Button>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               )}
             </Card>
-          </motion.div>
+          </div>
         );
       })}
     </div>
