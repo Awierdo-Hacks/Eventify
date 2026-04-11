@@ -2,11 +2,16 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar } from '@/components/ui/calendar';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import {
   Calendar as CalendarIcon,
   Lock,
@@ -20,18 +25,17 @@ import {
   RefreshCw,
   ChevronLeft,
   ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
 } from 'lucide-react';
 import {
   startOfMonth,
   endOfMonth,
+  startOfWeek,
+  endOfWeek,
   addMonths,
   subMonths,
-  addYears,
-  subYears,
   format,
   isSameDay,
+  isSameMonth,
   isBefore,
   startOfDay,
   eachDayOfInterval,
@@ -78,6 +82,15 @@ interface SyncStatus {
 }
 
 type DayStatus = 'available' | 'blocked' | 'booked' | 'external_google' | 'external_ical' | 'past';
+
+type DayEventKind = 'booked' | 'blocked' | 'google' | 'ical';
+interface DayEvent {
+  kind: DayEventKind;
+  title: string | null;
+}
+
+const WEEKDAY_LABELS = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'];
+const MOBILE_WEEKDAY_LABELS = ['M', 'D', 'W', 'D', 'V', 'Z', 'Z'];
 
 export default function AgendaCalendar() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -143,7 +156,6 @@ export default function AgendaCalendar() {
   // On mount: fetch status, trigger background sync, then load calendar data
   useEffect(() => {
     fetchSyncStatus();
-    // Trigger auto-sync (respects cooldown server-side)
     fetch('/api/calendar/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -152,12 +164,12 @@ export default function AgendaCalendar() {
       fetchData(currentMonth);
       fetchSyncStatus();
     }).catch(() => fetchData(currentMonth));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (!loading) fetchData(currentMonth);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentMonth]);
 
   const handleManualSync = async () => {
@@ -212,6 +224,39 @@ export default function AgendaCalendar() {
     [blockedDateObjects, bookedDateObjects, googleDateObjects, icalDateObjects]
   );
 
+  const getEventsForDay = useCallback(
+    (date: Date): DayEvent[] => {
+      const dateStr = format(date, 'yyyy-MM-dd');
+      const events: DayEvent[] = [];
+
+      const booked = bookedDates.find((d) => d.date === dateStr);
+      if (booked) {
+        events.push({
+          kind: 'booked',
+          title: booked.eventType
+            ? `${booked.eventType} · ${booked.customerName}`
+            : booked.customerName,
+        });
+      }
+
+      const blocked = blockedDates.find((d) => d.date === dateStr);
+      if (blocked) {
+        events.push({ kind: 'blocked', title: blocked.reason || 'Niet beschikbaar' });
+      }
+
+      for (const ext of externalEvents) {
+        if (ext.date !== dateStr) continue;
+        events.push({
+          kind: ext.source === 'GOOGLE' ? 'google' : 'ical',
+          title: ext.title,
+        });
+      }
+
+      return events;
+    },
+    [bookedDates, blockedDates, externalEvents]
+  );
+
   const selectedDayInfo = useMemo(() => {
     if (!selectedDate) return null;
     const status = getDayStatus(selectedDate);
@@ -221,6 +266,17 @@ export default function AgendaCalendar() {
     const external = externalEvents.find((e) => e.date === dateStr);
     return { status, blocked, booked, external };
   }, [selectedDate, getDayStatus, blockedDates, bookedDates, externalEvents]);
+
+  // === Maand grid (6 rows × 7 cols, Monday-first) ===
+  const monthGrid = useMemo(() => {
+    const gridStart = startOfWeek(startOfMonth(currentMonth), { weekStartsOn: 1 });
+    const gridEnd = endOfWeek(endOfMonth(currentMonth), { weekStartsOn: 1 });
+    const days = eachDayOfInterval({ start: gridStart, end: gridEnd });
+    return days.map((date) => ({
+      date,
+      isCurrentMonth: isSameMonth(date, currentMonth),
+    }));
+  }, [currentMonth]);
 
   // === Maand statistieken ===
   const monthStats = useMemo(() => {
@@ -325,33 +381,9 @@ export default function AgendaCalendar() {
     }
   };
 
-  // Kalender modifiers
-  const calendarModifiers = useMemo(() => {
-    const monthStart = startOfMonth(currentMonth);
-    const monthEnd = endOfMonth(currentMonth);
-    const today = startOfDay(new Date());
-    const allExternalDates = [...googleDateObjects, ...icalDateObjects];
-
-    return {
-      blocked: blockedDateObjects,
-      booked: bookedDateObjects,
-      external_google: googleDateObjects,
-      external_ical: icalDateObjects,
-      available: eachDayOfInterval({ start: monthStart, end: monthEnd }).filter(
-        (d) =>
-          !isBefore(d, today) &&
-          !blockedDateObjects.some((bd) => isSameDay(bd, d)) &&
-          !bookedDateObjects.some((bd) => isSameDay(bd, d)) &&
-          !allExternalDates.some((bd) => isSameDay(bd, d))
-      ),
-    };
-  }, [currentMonth, blockedDateObjects, bookedDateObjects, googleDateObjects, icalDateObjects]);
-
   // Navigatie
   const goToPrevMonth = () => setCurrentMonth((m) => subMonths(m, 1));
   const goToNextMonth = () => setCurrentMonth((m) => addMonths(m, 1));
-  const goToPrevYear = () => setCurrentMonth((m) => subYears(m, 1));
-  const goToNextYear = () => setCurrentMonth((m) => addYears(m, 1));
   const goToToday = () => setCurrentMonth(new Date());
 
   // Drukste maand label
@@ -384,9 +416,9 @@ export default function AgendaCalendar() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[18rem_1fr] gap-6">
         <Skeleton className="h-80 rounded-3xl" />
-        <Skeleton className="h-80 rounded-3xl lg:col-span-2" />
+        <Skeleton className="h-[32rem] rounded-3xl" />
       </div>
     );
   }
@@ -407,6 +439,274 @@ export default function AgendaCalendar() {
       </Card>
     );
   }
+
+  // ========= Sub-components (closure over state) =========
+
+  const OccupancyCard = () => (
+    <Card className="p-5 border-2 border-gray-100 rounded-3xl bg-white">
+      <div className="flex items-center gap-2 mb-4">
+        <BarChart3 className="w-5 h-5 text-purple-600" />
+        <h4 className="font-semibold text-gray-900 text-sm">
+          {format(currentMonth, 'MMMM yyyy', { locale: nl })}
+        </h4>
+      </div>
+
+      <div className="flex justify-center mb-4">
+        <div className="relative w-28 h-28">
+          <svg className="w-28 h-28 -rotate-90" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="50" fill="none" stroke="#f3f4f6" strokeWidth="10" />
+            <circle
+              cx="60" cy="60" r="50" fill="none"
+              stroke={monthStats.occupancyRate >= 70 ? '#22c55e' : monthStats.occupancyRate >= 40 ? '#f59e0b' : '#9333ea'}
+              strokeWidth="10"
+              strokeDasharray={`${(monthStats.occupancyRate / 100) * 314} 314`}
+              strokeLinecap="round"
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-2xl font-bold text-gray-900">{monthStats.occupancyRate}%</span>
+            <span className="text-[10px] text-gray-500">bezetting</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-2.5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-green-400" />
+            <span className="text-sm text-gray-600">Beschikbaar</span>
+          </div>
+          <span className="text-sm font-semibold text-gray-900">{monthStats.availableCount}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-amber-400" />
+            <span className="text-sm text-gray-600">Geboekt</span>
+          </div>
+          <span className="text-sm font-semibold text-gray-900">{monthStats.bookedCount}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-red-400" />
+            <span className="text-sm text-gray-600">Niet beschikbaar</span>
+          </div>
+          <span className="text-sm font-semibold text-gray-900">{monthStats.blockedCount}</span>
+        </div>
+        {monthStats.googleCount > 0 && (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-blue-400" />
+              <span className="text-sm text-gray-600">Google Calendar</span>
+            </div>
+            <span className="text-sm font-semibold text-gray-900">{monthStats.googleCount}</span>
+          </div>
+        )}
+        {monthStats.icalCount > 0 && (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-purple-400" />
+              <span className="text-sm text-gray-600">iCalendar</span>
+            </div>
+            <span className="text-sm font-semibold text-gray-900">{monthStats.icalCount}</span>
+          </div>
+        )}
+      </div>
+
+      <div className="mt-4 h-3 bg-gray-100 rounded-full overflow-hidden flex">
+        {monthStats.totalDays > 0 && (
+          <>
+            <div
+              className="h-full bg-amber-400 transition-all duration-500"
+              style={{ width: `${(monthStats.bookedCount / monthStats.totalDays) * 100}%` }}
+            />
+            <div
+              className="h-full bg-red-400 transition-all duration-500"
+              style={{ width: `${(monthStats.blockedCount / monthStats.totalDays) * 100}%` }}
+            />
+            <div
+              className="h-full bg-blue-400 transition-all duration-500"
+              style={{ width: `${(monthStats.googleCount / monthStats.totalDays) * 100}%` }}
+            />
+            <div
+              className="h-full bg-purple-400 transition-all duration-500"
+              style={{ width: `${(monthStats.icalCount / monthStats.totalDays) * 100}%` }}
+            />
+            <div
+              className="h-full bg-green-200 transition-all duration-500"
+              style={{ width: `${(monthStats.availableCount / monthStats.totalDays) * 100}%` }}
+            />
+          </>
+        )}
+      </div>
+    </Card>
+  );
+
+  const NextBookingCard = () => (
+    <Card className="p-5 border-2 border-gray-100 rounded-3xl bg-white">
+      <div className="flex items-center gap-2 mb-3">
+        <Clock className="w-5 h-5 text-amber-500" />
+        <h4 className="font-semibold text-gray-900 text-sm">Volgende boeking</h4>
+      </div>
+      {nextBooking ? (
+        <div>
+          <p className="text-lg font-bold text-gray-900">
+            {format(new Date(nextBooking.date + 'T00:00:00'), 'd MMMM yyyy', { locale: nl })}
+          </p>
+          <p className="text-sm text-gray-500 mt-0.5">
+            {nextBooking.customerName}
+            {nextBooking.eventType && (
+              <span className="text-purple-600"> · {nextBooking.eventType}</span>
+            )}
+          </p>
+        </div>
+      ) : (
+        <p className="text-sm text-gray-400">Geen aankomende boekingen</p>
+      )}
+    </Card>
+  );
+
+  const InsightsCard = () => (
+    <Card className="p-5 border-2 border-gray-100 rounded-3xl bg-white">
+      <div className="flex items-center gap-2 mb-3">
+        <TrendingUp className="w-5 h-5 text-green-500" />
+        <h4 className="font-semibold text-gray-900 text-sm">Inzichten</h4>
+      </div>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-gray-600">Werkdagen</span>
+          <span className="text-sm font-semibold text-gray-900">{monthStats.totalWorkDays}</span>
+        </div>
+        {busiestMonthLabel && (
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-600">Drukste maand</span>
+            <span className="text-sm font-semibold text-gray-900 text-right">{busiestMonthLabel}</span>
+          </div>
+        )}
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-gray-600">Vrije dagen</span>
+          <span className="text-sm font-semibold text-gray-900">{monthStats.freeDays}</span>
+        </div>
+      </div>
+    </Card>
+  );
+
+  const MonthTitle = () => (
+    <div className="flex items-center gap-3">
+      <CalendarIcon className="w-6 h-6 text-purple-600" />
+      <h3 className="text-xl sm:text-2xl font-bold text-gray-900 capitalize">
+        {format(currentMonth, 'MMMM yyyy', { locale: nl })}
+      </h3>
+    </div>
+  );
+
+  const NavButtons = () => (
+    <div className="flex items-center gap-1">
+      <button
+        onClick={goToToday}
+        className="px-3 py-1 rounded-lg hover:bg-purple-50 text-sm font-medium text-purple-600 transition-colors"
+      >
+        Vandaag
+      </button>
+      <button
+        onClick={goToPrevMonth}
+        className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
+        title="Vorige maand"
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+      <button
+        onClick={goToNextMonth}
+        className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
+        title="Volgende maand"
+      >
+        <ChevronRight className="w-5 h-5" />
+      </button>
+    </div>
+  );
+
+  const SyncButton = ({ compact = false }: { compact?: boolean }) => (
+    <button
+      onClick={handleManualSync}
+      disabled={syncing}
+      className={`flex items-center gap-2 border-2 border-gray-200 bg-white rounded-xl ${compact ? 'px-3 py-2 text-xs' : 'px-4 py-2 text-sm'} font-medium text-gray-700 hover:border-purple-300 hover:text-purple-700 transition-colors disabled:opacity-50`}
+    >
+      <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
+      {syncing ? 'Bezig...' : 'Sync Calendar'}
+    </button>
+  );
+
+  // Cell styling helpers
+  const statusBorderClass = (status: DayStatus): string => {
+    switch (status) {
+      case 'available':
+        return 'border-l-[3px] border-l-green-400';
+      case 'booked':
+        return 'border-l-[3px] border-l-amber-400 bg-amber-50/40';
+      case 'blocked':
+        return 'border-l-[3px] border-l-red-400 bg-red-50/40';
+      case 'external_google':
+        return 'border-l-[3px] border-l-blue-400 bg-blue-50/40';
+      case 'external_ical':
+        return 'border-l-[3px] border-l-purple-400 bg-purple-50/40';
+      default:
+        return 'border-l-[3px] border-l-gray-200';
+    }
+  };
+
+  const eventBlockClass = (kind: DayEventKind): string => {
+    switch (kind) {
+      case 'booked':
+        return 'bg-amber-100 border-l-2 border-amber-500 text-amber-900';
+      case 'blocked':
+        return 'bg-red-100 border-l-2 border-red-500 text-red-900';
+      case 'google':
+        return 'bg-blue-100 border-l-2 border-blue-500 text-blue-900';
+      case 'ical':
+        return 'bg-purple-100 border-l-2 border-purple-500 text-purple-900';
+    }
+  };
+
+  const mobileDotClass = (kind: DayEventKind): string => {
+    switch (kind) {
+      case 'booked':
+        return 'bg-amber-400';
+      case 'blocked':
+        return 'bg-red-400';
+      case 'google':
+        return 'bg-blue-400';
+      case 'ical':
+        return 'bg-purple-400';
+    }
+  };
+
+  const Legend = () => (
+    <div className="mt-4 flex flex-wrap gap-4 text-xs text-gray-600 px-1">
+      <div className="flex items-center gap-1.5">
+        <span className="w-3 h-3 rounded-full bg-green-400" />
+        Beschikbaar
+      </div>
+      <div className="flex items-center gap-1.5">
+        <span className="w-3 h-3 rounded-full bg-amber-400" />
+        Geboekt
+      </div>
+      <div className="flex items-center gap-1.5">
+        <span className="w-3 h-3 rounded-full bg-red-400" />
+        Niet beschikbaar
+      </div>
+      {(syncStatus?.google?.connected || monthStats.googleCount > 0) && (
+        <div className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-full bg-blue-400" />
+          Google
+        </div>
+      )}
+      {(syncStatus?.ical?.connected || monthStats.icalCount > 0) && (
+        <div className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-full bg-purple-400" />
+          iCal
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -433,422 +733,410 @@ export default function AgendaCalendar() {
         )}
       </AnimatePresence>
 
-      {/* Hoofd layout: Stats links + Agenda rechts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* ================= DESKTOP LAYOUT ================= */}
+      <div className="hidden lg:grid lg:grid-cols-[18rem_1fr] gap-6">
+        {/* Sidebar */}
+        <aside className="space-y-4">
+          <OccupancyCard />
+          <NextBookingCard />
+          <InsightsCard />
+        </aside>
 
-        {/* === STATS PANEL === */}
-        <div className="space-y-4 lg:col-span-1">
-          {/* Bezettingsgraad */}
-          <Card className="p-5 border-2 border-gray-100 rounded-3xl">
-            <div className="flex items-center gap-2 mb-4">
-              <BarChart3 className="w-5 h-5 text-purple-600" />
-              <h4 className="font-semibold text-gray-900 text-sm">
-                {format(currentMonth, 'MMMM yyyy', { locale: nl })}
-              </h4>
-            </div>
-
-            <div className="flex justify-center mb-4">
-              <div className="relative w-28 h-28">
-                <svg className="w-28 h-28 -rotate-90" viewBox="0 0 120 120">
-                  <circle cx="60" cy="60" r="50" fill="none" stroke="#f3f4f6" strokeWidth="10" />
-                  <circle
-                    cx="60" cy="60" r="50" fill="none"
-                    stroke={monthStats.occupancyRate >= 70 ? '#22c55e' : monthStats.occupancyRate >= 40 ? '#f59e0b' : '#9333ea'}
-                    strokeWidth="10"
-                    strokeDasharray={`${(monthStats.occupancyRate / 100) * 314} 314`}
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl font-bold text-gray-900">{monthStats.occupancyRate}%</span>
-                  <span className="text-[10px] text-gray-500">bezetting</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-2.5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-green-400" />
-                  <span className="text-sm text-gray-600">Beschikbaar</span>
-                </div>
-                <span className="text-sm font-semibold text-gray-900">{monthStats.availableCount}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-amber-400" />
-                  <span className="text-sm text-gray-600">Geboekt</span>
-                </div>
-                <span className="text-sm font-semibold text-gray-900">{monthStats.bookedCount}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-400" />
-                  <span className="text-sm text-gray-600">Manueel geblokkeerd</span>
-                </div>
-                <span className="text-sm font-semibold text-gray-900">{monthStats.blockedCount}</span>
-              </div>
-              {monthStats.googleCount > 0 && (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-blue-400" />
-                    <span className="text-sm text-gray-600">Google Calendar</span>
-                  </div>
-                  <span className="text-sm font-semibold text-gray-900">{monthStats.googleCount}</span>
-                </div>
-              )}
-              {monthStats.icalCount > 0 && (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-purple-400" />
-                    <span className="text-sm text-gray-600">iCalendar</span>
-                  </div>
-                  <span className="text-sm font-semibold text-gray-900">{monthStats.icalCount}</span>
-                </div>
-              )}
-            </div>
-
-            <div className="mt-4 h-3 bg-gray-100 rounded-full overflow-hidden flex">
-              {monthStats.totalDays > 0 && (
-                <>
-                  <div
-                    className="h-full bg-amber-400 transition-all duration-500"
-                    style={{ width: `${(monthStats.bookedCount / monthStats.totalDays) * 100}%` }}
-                  />
-                  <div
-                    className="h-full bg-red-400 transition-all duration-500"
-                    style={{ width: `${(monthStats.blockedCount / monthStats.totalDays) * 100}%` }}
-                  />
-                  <div
-                    className="h-full bg-blue-400 transition-all duration-500"
-                    style={{ width: `${(monthStats.googleCount / monthStats.totalDays) * 100}%` }}
-                  />
-                  <div
-                    className="h-full bg-purple-400 transition-all duration-500"
-                    style={{ width: `${(monthStats.icalCount / monthStats.totalDays) * 100}%` }}
-                  />
-                  <div
-                    className="h-full bg-green-200 transition-all duration-500"
-                    style={{ width: `${(monthStats.availableCount / monthStats.totalDays) * 100}%` }}
-                  />
-                </>
-              )}
-            </div>
-          </Card>
-
-          {/* Volgende boeking */}
-          <Card className="p-5 border-2 border-gray-100 rounded-3xl">
-            <div className="flex items-center gap-2 mb-3">
-              <Clock className="w-5 h-5 text-amber-500" />
-              <h4 className="font-semibold text-gray-900 text-sm">Volgende boeking</h4>
-            </div>
-            {nextBooking ? (
-              <div>
-                <p className="text-lg font-bold text-gray-900">
-                  {format(new Date(nextBooking.date + 'T00:00:00'), 'd MMMM yyyy', { locale: nl })}
-                </p>
-                <p className="text-sm text-gray-500 mt-0.5">
-                  {nextBooking.customerName}
-                  {nextBooking.eventType && (
-                    <span className="text-purple-600"> · {nextBooking.eventType}</span>
-                  )}
-                </p>
-              </div>
-            ) : (
-              <p className="text-sm text-gray-400">Geen aankomende boekingen</p>
-            )}
-          </Card>
-
-          {/* Inzichten */}
-          <Card className="p-5 border-2 border-gray-100 rounded-3xl">
-            <div className="flex items-center gap-2 mb-3">
-              <TrendingUp className="w-5 h-5 text-green-500" />
-              <h4 className="font-semibold text-gray-900 text-sm">Inzichten</h4>
-            </div>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Werkdagen</span>
-                <span className="text-sm font-semibold text-gray-900">{monthStats.totalWorkDays}</span>
-              </div>
-              {busiestMonthLabel && (
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Drukste maand</span>
-                  <span className="text-sm font-semibold text-gray-900 text-right">{busiestMonthLabel}</span>
-                </div>
-              )}
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Vrije dagen</span>
-                <span className="text-sm font-semibold text-gray-900">{monthStats.freeDays}</span>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* === AGENDA CARD === */}
-        <Card className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl lg:col-span-2">
-          {/* Header met navigatie */}
-          <div className="flex items-center justify-between mb-2">
+        {/* Calendar card */}
+        <Card className="p-6 border-2 border-gray-100 rounded-3xl bg-white flex flex-col min-w-0">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+            <MonthTitle />
             <div className="flex items-center gap-3">
-              <CalendarIcon className="w-6 h-6 text-purple-600" />
-              <h3 className="text-xl font-bold text-gray-900">Agenda</h3>
-            </div>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={goToPrevYear}
-                className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
-                title="Vorig jaar"
-              >
-                <ChevronsLeft className="w-4 h-4" />
-              </button>
-              <button
-                onClick={goToPrevMonth}
-                className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
-                title="Vorige maand"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                onClick={goToToday}
-                className="px-3 py-1 rounded-lg hover:bg-purple-50 text-sm font-medium text-purple-600 transition-colors"
-              >
-                Vandaag
-              </button>
-              <button
-                onClick={goToNextMonth}
-                className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
-                title="Volgende maand"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-              <button
-                onClick={goToNextYear}
-                className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
-                title="Volgend jaar"
-              >
-                <ChevronsRight className="w-4 h-4" />
-              </button>
+              <SyncButton />
+              <div className="w-px h-6 bg-gray-200" />
+              <NavButtons />
             </div>
           </div>
 
-          {/* Sync-banner (only if integrations exist) */}
+          {/* Sync micro-label */}
           {hasExternalIntegration && (
-            <div className="flex items-center justify-between mb-3 px-1">
+            <div className="flex items-center justify-end mb-2 px-1">
               <span className="text-xs text-gray-400">
                 {lastSyncedLabel ? `Gesynchroniseerd ${lastSyncedLabel}` : 'Nog niet gesynchroniseerd'}
               </span>
-              <button
-                onClick={handleManualSync}
-                disabled={syncing}
-                className="flex items-center gap-1.5 text-xs text-purple-600 hover:text-purple-700 font-medium disabled:opacity-50"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
-                {syncing ? 'Bezig...' : 'Sync nu'}
-              </button>
             </div>
           )}
 
-          {/* Kalender + dag detail naast elkaar */}
-          <div className="flex flex-col lg:flex-row gap-5">
-            {/* Kalender */}
-            <div className="flex-shrink-0">
-              <Calendar
-                mode="single"
-                selected={selectedDate ?? undefined}
-                onSelect={(date) => setSelectedDate(date ?? null)}
-                onMonthChange={setCurrentMonth}
-                month={currentMonth}
-                modifiers={calendarModifiers}
-                modifiersClassNames={{
-                  blocked: '!bg-red-100 !text-red-600 !font-semibold hover:!bg-red-200',
-                  booked: '!bg-amber-100 !text-amber-700 !font-semibold hover:!bg-amber-200',
-                  external_google: '!bg-blue-100 !text-blue-700 !font-semibold hover:!bg-blue-200',
-                  external_ical: '!bg-purple-100 !text-purple-700 !font-semibold hover:!bg-purple-200',
-                  available: '!bg-green-50 hover:!bg-green-100',
-                }}
-              />
-
-              {/* Legenda */}
-              <div className="flex flex-wrap gap-3 mt-3 justify-center text-xs">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-green-100 border border-green-300" />
-                  <span className="text-gray-500">Beschikbaar</span>
+          {/* Month grid */}
+          <div className="flex-1 border border-gray-200 rounded-2xl overflow-hidden flex flex-col bg-white">
+            {/* Weekday header */}
+            <div className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
+              {WEEKDAY_LABELS.map((label) => (
+                <div
+                  key={label}
+                  className="py-2 text-center text-xs font-semibold text-gray-600 uppercase tracking-wide"
+                >
+                  {label}
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-amber-100 border border-amber-300" />
-                  <span className="text-gray-500">Geboekt</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-100 border border-red-300" />
-                  <span className="text-gray-500">Geblokkeerd</span>
-                </div>
-                {(syncStatus?.google?.connected || monthStats.googleCount > 0) && (
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-blue-100 border border-blue-300" />
-                    <span className="text-gray-500">Google Calendar</span>
-                  </div>
-                )}
-                {(syncStatus?.ical?.connected || monthStats.icalCount > 0) && (
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-purple-100 border border-purple-300" />
-                    <span className="text-gray-500">iCalendar</span>
-                  </div>
-                )}
-              </div>
+              ))}
             </div>
 
-            {/* Dag detail panel */}
-            <div className="flex-1 min-w-0">
-              <AnimatePresence mode="wait">
-                {selectedDate && selectedDayInfo ? (
-                  <motion.div
-                    key={selectedDate.toISOString()}
-                    initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.15 }}
-                    className="h-full"
+            {/* Day cells */}
+            <div className="grid grid-cols-7 grid-rows-6 flex-1">
+              {monthGrid.map((cell, idx) => {
+                const status = getDayStatus(cell.date);
+                const events = getEventsForDay(cell.date);
+                const isPast = status === 'past';
+                const inMonth = cell.isCurrentMonth;
+                const rowEnd = Math.floor(idx / 7) === 5;
+                const colEnd = (idx + 1) % 7 === 0;
+
+                return (
+                  <button
+                    key={cell.date.toISOString()}
+                    type="button"
+                    onClick={() => setSelectedDate(cell.date)}
+                    className={`group relative text-left min-h-[110px] p-2 bg-white hover:bg-gray-50/60 transition-colors
+                      ${colEnd ? '' : 'border-r border-gray-200'}
+                      ${rowEnd ? '' : 'border-b border-gray-200'}
+                      ${inMonth ? statusBorderClass(status) : 'border-l-[3px] border-l-transparent opacity-40'}
+                      ${isPast ? 'opacity-60' : ''}
+                    `}
                   >
-                    <div className="p-4 rounded-2xl border-2 border-gray-100 bg-gray-50/50 h-full flex flex-col">
-                      <div className="mb-3">
-                        <p className="font-bold text-gray-900">
-                          {format(selectedDate, 'EEEE', { locale: nl })}
-                        </p>
-                        <p className="text-2xl font-bold text-gray-900">
-                          {format(selectedDate, 'd MMMM yyyy', { locale: nl })}
-                        </p>
-                        <div className="flex items-center gap-2 mt-1.5">
+                    {/* Date number */}
+                    <span
+                      className={`absolute top-2 right-2 text-sm font-medium ${
+                        inMonth ? 'text-gray-700' : 'text-gray-300'
+                      }`}
+                    >
+                      {format(cell.date, 'd')}
+                    </span>
+
+                    {/* Events */}
+                    {inMonth && events.length > 0 && (
+                      <div className="mt-6 space-y-1">
+                        {events.slice(0, 2).map((event, i) => (
                           <div
-                            className={`w-2.5 h-2.5 rounded-full ${
-                              selectedDayInfo.status === 'available'
-                                ? 'bg-green-400'
-                                : selectedDayInfo.status === 'booked'
-                                ? 'bg-amber-400'
-                                : selectedDayInfo.status === 'blocked'
-                                ? 'bg-red-400'
-                                : selectedDayInfo.status === 'external_google'
-                                ? 'bg-blue-400'
-                                : selectedDayInfo.status === 'external_ical'
-                                ? 'bg-purple-400'
-                                : 'bg-gray-300'
-                            }`}
-                          />
-                          <span className="text-sm text-gray-500">
-                            {selectedDayInfo.status === 'available' && 'Beschikbaar'}
-                            {selectedDayInfo.status === 'booked' && 'Geboekt'}
-                            {selectedDayInfo.status === 'blocked' && 'Niet beschikbaar (manueel)'}
-                            {selectedDayInfo.status === 'external_google' && 'Bezet via Google Calendar'}
-                            {selectedDayInfo.status === 'external_ical' && 'Bezet via iCalendar'}
-                            {selectedDayInfo.status === 'past' && 'Verlopen'}
-                          </span>
+                            key={i}
+                            className={`p-1.5 rounded text-[11px] leading-tight shadow-sm relative overflow-hidden ${eventBlockClass(event.kind)}`}
+                          >
+                            <div className="truncate pr-5">
+                              {event.title || (event.kind === 'blocked' ? 'Niet beschikbaar' : 'Event')}
+                            </div>
+                            {event.kind === 'google' && (
+                              <span className="absolute top-0.5 right-1 text-[9px] font-bold text-blue-700">
+                                G
+                              </span>
+                            )}
+                            {event.kind === 'ical' && (
+                              <span className="absolute top-0 right-0 text-[9px] bg-purple-500 text-white px-1 rounded-bl">
+                                ical
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                        {events.length > 2 && (
+                          <div className="text-[10px] text-gray-500 font-medium px-1">
+                            +{events.length - 2} meer
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Hover quick-action */}
+                    {inMonth && !isPast && (status === 'available' || status === 'blocked') && (
+                      <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (status === 'available') {
+                              handleBlockDate(cell.date);
+                            } else {
+                              handleUnblockDate(cell.date);
+                            }
+                          }}
+                          role="button"
+                          tabIndex={-1}
+                          className={`w-full text-center py-1 rounded text-[10px] font-bold shadow-sm border cursor-pointer ${
+                            status === 'available'
+                              ? 'bg-white text-red-600 border-red-200 hover:bg-red-50'
+                              : 'bg-white text-green-600 border-green-200 hover:bg-green-50'
+                          }`}
+                        >
+                          {status === 'available' ? 'Niet beschikbaar' : 'Beschikbaar'}
                         </div>
                       </div>
-
-                      <div className="flex-1 flex flex-col justify-between">
-                        {selectedDayInfo.status === 'available' && (
-                          <div className="space-y-2">
-                            <Input
-                              placeholder="Reden (optioneel)"
-                              value={blockReason}
-                              onChange={(e) => setBlockReason(e.target.value)}
-                              className="border-2 border-gray-200 rounded-xl h-10 text-sm"
-                            />
-                            <Button
-                              onClick={() => {
-                                if (selectedDate) handleBlockDate(selectedDate, blockReason);
-                              }}
-                              disabled={saving}
-                              className="w-full rounded-xl border-2 border-red-300 text-red-700 bg-white hover:bg-red-50 font-medium h-10 text-sm"
-                              variant="outline"
-                            >
-                              {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Lock className="w-4 h-4 mr-2" />}
-                              Niet beschikbaar zetten
-                            </Button>
-                          </div>
-                        )}
-
-                        {selectedDayInfo.status === 'blocked' && (
-                          <div className="space-y-2">
-                            {selectedDayInfo.blocked?.reason && (
-                              <p className="text-sm text-gray-500">
-                                Reden: <span className="text-gray-700 font-medium">{selectedDayInfo.blocked.reason}</span>
-                              </p>
-                            )}
-                            <Button
-                              onClick={() => {
-                                if (selectedDate) handleUnblockDate(selectedDate);
-                              }}
-                              disabled={saving}
-                              className="w-full rounded-xl border-2 border-green-300 text-green-700 bg-white hover:bg-green-50 font-medium h-10 text-sm"
-                              variant="outline"
-                            >
-                              {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Unlock className="w-4 h-4 mr-2" />}
-                              Beschikbaar maken
-                            </Button>
-                          </div>
-                        )}
-
-                        {(selectedDayInfo.status === 'external_google' || selectedDayInfo.status === 'external_ical') && (
-                          <div className="space-y-1.5">
-                            {selectedDayInfo.external?.title && (
-                              <p className="text-sm text-gray-700">
-                                <span className="text-gray-500">Agendaitem:</span>{' '}
-                                <span className="font-medium">{selectedDayInfo.external.title}</span>
-                              </p>
-                            )}
-                            <p className="text-sm text-gray-500">
-                              Bron:{' '}
-                              <span className={`font-medium ${selectedDayInfo.status === 'external_google' ? 'text-blue-600' : 'text-purple-600'}`}>
-                                {selectedDayInfo.status === 'external_google' ? 'Google Calendar' : 'iCalendar'}
-                              </span>
-                            </p>
-                            <p className="text-xs text-gray-400 mt-2">
-                              Bewerk dit event in je externe agenda om de beschikbaarheid te wijzigen.
-                            </p>
-                          </div>
-                        )}
-
-                        {selectedDayInfo.status === 'booked' && selectedDayInfo.booked && (
-                          <div className="space-y-1.5">
-                            <p className="text-sm text-gray-700">
-                              <span className="text-gray-500">Klant:</span>{' '}
-                              <span className="font-medium">{selectedDayInfo.booked.customerName}</span>
-                            </p>
-                            {selectedDayInfo.booked.eventType && (
-                              <p className="text-sm text-gray-700">
-                                <span className="text-gray-500">Type:</span>{' '}
-                                <span className="font-medium">{selectedDayInfo.booked.eventType}</span>
-                              </p>
-                            )}
-                            <p className="text-xs text-gray-400 mt-2">
-                              Status kan niet gewijzigd worden.
-                            </p>
-                          </div>
-                        )}
-
-                        {selectedDayInfo.status === 'past' && (
-                          <p className="text-sm text-gray-400">
-                            Verlopen datums kunnen niet gewijzigd worden.
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="h-full flex items-center justify-center p-4 rounded-2xl border-2 border-dashed border-gray-200"
-                  >
-                    <p className="text-sm text-gray-400 text-center">
-                      Selecteer een datum om de status te bekijken of te wijzigen.
-                    </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
+
+          <Legend />
         </Card>
       </div>
+
+      {/* ================= MOBILE LAYOUT ================= */}
+      <div className="lg:hidden space-y-4">
+        {/* Calendar card */}
+        <Card className="p-4 border-2 border-gray-100 rounded-3xl bg-white">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <CalendarIcon className="w-5 h-5 text-purple-600" />
+              <h3 className="text-lg font-bold text-gray-900 capitalize">
+                {format(currentMonth, 'MMMM yyyy', { locale: nl })}
+              </h3>
+            </div>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={goToPrevMonth}
+                className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                onClick={goToNextMonth}
+                className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 mb-3">
+            <button
+              onClick={goToToday}
+              className="px-3 py-1.5 rounded-lg text-xs font-medium text-purple-600 border-2 border-purple-100 hover:bg-purple-50"
+            >
+              Vandaag
+            </button>
+            <SyncButton compact />
+          </div>
+
+          {hasExternalIntegration && lastSyncedLabel && (
+            <p className="text-[11px] text-gray-400 mb-2 px-1">
+              Gesynchroniseerd {lastSyncedLabel}
+            </p>
+          )}
+
+          <div className="border border-gray-200 rounded-xl overflow-hidden bg-white">
+            <div className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
+              {MOBILE_WEEKDAY_LABELS.map((label, i) => (
+                <div
+                  key={i}
+                  className="py-1.5 text-center text-[10px] font-bold text-gray-600"
+                >
+                  {label}
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-7">
+              {monthGrid.map((cell, idx) => {
+                const status = getDayStatus(cell.date);
+                const events = getEventsForDay(cell.date);
+                const inMonth = cell.isCurrentMonth;
+                const colEnd = (idx + 1) % 7 === 0;
+                const rowEnd = idx >= monthGrid.length - 7;
+
+                return (
+                  <button
+                    key={cell.date.toISOString()}
+                    type="button"
+                    onClick={() => setSelectedDate(cell.date)}
+                    className={`aspect-square relative p-1 text-[11px] bg-white active:bg-gray-100
+                      ${colEnd ? '' : 'border-r border-gray-200'}
+                      ${rowEnd ? '' : 'border-b border-gray-200'}
+                      ${inMonth ? statusBorderClass(status) : 'border-l-[2px] border-l-transparent opacity-40'}
+                    `}
+                  >
+                    <span
+                      className={`absolute top-1 right-1.5 font-medium ${
+                        inMonth ? 'text-gray-700' : 'text-gray-300'
+                      }`}
+                    >
+                      {format(cell.date, 'd')}
+                    </span>
+                    {inMonth && events.length > 0 && (
+                      <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5">
+                        {events.slice(0, 3).map((event, i) => (
+                          <span
+                            key={i}
+                            className={`w-1.5 h-1.5 rounded-full ${mobileDotClass(event.kind)}`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <Legend />
+        </Card>
+
+        <OccupancyCard />
+        <NextBookingCard />
+        <InsightsCard />
+      </div>
+
+      {/* ================= DAY DETAIL DIALOG (shared) ================= */}
+      <Dialog
+        open={selectedDate !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedDate(null);
+            setBlockReason('');
+          }
+        }}
+      >
+        <DialogContent className="max-w-md">
+          {selectedDate && selectedDayInfo && (
+            <>
+              <DialogTitle className="text-xl font-bold text-gray-900 capitalize pr-8">
+                {format(selectedDate, 'EEEE d MMMM yyyy', { locale: nl })}
+              </DialogTitle>
+              <DialogDescription asChild>
+                <div className="flex items-center gap-2 mt-1">
+                  <div
+                    className={`w-2.5 h-2.5 rounded-full ${
+                      selectedDayInfo.status === 'available'
+                        ? 'bg-green-400'
+                        : selectedDayInfo.status === 'booked'
+                        ? 'bg-amber-400'
+                        : selectedDayInfo.status === 'blocked'
+                        ? 'bg-red-400'
+                        : selectedDayInfo.status === 'external_google'
+                        ? 'bg-blue-400'
+                        : selectedDayInfo.status === 'external_ical'
+                        ? 'bg-purple-400'
+                        : 'bg-gray-300'
+                    }`}
+                  />
+                  <span className="text-sm text-gray-600">
+                    {selectedDayInfo.status === 'available' && 'Beschikbaar'}
+                    {selectedDayInfo.status === 'booked' && 'Geboekt'}
+                    {selectedDayInfo.status === 'blocked' && 'Niet beschikbaar'}
+                    {selectedDayInfo.status === 'external_google' && 'Bezet via Google Calendar'}
+                    {selectedDayInfo.status === 'external_ical' && 'Bezet via iCalendar'}
+                    {selectedDayInfo.status === 'past' && 'Verlopen'}
+                  </span>
+                </div>
+              </DialogDescription>
+
+              {/* Event card inside dialog */}
+              {selectedDayInfo.status === 'booked' && selectedDayInfo.booked && (
+                <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-xl">
+                  <p className="text-sm text-gray-700">
+                    <span className="text-gray-500">Klant:</span>{' '}
+                    <span className="font-semibold">{selectedDayInfo.booked.customerName}</span>
+                  </p>
+                  {selectedDayInfo.booked.eventType && (
+                    <p className="text-sm text-gray-700 mt-1">
+                      <span className="text-gray-500">Type:</span>{' '}
+                      <span className="font-semibold">{selectedDayInfo.booked.eventType}</span>
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-500 mt-2">
+                    Geboekte datums kunnen niet handmatig gewijzigd worden.
+                  </p>
+                </div>
+              )}
+
+              {(selectedDayInfo.status === 'external_google' ||
+                selectedDayInfo.status === 'external_ical') &&
+                selectedDayInfo.external && (
+                  <div
+                    className={`${
+                      selectedDayInfo.status === 'external_google'
+                        ? 'bg-blue-50 border-blue-400'
+                        : 'bg-purple-50 border-purple-400'
+                    } border-l-4 p-4 rounded-xl`}
+                  >
+                    {selectedDayInfo.external.title && (
+                      <p className="text-sm text-gray-700">
+                        <span className="text-gray-500">Agendaitem:</span>{' '}
+                        <span className="font-semibold">{selectedDayInfo.external.title}</span>
+                      </p>
+                    )}
+                    <p className="text-sm text-gray-700 mt-1">
+                      <span className="text-gray-500">Bron:</span>{' '}
+                      <span
+                        className={`font-semibold ${
+                          selectedDayInfo.status === 'external_google'
+                            ? 'text-blue-700'
+                            : 'text-purple-700'
+                        }`}
+                      >
+                        {selectedDayInfo.status === 'external_google'
+                          ? 'Google Calendar'
+                          : 'iCalendar'}
+                      </span>
+                    </p>
+                    <p className="text-xs text-gray-500 mt-2">
+                      Bewerk dit event in je externe agenda om de beschikbaarheid te wijzigen.
+                    </p>
+                  </div>
+                )}
+
+              {selectedDayInfo.status === 'blocked' && selectedDayInfo.blocked?.reason && (
+                <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-xl">
+                  <p className="text-sm text-gray-700">
+                    <span className="text-gray-500">Reden:</span>{' '}
+                    <span className="font-semibold">{selectedDayInfo.blocked.reason}</span>
+                  </p>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="space-y-2">
+                {selectedDayInfo.status === 'available' && (
+                  <>
+                    <Input
+                      placeholder="Reden (optioneel)"
+                      value={blockReason}
+                      onChange={(e) => setBlockReason(e.target.value)}
+                      className="border-2 border-gray-200 rounded-xl h-11 text-sm"
+                    />
+                    <Button
+                      onClick={() => handleBlockDate(selectedDate, blockReason)}
+                      disabled={saving}
+                      className="w-full rounded-xl border-2 border-red-300 text-red-700 bg-white hover:bg-red-50 font-semibold h-11"
+                      variant="outline"
+                    >
+                      {saving ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <Lock className="w-4 h-4 mr-2" />
+                      )}
+                      Niet beschikbaar zetten
+                    </Button>
+                  </>
+                )}
+
+                {selectedDayInfo.status === 'blocked' && (
+                  <Button
+                    onClick={() => handleUnblockDate(selectedDate)}
+                    disabled={saving}
+                    className="w-full rounded-xl border-2 border-green-300 text-green-700 bg-white hover:bg-green-50 font-semibold h-11"
+                    variant="outline"
+                  >
+                    {saving ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Unlock className="w-4 h-4 mr-2" />
+                    )}
+                    Beschikbaar maken
+                  </Button>
+                )}
+
+                {selectedDayInfo.status === 'past' && (
+                  <p className="text-sm text-gray-400 text-center py-2">
+                    Verlopen datums kunnen niet gewijzigd worden.
+                  </p>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

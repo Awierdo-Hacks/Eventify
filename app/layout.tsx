@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Navigation } from "@/components/layout";
 import { SessionProvider } from "@/components/providers/SessionProvider";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://eventiphy.be"),
@@ -107,6 +108,7 @@ export default function RootLayout({
           <Navigation />
           {children}
         </SessionProvider>
+        <SpeedInsights />
       </body>
     </html>
   );

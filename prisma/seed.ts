@@ -1,8 +1,9 @@
 import { PrismaClient, UserRole, PriceRange, ServiceRequestStatus, BookingStatus, EventType, EventStatus, SlotStatus, ProviderCategory } from '@/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import bcrypt from 'bcryptjs';
+import { getDatabaseUrl } from "@/lib/database-url";
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+const adapter = new PrismaPg({ connectionString: getDatabaseUrl() });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {

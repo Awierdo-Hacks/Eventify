@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -66,11 +65,7 @@ export function EventCard({ event, onClick, onOpenEvent, index = 0 }: EventCardP
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.1 }}
-    >
+    <div>
       <Card
         className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-lg transition-all cursor-pointer group"
         onClick={() => {
@@ -120,11 +115,9 @@ export function EventCard({ event, onClick, onOpenEvent, index = 0 }: EventCardP
             </span>
           </div>
           <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-            <motion.div
+            <div
               className="h-full bg-gradient-to-r from-purple-500 to-amber-500 rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.5, delay: index * 0.1 + 0.2 }}
+              style={{ width: `${progress}%` }}
             />
           </div>
         </div>
@@ -171,6 +164,6 @@ export function EventCard({ event, onClick, onOpenEvent, index = 0 }: EventCardP
           </Button>
         </div>
       </Card>
-    </motion.div>
+    </div>
   );
 }
