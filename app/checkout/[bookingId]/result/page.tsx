@@ -26,21 +26,20 @@ export default function PaymentResultPage() {
           return
         }
         const data = await res.json()
-        const ps: string = data.paymentStatus ?? data.latestPayment?.status ?? ''
+        const ps: string = data.latestPayment?.status ?? data.paymentStatus ?? ''
 
-        if (ps === 'PAID') {
+        if (ps === 'UNPAID' || ps === 'PENDING' || ps === 'OPEN' || ps === 'open') {
+          // nog in behandeling, blijf pollen
+        } else if (ps === 'PAID') {
           setStatus('paid')
           return
-        }
-        if (ps === 'FAILED') {
+        } else if (ps === 'FAILED') {
           setStatus('failed')
           return
-        }
-        if (ps === 'CANCELLED') {
+        } else if (ps === 'CANCELLED') {
           setStatus('cancelled')
           return
-        }
-        if (ps === 'EXPIRED') {
+        } else if (ps === 'EXPIRED') {
           setStatus('expired')
           return
         }
