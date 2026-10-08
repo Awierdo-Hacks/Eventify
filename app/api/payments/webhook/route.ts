@@ -91,11 +91,14 @@ export async function POST(request: Request) {
       })
     })
 
-    // Mollie verwacht altijd een 200, anders herprobeert het
+    // Succesvol verwerkt (of bewust genegeerd in bovenstaande early returns):
+    // bevestig ontvangst zodat Mollie niet onnodig herprobeert.
     return new NextResponse(null, { status: 200 })
   } catch (error) {
     console.error('[payments/webhook] error:', error)
-    // Toch 200 teruggeven zodat Mollie niet blijft herprobeeren bij interne fouten
-    return new NextResponse(null, { status: 200 })
+    // Geef bij onverwachte interne fouten een non-2xx terug zodat Mollie
+    // de webhook opnieuw probeert. De database-updates hierboven blijven
+    // atomair door de transactie.
+    return new NextResponse(null, { status: 500 })
   }
 }
