@@ -37,6 +37,7 @@ import {
   eachDayOfInterval,
   isWeekend,
   parse,
+  formatDistanceToNow,
 } from 'date-fns';
 import { nl } from 'date-fns/locale';
 
@@ -54,6 +55,12 @@ interface BookedDate {
   eventType: string | null;
 }
 
+interface ExternalEvent {
+  date: string;
+  title: string | null;
+  source: 'GOOGLE' | 'ICAL' | string;
+}
+
 interface NextBooking {
   date: string;
   customerName: string;
@@ -65,12 +72,19 @@ interface BusiestMonth {
   count: number;
 }
 
-type DayStatus = 'available' | 'blocked' | 'booked' | 'past';
+interface SyncStatus {
+  google: { connected: boolean; lastSynced?: string | null; error?: string | null };
+  ical: { connected: boolean; lastSynced?: string | null; error?: string | null };
+}
+
+type DayStatus = 'available' | 'blocked' | 'booked' | 'external_google' | 'external_ical' | 'past';
 
 export default function AgendaCalendar() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [blockedDates, setBlockedDates] = useState<BlockedDate[]>([]);
   const [bookedDates, setBookedDates] = useState<BookedDate[]>([]);
+  const [externalEvents, setExternalEvents] = useState<ExternalEvent[]>([]);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null);
   const [nextBooking, setNextBooking] = useState<NextBooking | null>(null);
   const [busiestMonth, setBusiestMonth] = useState<BusiestMonth | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -78,7 +92,22 @@ export default function AgendaCalendar() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const showNotification = (type: 'success' | 'error', message: string) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification(null), 4000);
+  };
+
+  const fetchSyncStatus = useCallback(async () => {
+    try {
+      const res = await fetch('/api/calendar/status');
+      if (res.ok) setSyncStatus(await res.json());
+    } catch {
+      // Non-critical
+    }
+  }, []);
 
   const fetchData = useCallback(async (month: Date) => {
     setLoadError(null);
@@ -92,13 +121,13 @@ export default function AgendaCalendar() {
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => null);
-        const msg = errorData?.error || `Server fout (${res.status})`;
-        throw new Error(msg);
+        throw new Error(errorData?.error || `Server fout (${res.status})`);
       }
 
       const data = await res.json();
       setBlockedDates(data.blockedDates || []);
       setBookedDates(data.bookedDates || []);
+      setExternalEvents(data.externalEvents || []);
       setNextBooking(data.nextBooking || null);
       setBusiestMonth(data.busiestMonth || null);
     } catch (err) {
@@ -111,13 +140,47 @@ export default function AgendaCalendar() {
     }
   }, []);
 
+  // On mount: fetch status, trigger background sync, then load calendar data
   useEffect(() => {
-    fetchData(currentMonth);
-  }, [currentMonth, fetchData]);
+    fetchSyncStatus();
+    // Trigger auto-sync (respects cooldown server-side)
+    fetch('/api/calendar/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ force: false }),
+    }).then(() => {
+      fetchData(currentMonth);
+      fetchSyncStatus();
+    }).catch(() => fetchData(currentMonth));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const showNotification = (type: 'success' | 'error', message: string) => {
-    setNotification({ type, message });
-    setTimeout(() => setNotification(null), 4000);
+  useEffect(() => {
+    if (!loading) fetchData(currentMonth);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentMonth]);
+
+  const handleManualSync = async () => {
+    setSyncing(true);
+    try {
+      const res = await fetch('/api/calendar/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ force: true }),
+      });
+      const data = await res.json();
+      if (data.synced > 0) {
+        showNotification('success', `${data.synced} agenda${data.synced > 1 ? "'s" : ''} gesynchroniseerd`);
+        await fetchData(currentMonth);
+        await fetchSyncStatus();
+      } else {
+        showNotification('success', 'Agenda is up-to-date');
+      }
+    } catch {
+      showNotification('error', 'Sync mislukt');
+    } finally {
+      setSyncing(false);
+    }
   };
 
   const blockedDateObjects = useMemo(
@@ -128,15 +191,25 @@ export default function AgendaCalendar() {
     () => bookedDates.map((d) => new Date(d.date + 'T00:00:00')),
     [bookedDates]
   );
+  const googleDateObjects = useMemo(
+    () => externalEvents.filter((e) => e.source === 'GOOGLE').map((e) => new Date(e.date + 'T00:00:00')),
+    [externalEvents]
+  );
+  const icalDateObjects = useMemo(
+    () => externalEvents.filter((e) => e.source === 'ICAL').map((e) => new Date(e.date + 'T00:00:00')),
+    [externalEvents]
+  );
 
   const getDayStatus = useCallback(
     (date: Date): DayStatus => {
       if (isBefore(date, startOfDay(new Date()))) return 'past';
       if (bookedDateObjects.some((bd) => isSameDay(bd, date))) return 'booked';
       if (blockedDateObjects.some((bd) => isSameDay(bd, date))) return 'blocked';
+      if (googleDateObjects.some((bd) => isSameDay(bd, date))) return 'external_google';
+      if (icalDateObjects.some((bd) => isSameDay(bd, date))) return 'external_ical';
       return 'available';
     },
-    [blockedDateObjects, bookedDateObjects]
+    [blockedDateObjects, bookedDateObjects, googleDateObjects, icalDateObjects]
   );
 
   const selectedDayInfo = useMemo(() => {
@@ -145,8 +218,9 @@ export default function AgendaCalendar() {
     const dateStr = format(selectedDate, 'yyyy-MM-dd');
     const blocked = blockedDates.find((d) => d.date === dateStr);
     const booked = bookedDates.find((d) => d.date === dateStr);
-    return { status, blocked, booked };
-  }, [selectedDate, getDayStatus, blockedDates, bookedDates]);
+    const external = externalEvents.find((e) => e.date === dateStr);
+    return { status, blocked, booked, external };
+  }, [selectedDate, getDayStatus, blockedDates, bookedDates, externalEvents]);
 
   // === Maand statistieken ===
   const monthStats = useMemo(() => {
@@ -166,29 +240,40 @@ export default function AgendaCalendar() {
       blockedDateObjects.some((bd) => isSameDay(bd, d))
     ).length;
 
-    const unavailableCount = bookedCount + blockedCount;
+    const googleCount = allDays.filter((d) =>
+      googleDateObjects.some((bd) => isSameDay(bd, d))
+    ).length;
+
+    const icalCount = allDays.filter((d) =>
+      icalDateObjects.some((bd) => isSameDay(bd, d))
+    ).length;
+
+    const unavailableCount = new Set([
+      ...bookedDates.map((d) => d.date),
+      ...blockedDates.map((d) => d.date),
+      ...externalEvents.map((e) => e.date),
+    ]).size;
+
     const availableCount = Math.max(0, totalDays - unavailableCount);
 
     const occupancyRate = totalWorkDays > 0
       ? Math.round((bookedCount / totalWorkDays) * 100)
       : 0;
 
-    const freeDays = allDays.filter(
-      (d) =>
-        !bookedDateObjects.some((bd) => isSameDay(bd, d)) &&
-        !blockedDateObjects.some((bd) => isSameDay(bd, d))
-    ).length;
+    const freeDays = availableCount;
 
     return {
       totalDays,
       totalWorkDays,
       bookedCount,
       blockedCount,
+      googleCount,
+      icalCount,
       availableCount,
       occupancyRate,
       freeDays,
     };
-  }, [currentMonth, blockedDateObjects, bookedDateObjects]);
+  }, [currentMonth, blockedDateObjects, bookedDateObjects, googleDateObjects, icalDateObjects, blockedDates, bookedDates, externalEvents]);
 
   // === Acties ===
   const handleBlockDate = async (date: Date, reason?: string) => {
@@ -245,18 +330,22 @@ export default function AgendaCalendar() {
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(currentMonth);
     const today = startOfDay(new Date());
+    const allExternalDates = [...googleDateObjects, ...icalDateObjects];
 
     return {
       blocked: blockedDateObjects,
       booked: bookedDateObjects,
+      external_google: googleDateObjects,
+      external_ical: icalDateObjects,
       available: eachDayOfInterval({ start: monthStart, end: monthEnd }).filter(
         (d) =>
           !isBefore(d, today) &&
           !blockedDateObjects.some((bd) => isSameDay(bd, d)) &&
-          !bookedDateObjects.some((bd) => isSameDay(bd, d))
+          !bookedDateObjects.some((bd) => isSameDay(bd, d)) &&
+          !allExternalDates.some((bd) => isSameDay(bd, d))
       ),
     };
-  }, [currentMonth, blockedDateObjects, bookedDateObjects]);
+  }, [currentMonth, blockedDateObjects, bookedDateObjects, googleDateObjects, icalDateObjects]);
 
   // Navigatie
   const goToPrevMonth = () => setCurrentMonth((m) => subMonths(m, 1));
@@ -275,6 +364,23 @@ export default function AgendaCalendar() {
       return null;
     }
   }, [busiestMonth]);
+
+  // Last sync label
+  const lastSyncedLabel = useMemo(() => {
+    const dates = [syncStatus?.google?.lastSynced, syncStatus?.ical?.lastSynced]
+      .filter(Boolean)
+      .map((d) => new Date(d!));
+    if (dates.length === 0) return null;
+    const latest = dates.reduce((a, b) => (a > b ? a : b));
+    try {
+      return formatDistanceToNow(latest, { addSuffix: true, locale: nl });
+    } catch {
+      return null;
+    }
+  }, [syncStatus]);
+
+  const hasExternalIntegration = syncStatus &&
+    (syncStatus.google?.connected || syncStatus.ical?.connected);
 
   if (loading) {
     return (
@@ -378,10 +484,28 @@ export default function AgendaCalendar() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-red-400" />
-                  <span className="text-sm text-gray-600">Niet beschikbaar</span>
+                  <span className="text-sm text-gray-600">Manueel geblokkeerd</span>
                 </div>
                 <span className="text-sm font-semibold text-gray-900">{monthStats.blockedCount}</span>
               </div>
+              {monthStats.googleCount > 0 && (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-blue-400" />
+                    <span className="text-sm text-gray-600">Google Calendar</span>
+                  </div>
+                  <span className="text-sm font-semibold text-gray-900">{monthStats.googleCount}</span>
+                </div>
+              )}
+              {monthStats.icalCount > 0 && (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-purple-400" />
+                    <span className="text-sm text-gray-600">iCalendar</span>
+                  </div>
+                  <span className="text-sm font-semibold text-gray-900">{monthStats.icalCount}</span>
+                </div>
+              )}
             </div>
 
             <div className="mt-4 h-3 bg-gray-100 rounded-full overflow-hidden flex">
@@ -394,6 +518,14 @@ export default function AgendaCalendar() {
                   <div
                     className="h-full bg-red-400 transition-all duration-500"
                     style={{ width: `${(monthStats.blockedCount / monthStats.totalDays) * 100}%` }}
+                  />
+                  <div
+                    className="h-full bg-blue-400 transition-all duration-500"
+                    style={{ width: `${(monthStats.googleCount / monthStats.totalDays) * 100}%` }}
+                  />
+                  <div
+                    className="h-full bg-purple-400 transition-all duration-500"
+                    style={{ width: `${(monthStats.icalCount / monthStats.totalDays) * 100}%` }}
                   />
                   <div
                     className="h-full bg-green-200 transition-all duration-500"
@@ -455,7 +587,7 @@ export default function AgendaCalendar() {
         {/* === AGENDA CARD === */}
         <Card className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl lg:col-span-2">
           {/* Header met navigatie */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
               <CalendarIcon className="w-6 h-6 text-purple-600" />
               <h3 className="text-xl font-bold text-gray-900">Agenda</h3>
@@ -498,6 +630,23 @@ export default function AgendaCalendar() {
             </div>
           </div>
 
+          {/* Sync-banner (only if integrations exist) */}
+          {hasExternalIntegration && (
+            <div className="flex items-center justify-between mb-3 px-1">
+              <span className="text-xs text-gray-400">
+                {lastSyncedLabel ? `Gesynchroniseerd ${lastSyncedLabel}` : 'Nog niet gesynchroniseerd'}
+              </span>
+              <button
+                onClick={handleManualSync}
+                disabled={syncing}
+                className="flex items-center gap-1.5 text-xs text-purple-600 hover:text-purple-700 font-medium disabled:opacity-50"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
+                {syncing ? 'Bezig...' : 'Sync nu'}
+              </button>
+            </div>
+          )}
+
           {/* Kalender + dag detail naast elkaar */}
           <div className="flex flex-col lg:flex-row gap-5">
             {/* Kalender */}
@@ -512,6 +661,8 @@ export default function AgendaCalendar() {
                 modifiersClassNames={{
                   blocked: '!bg-red-100 !text-red-600 !font-semibold hover:!bg-red-200',
                   booked: '!bg-amber-100 !text-amber-700 !font-semibold hover:!bg-amber-200',
+                  external_google: '!bg-blue-100 !text-blue-700 !font-semibold hover:!bg-blue-200',
+                  external_ical: '!bg-purple-100 !text-purple-700 !font-semibold hover:!bg-purple-200',
                   available: '!bg-green-50 hover:!bg-green-100',
                 }}
               />
@@ -528,8 +679,20 @@ export default function AgendaCalendar() {
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-red-100 border border-red-300" />
-                  <span className="text-gray-500">Niet beschikbaar</span>
+                  <span className="text-gray-500">Geblokkeerd</span>
                 </div>
+                {(syncStatus?.google?.connected || monthStats.googleCount > 0) && (
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-blue-100 border border-blue-300" />
+                    <span className="text-gray-500">Google Calendar</span>
+                  </div>
+                )}
+                {(syncStatus?.ical?.connected || monthStats.icalCount > 0) && (
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-purple-100 border border-purple-300" />
+                    <span className="text-gray-500">iCalendar</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -562,13 +725,19 @@ export default function AgendaCalendar() {
                                 ? 'bg-amber-400'
                                 : selectedDayInfo.status === 'blocked'
                                 ? 'bg-red-400'
+                                : selectedDayInfo.status === 'external_google'
+                                ? 'bg-blue-400'
+                                : selectedDayInfo.status === 'external_ical'
+                                ? 'bg-purple-400'
                                 : 'bg-gray-300'
                             }`}
                           />
                           <span className="text-sm text-gray-500">
                             {selectedDayInfo.status === 'available' && 'Beschikbaar'}
                             {selectedDayInfo.status === 'booked' && 'Geboekt'}
-                            {selectedDayInfo.status === 'blocked' && 'Niet beschikbaar'}
+                            {selectedDayInfo.status === 'blocked' && 'Niet beschikbaar (manueel)'}
+                            {selectedDayInfo.status === 'external_google' && 'Bezet via Google Calendar'}
+                            {selectedDayInfo.status === 'external_ical' && 'Bezet via iCalendar'}
                             {selectedDayInfo.status === 'past' && 'Verlopen'}
                           </span>
                         </div>
@@ -615,6 +784,26 @@ export default function AgendaCalendar() {
                               {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Unlock className="w-4 h-4 mr-2" />}
                               Beschikbaar maken
                             </Button>
+                          </div>
+                        )}
+
+                        {(selectedDayInfo.status === 'external_google' || selectedDayInfo.status === 'external_ical') && (
+                          <div className="space-y-1.5">
+                            {selectedDayInfo.external?.title && (
+                              <p className="text-sm text-gray-700">
+                                <span className="text-gray-500">Agendaitem:</span>{' '}
+                                <span className="font-medium">{selectedDayInfo.external.title}</span>
+                              </p>
+                            )}
+                            <p className="text-sm text-gray-500">
+                              Bron:{' '}
+                              <span className={`font-medium ${selectedDayInfo.status === 'external_google' ? 'text-blue-600' : 'text-purple-600'}`}>
+                                {selectedDayInfo.status === 'external_google' ? 'Google Calendar' : 'iCalendar'}
+                              </span>
+                            </p>
+                            <p className="text-xs text-gray-400 mt-2">
+                              Bewerk dit event in je externe agenda om de beschikbaarheid te wijzigen.
+                            </p>
                           </div>
                         )}
 

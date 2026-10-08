@@ -7,9 +7,17 @@ import { Badge } from '@/components/ui/badge';
 import { Mail, Phone, MapPin, Instagram, Target, Users, Sparkles, Shield, FileText } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Over Ons - Eventiphy',
+  title: 'Over Ons',
   description:
-    'Ontdek de missie van Eventiphy en neem contact op met ons team voor jouw volgende evenement.',
+    'Ontdek de missie van Eventiphy en neem contact op met ons team. Plan slimmer, vier groter — wij verbinden klanten en dienstverleners voor elk event.',
+  openGraph: {
+    title: 'Over Ons | Eventiphy',
+    description: 'Ontdek de missie van Eventiphy en neem contact op met ons team voor jouw volgende evenement.',
+    url: 'https://eventiphy.be/about',
+  },
+  alternates: {
+    canonical: 'https://eventiphy.be/about',
+  },
 };
 
 const teamMembers = [

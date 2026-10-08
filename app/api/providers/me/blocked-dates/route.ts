@@ -121,6 +121,39 @@ export async function GET(request: NextRequest) {
     console.error('Busiest month query error:', error);
   }
 
+  // Externe kalender events ophalen
+  let externalEvents: { date: string; title: string | null; source: string }[] = [];
+  try {
+    const integrations = await prisma.calendarIntegration.findMany({
+      where: { provider_id: providerId, is_active: true },
+      select: { id: true, type: true },
+    });
+
+    if (integrations.length > 0) {
+      const integrationIds = integrations.map((i) => i.id);
+      const typeMap = Object.fromEntries(integrations.map((i: { id: string; type: string }) => [i.id, i.type]));
+
+      const rawExternal = await prisma.externalCalendarEvent.findMany({
+        where: {
+          integration_id: { in: integrationIds },
+          ...(hasDateFilter ? { start_date: dateFilter } : {}),
+        },
+        select: { start_date: true, title: true, integration_id: true },
+        orderBy: { start_date: 'asc' },
+      });
+
+      externalEvents = rawExternal.map((e: { start_date: Date; title: string | null; integration_id: string }) => ({
+        date: e.start_date instanceof Date
+          ? e.start_date.toISOString().split('T')[0]
+          : String(e.start_date).split('T')[0],
+        title: e.title,
+        source: typeMap[e.integration_id] ?? 'EXTERNAL',
+      }));
+    }
+  } catch (error) {
+    console.error('External events query error:', error);
+  }
+
   return NextResponse.json({
     blockedDates: blockedDates.map((d) => ({
       id: d.id,
@@ -134,6 +167,7 @@ export async function GET(request: NextRequest) {
       customerName: b.customer?.name ?? 'Onbekend',
       eventType: b.request?.event_type ?? null,
     })),
+    externalEvents,
     nextBooking,
     busiestMonth,
   });

@@ -31,7 +31,7 @@ export async function GET(
 
     const dateWhere = Object.keys(dateFilter).length > 0 ? dateFilter : undefined;
 
-    const [blockedDates, bookings] = await Promise.all([
+    const [blockedDates, bookings, externalEvents] = await Promise.all([
       prisma.blockedDate.findMany({
         where: {
           provider_id: providerId,
@@ -47,15 +47,25 @@ export async function GET(
         },
         select: { event_date: true },
       }),
+      prisma.externalCalendarEvent.findMany({
+        where: {
+          integration: { provider_id: providerId, is_active: true },
+          ...(dateWhere ? { start_date: dateWhere } : {}),
+        },
+        select: { start_date: true },
+      }),
     ]);
 
-    // Combineer geblokkeerde datums en boekingdatums in één lijst
+    // Combineer alle bronnen in één lijst
     const unavailableSet = new Set<string>();
     for (const d of blockedDates) {
       unavailableSet.add(d.date.toISOString().split('T')[0]);
     }
     for (const b of bookings) {
       unavailableSet.add(b.event_date.toISOString().split('T')[0]);
+    }
+    for (const e of externalEvents) {
+      unavailableSet.add(e.start_date.toISOString().split('T')[0]);
     }
 
     const res = NextResponse.json({

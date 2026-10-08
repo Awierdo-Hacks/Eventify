@@ -19,6 +19,8 @@ async function main() {
   await prisma.event.deleteMany();
   await prisma.quote.deleteMany();
   await prisma.serviceRequest.deleteMany();
+  await prisma.waitlistEntry.deleteMany();
+  await prisma.blockedDate.deleteMany();
   await prisma.providerService.deleteMany();
   await prisma.serviceProvider.deleteMany();
   await prisma.user.deleteMany();
