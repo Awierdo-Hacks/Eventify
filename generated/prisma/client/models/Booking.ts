@@ -46,7 +46,9 @@ export type BookingMinAggregateOutputType = {
   guest_count: number | null
   final_price: number | null
   status: $Enums.BookingStatus | null
-  payment_status: string | null
+  payment_status: $Enums.PaymentStatus | null
+  agreement_accepted_at: Date | null
+  agreement_ip: string | null
   special_requests: string | null
   created_at: Date | null
   updated_at: Date | null
@@ -62,7 +64,9 @@ export type BookingMaxAggregateOutputType = {
   guest_count: number | null
   final_price: number | null
   status: $Enums.BookingStatus | null
-  payment_status: string | null
+  payment_status: $Enums.PaymentStatus | null
+  agreement_accepted_at: Date | null
+  agreement_ip: string | null
   special_requests: string | null
   created_at: Date | null
   updated_at: Date | null
@@ -79,6 +83,8 @@ export type BookingCountAggregateOutputType = {
   final_price: number
   status: number
   payment_status: number
+  agreement_accepted_at: number
+  agreement_ip: number
   special_requests: number
   created_at: number
   updated_at: number
@@ -107,6 +113,8 @@ export type BookingMinAggregateInputType = {
   final_price?: true
   status?: true
   payment_status?: true
+  agreement_accepted_at?: true
+  agreement_ip?: true
   special_requests?: true
   created_at?: true
   updated_at?: true
@@ -123,6 +131,8 @@ export type BookingMaxAggregateInputType = {
   final_price?: true
   status?: true
   payment_status?: true
+  agreement_accepted_at?: true
+  agreement_ip?: true
   special_requests?: true
   created_at?: true
   updated_at?: true
@@ -139,6 +149,8 @@ export type BookingCountAggregateInputType = {
   final_price?: true
   status?: true
   payment_status?: true
+  agreement_accepted_at?: true
+  agreement_ip?: true
   special_requests?: true
   created_at?: true
   updated_at?: true
@@ -241,7 +253,9 @@ export type BookingGroupByOutputType = {
   guest_count: number
   final_price: number
   status: $Enums.BookingStatus
-  payment_status: string | null
+  payment_status: $Enums.PaymentStatus
+  agreement_accepted_at: Date | null
+  agreement_ip: string | null
   special_requests: string | null
   created_at: Date
   updated_at: Date
@@ -280,13 +294,16 @@ export type BookingWhereInput = {
   guest_count?: Prisma.IntFilter<"Booking"> | number
   final_price?: Prisma.FloatFilter<"Booking"> | number
   status?: Prisma.EnumBookingStatusFilter<"Booking"> | $Enums.BookingStatus
-  payment_status?: Prisma.StringNullableFilter<"Booking"> | string | null
+  payment_status?: Prisma.EnumPaymentStatusFilter<"Booking"> | $Enums.PaymentStatus
+  agreement_accepted_at?: Prisma.DateTimeNullableFilter<"Booking"> | Date | string | null
+  agreement_ip?: Prisma.StringNullableFilter<"Booking"> | string | null
   special_requests?: Prisma.StringNullableFilter<"Booking"> | string | null
   created_at?: Prisma.DateTimeFilter<"Booking"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Booking"> | Date | string
   request?: Prisma.XOR<Prisma.ServiceRequestScalarRelationFilter, Prisma.ServiceRequestWhereInput>
   customer?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   provider?: Prisma.XOR<Prisma.ServiceProviderScalarRelationFilter, Prisma.ServiceProviderWhereInput>
+  payments?: Prisma.PaymentListRelationFilter
 }
 
 export type BookingOrderByWithRelationInput = {
@@ -299,13 +316,16 @@ export type BookingOrderByWithRelationInput = {
   guest_count?: Prisma.SortOrder
   final_price?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  payment_status?: Prisma.SortOrderInput | Prisma.SortOrder
+  payment_status?: Prisma.SortOrder
+  agreement_accepted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  agreement_ip?: Prisma.SortOrderInput | Prisma.SortOrder
   special_requests?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   request?: Prisma.ServiceRequestOrderByWithRelationInput
   customer?: Prisma.UserOrderByWithRelationInput
   provider?: Prisma.ServiceProviderOrderByWithRelationInput
+  payments?: Prisma.PaymentOrderByRelationAggregateInput
 }
 
 export type BookingWhereUniqueInput = Prisma.AtLeast<{
@@ -321,13 +341,16 @@ export type BookingWhereUniqueInput = Prisma.AtLeast<{
   guest_count?: Prisma.IntFilter<"Booking"> | number
   final_price?: Prisma.FloatFilter<"Booking"> | number
   status?: Prisma.EnumBookingStatusFilter<"Booking"> | $Enums.BookingStatus
-  payment_status?: Prisma.StringNullableFilter<"Booking"> | string | null
+  payment_status?: Prisma.EnumPaymentStatusFilter<"Booking"> | $Enums.PaymentStatus
+  agreement_accepted_at?: Prisma.DateTimeNullableFilter<"Booking"> | Date | string | null
+  agreement_ip?: Prisma.StringNullableFilter<"Booking"> | string | null
   special_requests?: Prisma.StringNullableFilter<"Booking"> | string | null
   created_at?: Prisma.DateTimeFilter<"Booking"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Booking"> | Date | string
   request?: Prisma.XOR<Prisma.ServiceRequestScalarRelationFilter, Prisma.ServiceRequestWhereInput>
   customer?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   provider?: Prisma.XOR<Prisma.ServiceProviderScalarRelationFilter, Prisma.ServiceProviderWhereInput>
+  payments?: Prisma.PaymentListRelationFilter
 }, "id" | "request_id">
 
 export type BookingOrderByWithAggregationInput = {
@@ -340,7 +363,9 @@ export type BookingOrderByWithAggregationInput = {
   guest_count?: Prisma.SortOrder
   final_price?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  payment_status?: Prisma.SortOrderInput | Prisma.SortOrder
+  payment_status?: Prisma.SortOrder
+  agreement_accepted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  agreement_ip?: Prisma.SortOrderInput | Prisma.SortOrder
   special_requests?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -364,7 +389,9 @@ export type BookingScalarWhereWithAggregatesInput = {
   guest_count?: Prisma.IntWithAggregatesFilter<"Booking"> | number
   final_price?: Prisma.FloatWithAggregatesFilter<"Booking"> | number
   status?: Prisma.EnumBookingStatusWithAggregatesFilter<"Booking"> | $Enums.BookingStatus
-  payment_status?: Prisma.StringNullableWithAggregatesFilter<"Booking"> | string | null
+  payment_status?: Prisma.EnumPaymentStatusWithAggregatesFilter<"Booking"> | $Enums.PaymentStatus
+  agreement_accepted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"Booking"> | Date | string | null
+  agreement_ip?: Prisma.StringNullableWithAggregatesFilter<"Booking"> | string | null
   special_requests?: Prisma.StringNullableWithAggregatesFilter<"Booking"> | string | null
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Booking"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"Booking"> | Date | string
@@ -377,13 +404,16 @@ export type BookingCreateInput = {
   guest_count: number
   final_price: number
   status?: $Enums.BookingStatus
-  payment_status?: string | null
+  payment_status?: $Enums.PaymentStatus
+  agreement_accepted_at?: Date | string | null
+  agreement_ip?: string | null
   special_requests?: string | null
   created_at?: Date | string
   updated_at?: Date | string
   request: Prisma.ServiceRequestCreateNestedOneWithoutBookingInput
   customer: Prisma.UserCreateNestedOneWithoutBookingsInput
   provider: Prisma.ServiceProviderCreateNestedOneWithoutBookingsInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutBookingInput
 }
 
 export type BookingUncheckedCreateInput = {
@@ -396,10 +426,13 @@ export type BookingUncheckedCreateInput = {
   guest_count: number
   final_price: number
   status?: $Enums.BookingStatus
-  payment_status?: string | null
+  payment_status?: $Enums.PaymentStatus
+  agreement_accepted_at?: Date | string | null
+  agreement_ip?: string | null
   special_requests?: string | null
   created_at?: Date | string
   updated_at?: Date | string
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutBookingInput
 }
 
 export type BookingUpdateInput = {
@@ -409,13 +442,16 @@ export type BookingUpdateInput = {
   guest_count?: Prisma.IntFieldUpdateOperationsInput | number
   final_price?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
-  payment_status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  agreement_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  agreement_ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   special_requests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   request?: Prisma.ServiceRequestUpdateOneRequiredWithoutBookingNestedInput
   customer?: Prisma.UserUpdateOneRequiredWithoutBookingsNestedInput
   provider?: Prisma.ServiceProviderUpdateOneRequiredWithoutBookingsNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutBookingNestedInput
 }
 
 export type BookingUncheckedUpdateInput = {
@@ -428,10 +464,13 @@ export type BookingUncheckedUpdateInput = {
   guest_count?: Prisma.IntFieldUpdateOperationsInput | number
   final_price?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
-  payment_status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  agreement_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  agreement_ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   special_requests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutBookingNestedInput
 }
 
 export type BookingCreateManyInput = {
@@ -444,7 +483,9 @@ export type BookingCreateManyInput = {
   guest_count: number
   final_price: number
   status?: $Enums.BookingStatus
-  payment_status?: string | null
+  payment_status?: $Enums.PaymentStatus
+  agreement_accepted_at?: Date | string | null
+  agreement_ip?: string | null
   special_requests?: string | null
   created_at?: Date | string
   updated_at?: Date | string
@@ -457,7 +498,9 @@ export type BookingUpdateManyMutationInput = {
   guest_count?: Prisma.IntFieldUpdateOperationsInput | number
   final_price?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
-  payment_status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  agreement_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  agreement_ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   special_requests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -473,7 +516,9 @@ export type BookingUncheckedUpdateManyInput = {
   guest_count?: Prisma.IntFieldUpdateOperationsInput | number
   final_price?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
-  payment_status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  agreement_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  agreement_ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   special_requests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -505,6 +550,8 @@ export type BookingCountOrderByAggregateInput = {
   final_price?: Prisma.SortOrder
   status?: Prisma.SortOrder
   payment_status?: Prisma.SortOrder
+  agreement_accepted_at?: Prisma.SortOrder
+  agreement_ip?: Prisma.SortOrder
   special_requests?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -526,6 +573,8 @@ export type BookingMaxOrderByAggregateInput = {
   final_price?: Prisma.SortOrder
   status?: Prisma.SortOrder
   payment_status?: Prisma.SortOrder
+  agreement_accepted_at?: Prisma.SortOrder
+  agreement_ip?: Prisma.SortOrder
   special_requests?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -542,6 +591,8 @@ export type BookingMinOrderByAggregateInput = {
   final_price?: Prisma.SortOrder
   status?: Prisma.SortOrder
   payment_status?: Prisma.SortOrder
+  agreement_accepted_at?: Prisma.SortOrder
+  agreement_ip?: Prisma.SortOrder
   special_requests?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -550,6 +601,11 @@ export type BookingMinOrderByAggregateInput = {
 export type BookingSumOrderByAggregateInput = {
   guest_count?: Prisma.SortOrder
   final_price?: Prisma.SortOrder
+}
+
+export type BookingScalarRelationFilter = {
+  is?: Prisma.BookingWhereInput
+  isNot?: Prisma.BookingWhereInput
 }
 
 export type BookingCreateNestedManyWithoutCustomerInput = {
@@ -672,6 +728,24 @@ export type EnumBookingStatusFieldUpdateOperationsInput = {
   set?: $Enums.BookingStatus
 }
 
+export type EnumPaymentStatusFieldUpdateOperationsInput = {
+  set?: $Enums.PaymentStatus
+}
+
+export type BookingCreateNestedOneWithoutPaymentsInput = {
+  create?: Prisma.XOR<Prisma.BookingCreateWithoutPaymentsInput, Prisma.BookingUncheckedCreateWithoutPaymentsInput>
+  connectOrCreate?: Prisma.BookingCreateOrConnectWithoutPaymentsInput
+  connect?: Prisma.BookingWhereUniqueInput
+}
+
+export type BookingUpdateOneRequiredWithoutPaymentsNestedInput = {
+  create?: Prisma.XOR<Prisma.BookingCreateWithoutPaymentsInput, Prisma.BookingUncheckedCreateWithoutPaymentsInput>
+  connectOrCreate?: Prisma.BookingCreateOrConnectWithoutPaymentsInput
+  upsert?: Prisma.BookingUpsertWithoutPaymentsInput
+  connect?: Prisma.BookingWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BookingUpdateToOneWithWhereWithoutPaymentsInput, Prisma.BookingUpdateWithoutPaymentsInput>, Prisma.BookingUncheckedUpdateWithoutPaymentsInput>
+}
+
 export type BookingCreateWithoutCustomerInput = {
   id?: string
   event_date: Date | string
@@ -679,12 +753,15 @@ export type BookingCreateWithoutCustomerInput = {
   guest_count: number
   final_price: number
   status?: $Enums.BookingStatus
-  payment_status?: string | null
+  payment_status?: $Enums.PaymentStatus
+  agreement_accepted_at?: Date | string | null
+  agreement_ip?: string | null
   special_requests?: string | null
   created_at?: Date | string
   updated_at?: Date | string
   request: Prisma.ServiceRequestCreateNestedOneWithoutBookingInput
   provider: Prisma.ServiceProviderCreateNestedOneWithoutBookingsInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutBookingInput
 }
 
 export type BookingUncheckedCreateWithoutCustomerInput = {
@@ -696,10 +773,13 @@ export type BookingUncheckedCreateWithoutCustomerInput = {
   guest_count: number
   final_price: number
   status?: $Enums.BookingStatus
-  payment_status?: string | null
+  payment_status?: $Enums.PaymentStatus
+  agreement_accepted_at?: Date | string | null
+  agreement_ip?: string | null
   special_requests?: string | null
   created_at?: Date | string
   updated_at?: Date | string
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutBookingInput
 }
 
 export type BookingCreateOrConnectWithoutCustomerInput = {
@@ -741,7 +821,9 @@ export type BookingScalarWhereInput = {
   guest_count?: Prisma.IntFilter<"Booking"> | number
   final_price?: Prisma.FloatFilter<"Booking"> | number
   status?: Prisma.EnumBookingStatusFilter<"Booking"> | $Enums.BookingStatus
-  payment_status?: Prisma.StringNullableFilter<"Booking"> | string | null
+  payment_status?: Prisma.EnumPaymentStatusFilter<"Booking"> | $Enums.PaymentStatus
+  agreement_accepted_at?: Prisma.DateTimeNullableFilter<"Booking"> | Date | string | null
+  agreement_ip?: Prisma.StringNullableFilter<"Booking"> | string | null
   special_requests?: Prisma.StringNullableFilter<"Booking"> | string | null
   created_at?: Prisma.DateTimeFilter<"Booking"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Booking"> | Date | string
@@ -754,12 +836,15 @@ export type BookingCreateWithoutProviderInput = {
   guest_count: number
   final_price: number
   status?: $Enums.BookingStatus
-  payment_status?: string | null
+  payment_status?: $Enums.PaymentStatus
+  agreement_accepted_at?: Date | string | null
+  agreement_ip?: string | null
   special_requests?: string | null
   created_at?: Date | string
   updated_at?: Date | string
   request: Prisma.ServiceRequestCreateNestedOneWithoutBookingInput
   customer: Prisma.UserCreateNestedOneWithoutBookingsInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutBookingInput
 }
 
 export type BookingUncheckedCreateWithoutProviderInput = {
@@ -771,10 +856,13 @@ export type BookingUncheckedCreateWithoutProviderInput = {
   guest_count: number
   final_price: number
   status?: $Enums.BookingStatus
-  payment_status?: string | null
+  payment_status?: $Enums.PaymentStatus
+  agreement_accepted_at?: Date | string | null
+  agreement_ip?: string | null
   special_requests?: string | null
   created_at?: Date | string
   updated_at?: Date | string
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutBookingInput
 }
 
 export type BookingCreateOrConnectWithoutProviderInput = {
@@ -810,12 +898,15 @@ export type BookingCreateWithoutRequestInput = {
   guest_count: number
   final_price: number
   status?: $Enums.BookingStatus
-  payment_status?: string | null
+  payment_status?: $Enums.PaymentStatus
+  agreement_accepted_at?: Date | string | null
+  agreement_ip?: string | null
   special_requests?: string | null
   created_at?: Date | string
   updated_at?: Date | string
   customer: Prisma.UserCreateNestedOneWithoutBookingsInput
   provider: Prisma.ServiceProviderCreateNestedOneWithoutBookingsInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutBookingInput
 }
 
 export type BookingUncheckedCreateWithoutRequestInput = {
@@ -827,10 +918,13 @@ export type BookingUncheckedCreateWithoutRequestInput = {
   guest_count: number
   final_price: number
   status?: $Enums.BookingStatus
-  payment_status?: string | null
+  payment_status?: $Enums.PaymentStatus
+  agreement_accepted_at?: Date | string | null
+  agreement_ip?: string | null
   special_requests?: string | null
   created_at?: Date | string
   updated_at?: Date | string
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutBookingInput
 }
 
 export type BookingCreateOrConnectWithoutRequestInput = {
@@ -856,12 +950,15 @@ export type BookingUpdateWithoutRequestInput = {
   guest_count?: Prisma.IntFieldUpdateOperationsInput | number
   final_price?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
-  payment_status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  agreement_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  agreement_ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   special_requests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customer?: Prisma.UserUpdateOneRequiredWithoutBookingsNestedInput
   provider?: Prisma.ServiceProviderUpdateOneRequiredWithoutBookingsNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutBookingNestedInput
 }
 
 export type BookingUncheckedUpdateWithoutRequestInput = {
@@ -873,7 +970,98 @@ export type BookingUncheckedUpdateWithoutRequestInput = {
   guest_count?: Prisma.IntFieldUpdateOperationsInput | number
   final_price?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
-  payment_status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  agreement_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  agreement_ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  special_requests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutBookingNestedInput
+}
+
+export type BookingCreateWithoutPaymentsInput = {
+  id?: string
+  event_date: Date | string
+  event_location: string
+  guest_count: number
+  final_price: number
+  status?: $Enums.BookingStatus
+  payment_status?: $Enums.PaymentStatus
+  agreement_accepted_at?: Date | string | null
+  agreement_ip?: string | null
+  special_requests?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  request: Prisma.ServiceRequestCreateNestedOneWithoutBookingInput
+  customer: Prisma.UserCreateNestedOneWithoutBookingsInput
+  provider: Prisma.ServiceProviderCreateNestedOneWithoutBookingsInput
+}
+
+export type BookingUncheckedCreateWithoutPaymentsInput = {
+  id?: string
+  request_id: string
+  customer_id: string
+  provider_id: string
+  event_date: Date | string
+  event_location: string
+  guest_count: number
+  final_price: number
+  status?: $Enums.BookingStatus
+  payment_status?: $Enums.PaymentStatus
+  agreement_accepted_at?: Date | string | null
+  agreement_ip?: string | null
+  special_requests?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+}
+
+export type BookingCreateOrConnectWithoutPaymentsInput = {
+  where: Prisma.BookingWhereUniqueInput
+  create: Prisma.XOR<Prisma.BookingCreateWithoutPaymentsInput, Prisma.BookingUncheckedCreateWithoutPaymentsInput>
+}
+
+export type BookingUpsertWithoutPaymentsInput = {
+  update: Prisma.XOR<Prisma.BookingUpdateWithoutPaymentsInput, Prisma.BookingUncheckedUpdateWithoutPaymentsInput>
+  create: Prisma.XOR<Prisma.BookingCreateWithoutPaymentsInput, Prisma.BookingUncheckedCreateWithoutPaymentsInput>
+  where?: Prisma.BookingWhereInput
+}
+
+export type BookingUpdateToOneWithWhereWithoutPaymentsInput = {
+  where?: Prisma.BookingWhereInput
+  data: Prisma.XOR<Prisma.BookingUpdateWithoutPaymentsInput, Prisma.BookingUncheckedUpdateWithoutPaymentsInput>
+}
+
+export type BookingUpdateWithoutPaymentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  event_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  event_location?: Prisma.StringFieldUpdateOperationsInput | string
+  guest_count?: Prisma.IntFieldUpdateOperationsInput | number
+  final_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+  payment_status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  agreement_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  agreement_ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  special_requests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  request?: Prisma.ServiceRequestUpdateOneRequiredWithoutBookingNestedInput
+  customer?: Prisma.UserUpdateOneRequiredWithoutBookingsNestedInput
+  provider?: Prisma.ServiceProviderUpdateOneRequiredWithoutBookingsNestedInput
+}
+
+export type BookingUncheckedUpdateWithoutPaymentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  request_id?: Prisma.StringFieldUpdateOperationsInput | string
+  customer_id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider_id?: Prisma.StringFieldUpdateOperationsInput | string
+  event_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  event_location?: Prisma.StringFieldUpdateOperationsInput | string
+  guest_count?: Prisma.IntFieldUpdateOperationsInput | number
+  final_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+  payment_status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  agreement_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  agreement_ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   special_requests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -888,7 +1076,9 @@ export type BookingCreateManyCustomerInput = {
   guest_count: number
   final_price: number
   status?: $Enums.BookingStatus
-  payment_status?: string | null
+  payment_status?: $Enums.PaymentStatus
+  agreement_accepted_at?: Date | string | null
+  agreement_ip?: string | null
   special_requests?: string | null
   created_at?: Date | string
   updated_at?: Date | string
@@ -901,12 +1091,15 @@ export type BookingUpdateWithoutCustomerInput = {
   guest_count?: Prisma.IntFieldUpdateOperationsInput | number
   final_price?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
-  payment_status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  agreement_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  agreement_ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   special_requests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   request?: Prisma.ServiceRequestUpdateOneRequiredWithoutBookingNestedInput
   provider?: Prisma.ServiceProviderUpdateOneRequiredWithoutBookingsNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutBookingNestedInput
 }
 
 export type BookingUncheckedUpdateWithoutCustomerInput = {
@@ -918,10 +1111,13 @@ export type BookingUncheckedUpdateWithoutCustomerInput = {
   guest_count?: Prisma.IntFieldUpdateOperationsInput | number
   final_price?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
-  payment_status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  agreement_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  agreement_ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   special_requests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutBookingNestedInput
 }
 
 export type BookingUncheckedUpdateManyWithoutCustomerInput = {
@@ -933,7 +1129,9 @@ export type BookingUncheckedUpdateManyWithoutCustomerInput = {
   guest_count?: Prisma.IntFieldUpdateOperationsInput | number
   final_price?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
-  payment_status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  agreement_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  agreement_ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   special_requests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -948,7 +1146,9 @@ export type BookingCreateManyProviderInput = {
   guest_count: number
   final_price: number
   status?: $Enums.BookingStatus
-  payment_status?: string | null
+  payment_status?: $Enums.PaymentStatus
+  agreement_accepted_at?: Date | string | null
+  agreement_ip?: string | null
   special_requests?: string | null
   created_at?: Date | string
   updated_at?: Date | string
@@ -961,12 +1161,15 @@ export type BookingUpdateWithoutProviderInput = {
   guest_count?: Prisma.IntFieldUpdateOperationsInput | number
   final_price?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
-  payment_status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  agreement_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  agreement_ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   special_requests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   request?: Prisma.ServiceRequestUpdateOneRequiredWithoutBookingNestedInput
   customer?: Prisma.UserUpdateOneRequiredWithoutBookingsNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutBookingNestedInput
 }
 
 export type BookingUncheckedUpdateWithoutProviderInput = {
@@ -978,10 +1181,13 @@ export type BookingUncheckedUpdateWithoutProviderInput = {
   guest_count?: Prisma.IntFieldUpdateOperationsInput | number
   final_price?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
-  payment_status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  agreement_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  agreement_ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   special_requests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutBookingNestedInput
 }
 
 export type BookingUncheckedUpdateManyWithoutProviderInput = {
@@ -993,12 +1199,43 @@ export type BookingUncheckedUpdateManyWithoutProviderInput = {
   guest_count?: Prisma.IntFieldUpdateOperationsInput | number
   final_price?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
-  payment_status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  agreement_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  agreement_ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   special_requests?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+
+/**
+ * Count Type BookingCountOutputType
+ */
+
+export type BookingCountOutputType = {
+  payments: number
+}
+
+export type BookingCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  payments?: boolean | BookingCountOutputTypeCountPaymentsArgs
+}
+
+/**
+ * BookingCountOutputType without action
+ */
+export type BookingCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the BookingCountOutputType
+   */
+  select?: Prisma.BookingCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * BookingCountOutputType without action
+ */
+export type BookingCountOutputTypeCountPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaymentWhereInput
+}
 
 
 export type BookingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1012,12 +1249,16 @@ export type BookingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   final_price?: boolean
   status?: boolean
   payment_status?: boolean
+  agreement_accepted_at?: boolean
+  agreement_ip?: boolean
   special_requests?: boolean
   created_at?: boolean
   updated_at?: boolean
   request?: boolean | Prisma.ServiceRequestDefaultArgs<ExtArgs>
   customer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   provider?: boolean | Prisma.ServiceProviderDefaultArgs<ExtArgs>
+  payments?: boolean | Prisma.Booking$paymentsArgs<ExtArgs>
+  _count?: boolean | Prisma.BookingCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["booking"]>
 
 export type BookingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1031,6 +1272,8 @@ export type BookingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   final_price?: boolean
   status?: boolean
   payment_status?: boolean
+  agreement_accepted_at?: boolean
+  agreement_ip?: boolean
   special_requests?: boolean
   created_at?: boolean
   updated_at?: boolean
@@ -1050,6 +1293,8 @@ export type BookingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   final_price?: boolean
   status?: boolean
   payment_status?: boolean
+  agreement_accepted_at?: boolean
+  agreement_ip?: boolean
   special_requests?: boolean
   created_at?: boolean
   updated_at?: boolean
@@ -1069,16 +1314,20 @@ export type BookingSelectScalar = {
   final_price?: boolean
   status?: boolean
   payment_status?: boolean
+  agreement_accepted_at?: boolean
+  agreement_ip?: boolean
   special_requests?: boolean
   created_at?: boolean
   updated_at?: boolean
 }
 
-export type BookingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "request_id" | "customer_id" | "provider_id" | "event_date" | "event_location" | "guest_count" | "final_price" | "status" | "payment_status" | "special_requests" | "created_at" | "updated_at", ExtArgs["result"]["booking"]>
+export type BookingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "request_id" | "customer_id" | "provider_id" | "event_date" | "event_location" | "guest_count" | "final_price" | "status" | "payment_status" | "agreement_accepted_at" | "agreement_ip" | "special_requests" | "created_at" | "updated_at", ExtArgs["result"]["booking"]>
 export type BookingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   request?: boolean | Prisma.ServiceRequestDefaultArgs<ExtArgs>
   customer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   provider?: boolean | Prisma.ServiceProviderDefaultArgs<ExtArgs>
+  payments?: boolean | Prisma.Booking$paymentsArgs<ExtArgs>
+  _count?: boolean | Prisma.BookingCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type BookingIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   request?: boolean | Prisma.ServiceRequestDefaultArgs<ExtArgs>
@@ -1097,6 +1346,7 @@ export type $BookingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     request: Prisma.$ServiceRequestPayload<ExtArgs>
     customer: Prisma.$UserPayload<ExtArgs>
     provider: Prisma.$ServiceProviderPayload<ExtArgs>
+    payments: Prisma.$PaymentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1108,7 +1358,9 @@ export type $BookingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     guest_count: number
     final_price: number
     status: $Enums.BookingStatus
-    payment_status: string | null
+    payment_status: $Enums.PaymentStatus
+    agreement_accepted_at: Date | null
+    agreement_ip: string | null
     special_requests: string | null
     created_at: Date
     updated_at: Date
@@ -1509,6 +1761,7 @@ export interface Prisma__BookingClient<T, Null = never, ExtArgs extends runtime.
   request<T extends Prisma.ServiceRequestDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ServiceRequestDefaultArgs<ExtArgs>>): Prisma.Prisma__ServiceRequestClient<runtime.Types.Result.GetResult<Prisma.$ServiceRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   customer<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   provider<T extends Prisma.ServiceProviderDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ServiceProviderDefaultArgs<ExtArgs>>): Prisma.Prisma__ServiceProviderClient<runtime.Types.Result.GetResult<Prisma.$ServiceProviderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  payments<T extends Prisma.Booking$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Booking$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1547,7 +1800,9 @@ export interface BookingFieldRefs {
   readonly guest_count: Prisma.FieldRef<"Booking", 'Int'>
   readonly final_price: Prisma.FieldRef<"Booking", 'Float'>
   readonly status: Prisma.FieldRef<"Booking", 'BookingStatus'>
-  readonly payment_status: Prisma.FieldRef<"Booking", 'String'>
+  readonly payment_status: Prisma.FieldRef<"Booking", 'PaymentStatus'>
+  readonly agreement_accepted_at: Prisma.FieldRef<"Booking", 'DateTime'>
+  readonly agreement_ip: Prisma.FieldRef<"Booking", 'String'>
   readonly special_requests: Prisma.FieldRef<"Booking", 'String'>
   readonly created_at: Prisma.FieldRef<"Booking", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"Booking", 'DateTime'>
@@ -1944,6 +2199,30 @@ export type BookingDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Bookings to delete.
    */
   limit?: number
+}
+
+/**
+ * Booking.payments
+ */
+export type Booking$paymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Payment
+   */
+  select?: Prisma.PaymentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Payment
+   */
+  omit?: Prisma.PaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentInclude<ExtArgs> | null
+  where?: Prisma.PaymentWhereInput
+  orderBy?: Prisma.PaymentOrderByWithRelationInput | Prisma.PaymentOrderByWithRelationInput[]
+  cursor?: Prisma.PaymentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentScalarFieldEnum | Prisma.PaymentScalarFieldEnum[]
 }
 
 /**
