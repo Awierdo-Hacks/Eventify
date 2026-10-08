@@ -19,7 +19,7 @@ export default async function CheckoutPage({ params }: PageProps) {
     where: { id: bookingId },
     include: {
       provider: { select: { business_name: true } },
-      request: { select: { included_services: false, description: true } },
+      request: { select: { description: true } },
     },
   })
 
