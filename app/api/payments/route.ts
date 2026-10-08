@@ -98,6 +98,14 @@ export async function POST(request: Request) {
       },
     })
 
+    const checkoutUrl = molliePayment.getCheckoutUrl()
+    if (!checkoutUrl) {
+      return NextResponse.json(
+        { error: 'Geen geldige checkout-URL ontvangen van de betaalprovider.' },
+        { status: 502 }
+      )
+    }
+
     const idempotencyKey = crypto.randomUUID()
     const ip =
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
@@ -113,7 +121,7 @@ export async function POST(request: Request) {
           method,
           status: 'PENDING',
           idempotency_key: idempotencyKey,
-          checkout_url: molliePayment.getCheckoutUrl() ?? undefined,
+          checkout_url: checkoutUrl,
         },
       }),
       prisma.paymentAuditLog.create({
@@ -131,7 +139,7 @@ export async function POST(request: Request) {
       }),
     ])
 
-    return NextResponse.json({ checkoutUrl: molliePayment.getCheckoutUrl() })
+    return NextResponse.json({ checkoutUrl })
   } catch (error) {
     console.error('[payments/create] error:', error)
     return NextResponse.json(
