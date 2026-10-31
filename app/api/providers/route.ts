@@ -21,6 +21,8 @@ export async function GET(request: Request) {
       priceRange: searchParams.get('priceRange'),
       search: searchParams.get('search') || searchParams.get('q'),
       isActive: includeHidden ? 'false' : null,
+      availableOn: searchParams.get('availableOn'),
+      guests: Number(searchParams.get('guests')) || null,
       page: Number(searchParams.get('page') || 1),
       pageSize: Number(searchParams.get('pageSize') || undefined),
     });

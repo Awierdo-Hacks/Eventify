@@ -16,6 +16,7 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { ArrowLeft, Calendar, Users, Euro, MessageSquare, CheckCircle, AlertCircle } from 'lucide-react';
 import { format, isSameDay, isBefore, startOfDay, startOfMonth, endOfMonth, addMonths } from 'date-fns';
 import { nl } from 'date-fns/locale';
+import { categoryLabel } from '@/lib/categories';
 
 interface Provider {
   id: string;
@@ -44,6 +45,32 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
     description: '',
   });
   const [unavailableDates, setUnavailableDates] = useState<string[]>([]);
+  // Event context (from the customer's event builder → browse → provider)
+  const [eventContext, setEventContext] = useState<{ eventId: string; slotId: string; eventName: string } | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const eventId = params.get('eventId');
+    const slotId = params.get('slotId');
+    if (!eventId || !slotId) return;
+
+    fetch(`/api/events/${encodeURIComponent(eventId)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((event) => {
+        if (!event || !event.slots?.some((slot: { id: string }) => slot.id === slotId)) return;
+        setEventContext({ eventId, slotId, eventName: event.name });
+        // Pre-fill the form with what the customer already told us about the event
+        setFormData((current) => ({
+          ...current,
+          event_type: event.eventType || current.event_type,
+          event_date: event.eventDate ? String(event.eventDate).split('T')[0] : current.event_date,
+          event_location: event.location || current.event_location,
+          guest_count: event.guestCount ? String(event.guestCount) : current.guest_count,
+        }));
+        if (event.eventDate) setCalendarMonth(new Date(event.eventDate));
+      })
+      .catch(() => { /* form simply stays empty */ });
+  }, []);
   const [calendarMonth, setCalendarMonth] = useState(new Date());
   const selectedDate = formData.event_date ? new Date(formData.event_date + 'T00:00:00') : undefined;
 
@@ -106,7 +133,7 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
   // Redirect to login if not authenticated
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push(`/login?redirect=/request-quote/${providerId}`);
+      router.push(`/login?redirect=${encodeURIComponent(`/request-quote/${providerId}${window.location.search}`)}`);
     }
   }, [status, router, providerId]);
 
@@ -124,17 +151,14 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
     try {
       const requestBody = {
         providerId: providerId,
-        category: provider.category,
+        eventSlotId: eventContext?.slotId,
         eventType: formData.event_type,
         eventDate: formData.event_date,
         eventLocation: formData.event_location,
         guestCount: parseInt(formData.guest_count),
         budgetRange: formData.budget_range,
         description: formData.description,
-        customerName: user.name,
-        customerEmail: user.email,
-        customerPhone: user.email, // Use email as phone for now
-        preferredContact: 'email',
+        preferredContact: 'chat',
       };
       
       
@@ -148,14 +172,11 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
 
       if (!response.ok) {
         const data = await response.json();
-        console.error('API Error Response:', data);
         throw new Error(data.error || 'Er is iets misgegaan');
       }
 
-      const result = await response.json();
-
       // Success - redirect to dashboard
-      router.push('/dashboard?tab=requests&success=true');
+      router.push('/dashboard?tab=requests&success=request');
     } catch (err) {
       console.error('Error submitting request:', err);
       setError(err instanceof Error ? err.message : 'Er is iets misgegaan bij het versturen van de aanvraag');
@@ -174,7 +195,7 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
         <Container className="py-8">
           <Skeleton className="h-10 w-48 mb-6" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
-            <div className="lg:col-span-2">
+            <div className="md:col-span-2">
               <Card className="p-4 sm:p-8 border-2 border-gray-100 rounded-3xl bg-white">
                 <Skeleton className="h-8 w-3/4 mb-4" />
                 <Skeleton className="h-4 w-1/2 mb-8" />
@@ -185,7 +206,7 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
                 </div>
               </Card>
             </div>
-            <div className="lg:col-span-1">
+            <div className="md:col-span-1">
               <Card className="p-6 border-2 border-gray-100 rounded-3xl bg-white sticky top-8">
                 <Skeleton className="h-48 w-full mb-4" />
                 <Skeleton className="h-6 w-3/4 mb-2" />
@@ -216,7 +237,7 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
           {/* Form */}
-          <div className="lg:col-span-2">
+          <div className="md:col-span-2">
             <Card className="p-4 sm:p-8 border-2 border-gray-100 rounded-3xl bg-white">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -226,9 +247,18 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
                 <h1 className="text-xl sm:text-3xl font-bold mb-2">
                   <span className="gradient-text">Offerte Aanvragen</span>
                 </h1>
-                <p className="text-gray-600 mb-8">
-                  Vul onderstaand formulier in en ontvang binnen 24 uur een offerte op maat
+                <p className="text-gray-600 mb-6">
+                  Vertel de provider over je event. Je ontvangt de offerte in je dashboard en in de chat.
                 </p>
+
+                {eventContext && (
+                  <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-xl flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-purple-800">
+                      Deze aanvraag hoort bij je event <strong>{eventContext.eventName}</strong>. We hebben de gegevens alvast ingevuld; de offerte verschijnt straks automatisch bij het juiste onderdeel.
+                    </p>
+                  </div>
+                )}
 
                 {error && (
                   <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
@@ -257,11 +287,11 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
                           className="w-full rounded-xl border-2 border-gray-100 h-12 px-4 focus:border-purple-500 focus:outline-none"
                         >
                           <option value="">Selecteer type...</option>
-                          <option value="wedding">Bruiloft</option>
-                          <option value="birthday">Verjaardag</option>
-                          <option value="corporate">Bedrijfsfeest</option>
-                          <option value="anniversary">Jubileum</option>
-                          <option value="other">Anders</option>
+                          <option value="WEDDING">Bruiloft</option>
+                          <option value="BIRTHDAY">Verjaardag</option>
+                          <option value="CORPORATE">Zakelijk event</option>
+                          <option value="FESTIVAL">Festival</option>
+                          <option value="CUSTOM">Ander event</option>
                         </select>
                       </div>
 
@@ -389,7 +419,7 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
           </div>
 
           {/* Sidebar - Provider Info */}
-          <div className="lg:col-span-1">
+          <div className="md:col-span-1">
             <Card className="p-4 sm:p-6 border-2 border-gray-100 rounded-3xl bg-white md:sticky md:top-24">
               <h3 className="font-semibold text-lg mb-4 text-gray-900">Je vraagt offerte aan bij:</h3>
               
@@ -413,7 +443,7 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
                 <h4 className="font-semibold text-gray-900 mb-1">{provider.businessName}</h4>
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <Badge variant="secondary" className="bg-purple-100 text-purple-700">
-                    {provider.category}
+                    {categoryLabel(provider.category)}
                   </Badge>
                   {provider.verified && (
                     <Badge className="bg-green-500 text-white flex items-center gap-1">

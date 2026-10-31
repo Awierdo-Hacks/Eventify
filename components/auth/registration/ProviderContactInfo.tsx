@@ -102,7 +102,7 @@ export default function ProviderContactInfo({ data, onChange, errors }: Provider
                 type={showPassword ? 'text' : 'password'}
                 value={data.password}
                 onChange={(e) => updateField('password', e.target.value)}
-                placeholder="Minimaal 6 tekens"
+                placeholder="Minimaal 8 tekens"
                 className={`${inputClass('password')} pr-10`}
               />
               <button

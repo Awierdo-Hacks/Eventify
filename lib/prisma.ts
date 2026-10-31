@@ -15,8 +15,12 @@ function createPrismaClient() {
     ? `${connectionString}&connection_limit=10&pool_timeout=10`
     : `${connectionString}?connection_limit=10&pool_timeout=10`;
 
+  // Optional cap on connections per instance (useful on serverless, or for single-connection local dev DBs)
+  const poolMax = Number(process.env.DATABASE_POOL_MAX) || undefined;
+
   const adapter = new PrismaPg({
     connectionString: pooledConnectionString,
+    ...(poolMax && { max: poolMax }),
     // Remote databases (Render, etc.) need SSL with relaxed cert validation
     ...(isRemote && { ssl: { rejectUnauthorized: false } }),
   });

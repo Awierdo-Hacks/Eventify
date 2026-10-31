@@ -258,6 +258,7 @@ export type EventSlotWhereInput = {
   updated_at?: Prisma.DateTimeFilter<"EventSlot"> | Date | string
   event?: Prisma.XOR<Prisma.EventScalarRelationFilter, Prisma.EventWhereInput>
   quotes?: Prisma.QuoteListRelationFilter
+  requests?: Prisma.ServiceRequestListRelationFilter
   booked_quote?: Prisma.XOR<Prisma.QuoteNullableScalarRelationFilter, Prisma.QuoteWhereInput> | null
 }
 
@@ -274,6 +275,7 @@ export type EventSlotOrderByWithRelationInput = {
   updated_at?: Prisma.SortOrder
   event?: Prisma.EventOrderByWithRelationInput
   quotes?: Prisma.QuoteOrderByRelationAggregateInput
+  requests?: Prisma.ServiceRequestOrderByRelationAggregateInput
   booked_quote?: Prisma.QuoteOrderByWithRelationInput
 }
 
@@ -293,6 +295,7 @@ export type EventSlotWhereUniqueInput = Prisma.AtLeast<{
   updated_at?: Prisma.DateTimeFilter<"EventSlot"> | Date | string
   event?: Prisma.XOR<Prisma.EventScalarRelationFilter, Prisma.EventWhereInput>
   quotes?: Prisma.QuoteListRelationFilter
+  requests?: Prisma.ServiceRequestListRelationFilter
   booked_quote?: Prisma.XOR<Prisma.QuoteNullableScalarRelationFilter, Prisma.QuoteWhereInput> | null
 }, "id" | "booked_quote_id">
 
@@ -341,6 +344,7 @@ export type EventSlotCreateInput = {
   updated_at?: Date | string
   event: Prisma.EventCreateNestedOneWithoutSlotsInput
   quotes?: Prisma.QuoteCreateNestedManyWithoutEvent_slotInput
+  requests?: Prisma.ServiceRequestCreateNestedManyWithoutEvent_slotInput
   booked_quote?: Prisma.QuoteCreateNestedOneWithoutBooked_for_slotInput
 }
 
@@ -356,6 +360,7 @@ export type EventSlotUncheckedCreateInput = {
   created_at?: Date | string
   updated_at?: Date | string
   quotes?: Prisma.QuoteUncheckedCreateNestedManyWithoutEvent_slotInput
+  requests?: Prisma.ServiceRequestUncheckedCreateNestedManyWithoutEvent_slotInput
 }
 
 export type EventSlotUpdateInput = {
@@ -369,6 +374,7 @@ export type EventSlotUpdateInput = {
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   event?: Prisma.EventUpdateOneRequiredWithoutSlotsNestedInput
   quotes?: Prisma.QuoteUpdateManyWithoutEvent_slotNestedInput
+  requests?: Prisma.ServiceRequestUpdateManyWithoutEvent_slotNestedInput
   booked_quote?: Prisma.QuoteUpdateOneWithoutBooked_for_slotNestedInput
 }
 
@@ -384,6 +390,7 @@ export type EventSlotUncheckedUpdateInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quotes?: Prisma.QuoteUncheckedUpdateManyWithoutEvent_slotNestedInput
+  requests?: Prisma.ServiceRequestUncheckedUpdateManyWithoutEvent_slotNestedInput
 }
 
 export type EventSlotCreateManyInput = {
@@ -485,6 +492,22 @@ export type EventSlotSumOrderByAggregateInput = {
   display_order?: Prisma.SortOrder
 }
 
+export type EventSlotCreateNestedOneWithoutRequestsInput = {
+  create?: Prisma.XOR<Prisma.EventSlotCreateWithoutRequestsInput, Prisma.EventSlotUncheckedCreateWithoutRequestsInput>
+  connectOrCreate?: Prisma.EventSlotCreateOrConnectWithoutRequestsInput
+  connect?: Prisma.EventSlotWhereUniqueInput
+}
+
+export type EventSlotUpdateOneWithoutRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.EventSlotCreateWithoutRequestsInput, Prisma.EventSlotUncheckedCreateWithoutRequestsInput>
+  connectOrCreate?: Prisma.EventSlotCreateOrConnectWithoutRequestsInput
+  upsert?: Prisma.EventSlotUpsertWithoutRequestsInput
+  disconnect?: Prisma.EventSlotWhereInput | boolean
+  delete?: Prisma.EventSlotWhereInput | boolean
+  connect?: Prisma.EventSlotWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EventSlotUpdateToOneWithWhereWithoutRequestsInput, Prisma.EventSlotUpdateWithoutRequestsInput>, Prisma.EventSlotUncheckedUpdateWithoutRequestsInput>
+}
+
 export type EventSlotCreateNestedOneWithoutQuotesInput = {
   create?: Prisma.XOR<Prisma.EventSlotCreateWithoutQuotesInput, Prisma.EventSlotUncheckedCreateWithoutQuotesInput>
   connectOrCreate?: Prisma.EventSlotCreateOrConnectWithoutQuotesInput
@@ -575,12 +598,80 @@ export type EventSlotUncheckedUpdateManyWithoutEventNestedInput = {
   deleteMany?: Prisma.EventSlotScalarWhereInput | Prisma.EventSlotScalarWhereInput[]
 }
 
-export type EnumProviderCategoryFieldUpdateOperationsInput = {
-  set?: $Enums.ProviderCategory
-}
-
 export type EnumSlotStatusFieldUpdateOperationsInput = {
   set?: $Enums.SlotStatus
+}
+
+export type EventSlotCreateWithoutRequestsInput = {
+  id?: string
+  category: $Enums.ProviderCategory
+  custom_name?: string | null
+  is_required?: boolean
+  display_order?: number
+  status?: $Enums.SlotStatus
+  created_at?: Date | string
+  updated_at?: Date | string
+  event: Prisma.EventCreateNestedOneWithoutSlotsInput
+  quotes?: Prisma.QuoteCreateNestedManyWithoutEvent_slotInput
+  booked_quote?: Prisma.QuoteCreateNestedOneWithoutBooked_for_slotInput
+}
+
+export type EventSlotUncheckedCreateWithoutRequestsInput = {
+  id?: string
+  event_id: string
+  category: $Enums.ProviderCategory
+  custom_name?: string | null
+  is_required?: boolean
+  display_order?: number
+  status?: $Enums.SlotStatus
+  booked_quote_id?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  quotes?: Prisma.QuoteUncheckedCreateNestedManyWithoutEvent_slotInput
+}
+
+export type EventSlotCreateOrConnectWithoutRequestsInput = {
+  where: Prisma.EventSlotWhereUniqueInput
+  create: Prisma.XOR<Prisma.EventSlotCreateWithoutRequestsInput, Prisma.EventSlotUncheckedCreateWithoutRequestsInput>
+}
+
+export type EventSlotUpsertWithoutRequestsInput = {
+  update: Prisma.XOR<Prisma.EventSlotUpdateWithoutRequestsInput, Prisma.EventSlotUncheckedUpdateWithoutRequestsInput>
+  create: Prisma.XOR<Prisma.EventSlotCreateWithoutRequestsInput, Prisma.EventSlotUncheckedCreateWithoutRequestsInput>
+  where?: Prisma.EventSlotWhereInput
+}
+
+export type EventSlotUpdateToOneWithWhereWithoutRequestsInput = {
+  where?: Prisma.EventSlotWhereInput
+  data: Prisma.XOR<Prisma.EventSlotUpdateWithoutRequestsInput, Prisma.EventSlotUncheckedUpdateWithoutRequestsInput>
+}
+
+export type EventSlotUpdateWithoutRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
+  custom_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_required?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  display_order?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumSlotStatusFieldUpdateOperationsInput | $Enums.SlotStatus
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  event?: Prisma.EventUpdateOneRequiredWithoutSlotsNestedInput
+  quotes?: Prisma.QuoteUpdateManyWithoutEvent_slotNestedInput
+  booked_quote?: Prisma.QuoteUpdateOneWithoutBooked_for_slotNestedInput
+}
+
+export type EventSlotUncheckedUpdateWithoutRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  event_id?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
+  custom_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_required?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  display_order?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumSlotStatusFieldUpdateOperationsInput | $Enums.SlotStatus
+  booked_quote_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  quotes?: Prisma.QuoteUncheckedUpdateManyWithoutEvent_slotNestedInput
 }
 
 export type EventSlotCreateWithoutQuotesInput = {
@@ -593,6 +684,7 @@ export type EventSlotCreateWithoutQuotesInput = {
   created_at?: Date | string
   updated_at?: Date | string
   event: Prisma.EventCreateNestedOneWithoutSlotsInput
+  requests?: Prisma.ServiceRequestCreateNestedManyWithoutEvent_slotInput
   booked_quote?: Prisma.QuoteCreateNestedOneWithoutBooked_for_slotInput
 }
 
@@ -607,6 +699,7 @@ export type EventSlotUncheckedCreateWithoutQuotesInput = {
   booked_quote_id?: string | null
   created_at?: Date | string
   updated_at?: Date | string
+  requests?: Prisma.ServiceRequestUncheckedCreateNestedManyWithoutEvent_slotInput
 }
 
 export type EventSlotCreateOrConnectWithoutQuotesInput = {
@@ -625,6 +718,7 @@ export type EventSlotCreateWithoutBooked_quoteInput = {
   updated_at?: Date | string
   event: Prisma.EventCreateNestedOneWithoutSlotsInput
   quotes?: Prisma.QuoteCreateNestedManyWithoutEvent_slotInput
+  requests?: Prisma.ServiceRequestCreateNestedManyWithoutEvent_slotInput
 }
 
 export type EventSlotUncheckedCreateWithoutBooked_quoteInput = {
@@ -638,6 +732,7 @@ export type EventSlotUncheckedCreateWithoutBooked_quoteInput = {
   created_at?: Date | string
   updated_at?: Date | string
   quotes?: Prisma.QuoteUncheckedCreateNestedManyWithoutEvent_slotInput
+  requests?: Prisma.ServiceRequestUncheckedCreateNestedManyWithoutEvent_slotInput
 }
 
 export type EventSlotCreateOrConnectWithoutBooked_quoteInput = {
@@ -666,6 +761,7 @@ export type EventSlotUpdateWithoutQuotesInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   event?: Prisma.EventUpdateOneRequiredWithoutSlotsNestedInput
+  requests?: Prisma.ServiceRequestUpdateManyWithoutEvent_slotNestedInput
   booked_quote?: Prisma.QuoteUpdateOneWithoutBooked_for_slotNestedInput
 }
 
@@ -680,6 +776,7 @@ export type EventSlotUncheckedUpdateWithoutQuotesInput = {
   booked_quote_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requests?: Prisma.ServiceRequestUncheckedUpdateManyWithoutEvent_slotNestedInput
 }
 
 export type EventSlotUpsertWithoutBooked_quoteInput = {
@@ -704,6 +801,7 @@ export type EventSlotUpdateWithoutBooked_quoteInput = {
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   event?: Prisma.EventUpdateOneRequiredWithoutSlotsNestedInput
   quotes?: Prisma.QuoteUpdateManyWithoutEvent_slotNestedInput
+  requests?: Prisma.ServiceRequestUpdateManyWithoutEvent_slotNestedInput
 }
 
 export type EventSlotUncheckedUpdateWithoutBooked_quoteInput = {
@@ -717,6 +815,7 @@ export type EventSlotUncheckedUpdateWithoutBooked_quoteInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quotes?: Prisma.QuoteUncheckedUpdateManyWithoutEvent_slotNestedInput
+  requests?: Prisma.ServiceRequestUncheckedUpdateManyWithoutEvent_slotNestedInput
 }
 
 export type EventSlotCreateWithoutEventInput = {
@@ -729,6 +828,7 @@ export type EventSlotCreateWithoutEventInput = {
   created_at?: Date | string
   updated_at?: Date | string
   quotes?: Prisma.QuoteCreateNestedManyWithoutEvent_slotInput
+  requests?: Prisma.ServiceRequestCreateNestedManyWithoutEvent_slotInput
   booked_quote?: Prisma.QuoteCreateNestedOneWithoutBooked_for_slotInput
 }
 
@@ -743,6 +843,7 @@ export type EventSlotUncheckedCreateWithoutEventInput = {
   created_at?: Date | string
   updated_at?: Date | string
   quotes?: Prisma.QuoteUncheckedCreateNestedManyWithoutEvent_slotInput
+  requests?: Prisma.ServiceRequestUncheckedCreateNestedManyWithoutEvent_slotInput
 }
 
 export type EventSlotCreateOrConnectWithoutEventInput = {
@@ -809,6 +910,7 @@ export type EventSlotUpdateWithoutEventInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quotes?: Prisma.QuoteUpdateManyWithoutEvent_slotNestedInput
+  requests?: Prisma.ServiceRequestUpdateManyWithoutEvent_slotNestedInput
   booked_quote?: Prisma.QuoteUpdateOneWithoutBooked_for_slotNestedInput
 }
 
@@ -823,6 +925,7 @@ export type EventSlotUncheckedUpdateWithoutEventInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quotes?: Prisma.QuoteUncheckedUpdateManyWithoutEvent_slotNestedInput
+  requests?: Prisma.ServiceRequestUncheckedUpdateManyWithoutEvent_slotNestedInput
 }
 
 export type EventSlotUncheckedUpdateManyWithoutEventInput = {
@@ -844,10 +947,12 @@ export type EventSlotUncheckedUpdateManyWithoutEventInput = {
 
 export type EventSlotCountOutputType = {
   quotes: number
+  requests: number
 }
 
 export type EventSlotCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   quotes?: boolean | EventSlotCountOutputTypeCountQuotesArgs
+  requests?: boolean | EventSlotCountOutputTypeCountRequestsArgs
 }
 
 /**
@@ -867,6 +972,13 @@ export type EventSlotCountOutputTypeCountQuotesArgs<ExtArgs extends runtime.Type
   where?: Prisma.QuoteWhereInput
 }
 
+/**
+ * EventSlotCountOutputType without action
+ */
+export type EventSlotCountOutputTypeCountRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ServiceRequestWhereInput
+}
+
 
 export type EventSlotSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -881,6 +993,7 @@ export type EventSlotSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   updated_at?: boolean
   event?: boolean | Prisma.EventDefaultArgs<ExtArgs>
   quotes?: boolean | Prisma.EventSlot$quotesArgs<ExtArgs>
+  requests?: boolean | Prisma.EventSlot$requestsArgs<ExtArgs>
   booked_quote?: boolean | Prisma.EventSlot$booked_quoteArgs<ExtArgs>
   _count?: boolean | Prisma.EventSlotCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["eventSlot"]>
@@ -932,6 +1045,7 @@ export type EventSlotOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type EventSlotInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   event?: boolean | Prisma.EventDefaultArgs<ExtArgs>
   quotes?: boolean | Prisma.EventSlot$quotesArgs<ExtArgs>
+  requests?: boolean | Prisma.EventSlot$requestsArgs<ExtArgs>
   booked_quote?: boolean | Prisma.EventSlot$booked_quoteArgs<ExtArgs>
   _count?: boolean | Prisma.EventSlotCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -949,6 +1063,7 @@ export type $EventSlotPayload<ExtArgs extends runtime.Types.Extensions.InternalA
   objects: {
     event: Prisma.$EventPayload<ExtArgs>
     quotes: Prisma.$QuotePayload<ExtArgs>[]
+    requests: Prisma.$ServiceRequestPayload<ExtArgs>[]
     booked_quote: Prisma.$QuotePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1358,6 +1473,7 @@ export interface Prisma__EventSlotClient<T, Null = never, ExtArgs extends runtim
   readonly [Symbol.toStringTag]: "PrismaPromise"
   event<T extends Prisma.EventDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EventDefaultArgs<ExtArgs>>): Prisma.Prisma__EventClient<runtime.Types.Result.GetResult<Prisma.$EventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   quotes<T extends Prisma.EventSlot$quotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EventSlot$quotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$QuotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  requests<T extends Prisma.EventSlot$requestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EventSlot$requestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ServiceRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   booked_quote<T extends Prisma.EventSlot$booked_quoteArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EventSlot$booked_quoteArgs<ExtArgs>>): Prisma.Prisma__QuoteClient<runtime.Types.Result.GetResult<Prisma.$QuotePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1815,6 +1931,30 @@ export type EventSlot$quotesArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.QuoteScalarFieldEnum | Prisma.QuoteScalarFieldEnum[]
+}
+
+/**
+ * EventSlot.requests
+ */
+export type EventSlot$requestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ServiceRequest
+   */
+  select?: Prisma.ServiceRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ServiceRequest
+   */
+  omit?: Prisma.ServiceRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServiceRequestInclude<ExtArgs> | null
+  where?: Prisma.ServiceRequestWhereInput
+  orderBy?: Prisma.ServiceRequestOrderByWithRelationInput | Prisma.ServiceRequestOrderByWithRelationInput[]
+  cursor?: Prisma.ServiceRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ServiceRequestScalarFieldEnum | Prisma.ServiceRequestScalarFieldEnum[]
 }
 
 /**

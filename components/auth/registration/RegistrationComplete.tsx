@@ -60,7 +60,7 @@ export default function RegistrationComplete({ accountType, name }: Registration
         </h2>
         <p className="text-lg text-gray-600 max-w-md mx-auto">
           {accountType === 'PROVIDER'
-            ? 'Je profiel is aangemaakt! Klanten kunnen je nu vinden op de browse-pagina.'
+            ? 'Je profiel is aangemaakt! Het Eventiphy-team controleert je profiel; na verificatie word je zichtbaar voor klanten. Vul intussen je profiel en agenda aan.'
             : 'Je account is aangemaakt! Je kunt nu events plannen en dienstverleners vinden.'}
         </p>
       </motion.div>
@@ -76,7 +76,7 @@ export default function RegistrationComplete({ accountType, name }: Registration
           onClick={handleContinue}
           className="w-full h-14 rounded-2xl text-lg font-semibold bg-gradient-to-r from-purple-600 to-amber-500 hover:opacity-90 text-white"
         >
-          Ga naar {accountType === 'PROVIDER' ? 'Dashboard' : 'Dashboard'}
+          Ga naar je dashboard
           <ArrowRight className="w-5 h-5 ml-2" />
         </Button>
 
@@ -90,15 +90,6 @@ export default function RegistrationComplete({ accountType, name }: Registration
           </Button>
         )}
 
-        {accountType === 'PROVIDER' && (
-          <Button
-            onClick={() => router.push('/browse')}
-            variant="outline"
-            className="w-full h-12 rounded-xl border-2"
-          >
-            👀 Bekijk je profiel op de browse-pagina
-          </Button>
-        )}
       </motion.div>
 
       {/* Decorative confetti-like elements */}

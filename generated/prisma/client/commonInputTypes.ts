@@ -169,6 +169,13 @@ export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedDateTimeFilter<$PrismaModel>
 }
 
+export type EnumProviderCategoryFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProviderCategory | Prisma.EnumProviderCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.ProviderCategory[] | Prisma.ListEnumProviderCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProviderCategory[] | Prisma.ListEnumProviderCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProviderCategoryFilter<$PrismaModel> | $Enums.ProviderCategory
+}
+
 export type EnumPriceRangeFilter<$PrismaModel = never> = {
   equals?: $Enums.PriceRange | Prisma.EnumPriceRangeFieldRefInput<$PrismaModel>
   in?: $Enums.PriceRange[] | Prisma.ListEnumPriceRangeFieldRefInput<$PrismaModel>
@@ -212,6 +219,16 @@ export type IntFilter<$PrismaModel = never> = {
   gt?: number | Prisma.IntFieldRefInput<$PrismaModel>
   gte?: number | Prisma.IntFieldRefInput<$PrismaModel>
   not?: Prisma.NestedIntFilter<$PrismaModel> | number
+}
+
+export type EnumProviderCategoryWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProviderCategory | Prisma.EnumProviderCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.ProviderCategory[] | Prisma.ListEnumProviderCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProviderCategory[] | Prisma.ListEnumProviderCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProviderCategoryWithAggregatesFilter<$PrismaModel> | $Enums.ProviderCategory
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumProviderCategoryFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumProviderCategoryFilter<$PrismaModel>
 }
 
 export type EnumPriceRangeWithAggregatesFilter<$PrismaModel = never> = {
@@ -477,28 +494,11 @@ export type EnumEventStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumEventStatusFilter<$PrismaModel>
 }
 
-export type EnumProviderCategoryFilter<$PrismaModel = never> = {
-  equals?: $Enums.ProviderCategory | Prisma.EnumProviderCategoryFieldRefInput<$PrismaModel>
-  in?: $Enums.ProviderCategory[] | Prisma.ListEnumProviderCategoryFieldRefInput<$PrismaModel>
-  notIn?: $Enums.ProviderCategory[] | Prisma.ListEnumProviderCategoryFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumProviderCategoryFilter<$PrismaModel> | $Enums.ProviderCategory
-}
-
 export type EnumSlotStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.SlotStatus | Prisma.EnumSlotStatusFieldRefInput<$PrismaModel>
   in?: $Enums.SlotStatus[] | Prisma.ListEnumSlotStatusFieldRefInput<$PrismaModel>
   notIn?: $Enums.SlotStatus[] | Prisma.ListEnumSlotStatusFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumSlotStatusFilter<$PrismaModel> | $Enums.SlotStatus
-}
-
-export type EnumProviderCategoryWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.ProviderCategory | Prisma.EnumProviderCategoryFieldRefInput<$PrismaModel>
-  in?: $Enums.ProviderCategory[] | Prisma.ListEnumProviderCategoryFieldRefInput<$PrismaModel>
-  notIn?: $Enums.ProviderCategory[] | Prisma.ListEnumProviderCategoryFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumProviderCategoryWithAggregatesFilter<$PrismaModel> | $Enums.ProviderCategory
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumProviderCategoryFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumProviderCategoryFilter<$PrismaModel>
 }
 
 export type EnumSlotStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -696,6 +696,13 @@ export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedDateTimeFilter<$PrismaModel>
 }
 
+export type NestedEnumProviderCategoryFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProviderCategory | Prisma.EnumProviderCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.ProviderCategory[] | Prisma.ListEnumProviderCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProviderCategory[] | Prisma.ListEnumProviderCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProviderCategoryFilter<$PrismaModel> | $Enums.ProviderCategory
+}
+
 export type NestedEnumPriceRangeFilter<$PrismaModel = never> = {
   equals?: $Enums.PriceRange | Prisma.EnumPriceRangeFieldRefInput<$PrismaModel>
   in?: $Enums.PriceRange[] | Prisma.ListEnumPriceRangeFieldRefInput<$PrismaModel>
@@ -717,6 +724,16 @@ export type NestedFloatFilter<$PrismaModel = never> = {
   gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   not?: Prisma.NestedFloatFilter<$PrismaModel> | number
+}
+
+export type NestedEnumProviderCategoryWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProviderCategory | Prisma.EnumProviderCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.ProviderCategory[] | Prisma.ListEnumProviderCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProviderCategory[] | Prisma.ListEnumProviderCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProviderCategoryWithAggregatesFilter<$PrismaModel> | $Enums.ProviderCategory
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumProviderCategoryFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumProviderCategoryFilter<$PrismaModel>
 }
 
 export type NestedEnumPriceRangeWithAggregatesFilter<$PrismaModel = never> = {
@@ -955,28 +972,11 @@ export type NestedEnumEventStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumEventStatusFilter<$PrismaModel>
 }
 
-export type NestedEnumProviderCategoryFilter<$PrismaModel = never> = {
-  equals?: $Enums.ProviderCategory | Prisma.EnumProviderCategoryFieldRefInput<$PrismaModel>
-  in?: $Enums.ProviderCategory[] | Prisma.ListEnumProviderCategoryFieldRefInput<$PrismaModel>
-  notIn?: $Enums.ProviderCategory[] | Prisma.ListEnumProviderCategoryFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumProviderCategoryFilter<$PrismaModel> | $Enums.ProviderCategory
-}
-
 export type NestedEnumSlotStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.SlotStatus | Prisma.EnumSlotStatusFieldRefInput<$PrismaModel>
   in?: $Enums.SlotStatus[] | Prisma.ListEnumSlotStatusFieldRefInput<$PrismaModel>
   notIn?: $Enums.SlotStatus[] | Prisma.ListEnumSlotStatusFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumSlotStatusFilter<$PrismaModel> | $Enums.SlotStatus
-}
-
-export type NestedEnumProviderCategoryWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.ProviderCategory | Prisma.EnumProviderCategoryFieldRefInput<$PrismaModel>
-  in?: $Enums.ProviderCategory[] | Prisma.ListEnumProviderCategoryFieldRefInput<$PrismaModel>
-  notIn?: $Enums.ProviderCategory[] | Prisma.ListEnumProviderCategoryFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumProviderCategoryWithAggregatesFilter<$PrismaModel> | $Enums.ProviderCategory
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumProviderCategoryFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumProviderCategoryFilter<$PrismaModel>
 }
 
 export type NestedEnumSlotStatusWithAggregatesFilter<$PrismaModel = never> = {

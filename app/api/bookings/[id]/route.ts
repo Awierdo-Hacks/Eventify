@@ -1,8 +1,22 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
+import { parseBody } from '@/lib/validation';
+import { cancelBooking, completeBooking, workflowErrorResponse } from '@/lib/workflow';
 
-// PATCH - Update booking status
+const actionSchema = z.discriminatedUnion('action', [
+  z.object({ action: z.literal('complete') }),
+  z.object({ action: z.literal('cancel'), reason: z.string().min(3).max(500) }),
+  z.object({ action: z.literal('update'), specialRequests: z.string().max(2000).nullable() }),
+  // Admin correction of the payment status (normally set by the payment webhook)
+  z.object({
+    action: z.literal('setPaymentStatus'),
+    paymentStatus: z.enum(['UNPAID', 'PENDING', 'PAID', 'FAILED', 'CANCELLED', 'EXPIRED', 'REFUNDED']),
+  }),
+]);
+
+// PATCH - Complete, cancel or update a booking
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -18,118 +32,54 @@ export async function PATCH(
     }
 
     const { id: bookingId } = await params;
-    const body = await request.json();
-    const { status, paymentStatus, specialRequests } = body;
+    const { data, error } = await parseBody(request, actionSchema);
+    if (error) return error;
 
-    // Get booking
-    const booking = await prisma.booking.findUnique({
-      where: { id: bookingId },
-    });
-
-    if (!booking) {
-      return NextResponse.json(
-        { error: 'Boeking niet gevonden' },
-        { status: 404 }
-      );
+    if (data.action === 'complete') {
+      const booking = await completeBooking({ bookingId, actor: session });
+      return NextResponse.json({ success: true, booking: { id: booking.id, status: booking.status } });
     }
 
-    // Check authorization
+    if (data.action === 'cancel') {
+      const booking = await cancelBooking({ bookingId, actor: session, reason: data.reason });
+      return NextResponse.json({ success: true, booking: { id: booking.id, status: booking.status } });
+    }
+
+    const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
+    if (!booking) {
+      return NextResponse.json({ error: 'Boeking niet gevonden' }, { status: 404 });
+    }
+
     const isCustomer = booking.customer_id === session.id;
-    const isProvider = booking.provider_id === session.providerId;
+    const isProvider = !!session.providerId && booking.provider_id === session.providerId;
     const isAdmin = session.role === 'ADMIN';
 
-    if (!isCustomer && !isProvider && !isAdmin) {
-      return NextResponse.json(
-        { error: 'Forbidden - geen toegang tot deze boeking' },
-        { status: 403 }
-      );
-    }
-
-    // Build update data
-    const updateData: any = {};
-
-    if (status) {
-      // Only provider and admin can update status
-      if (!isProvider && !isAdmin) {
-        return NextResponse.json(
-          { error: 'Alleen providers en admins kunnen de status updaten' },
-          { status: 403 }
-        );
-      }
-      if (!['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED'].includes(status)) {
-        return NextResponse.json(
-          { error: 'Ongeldige status' },
-          { status: 400 }
-        );
-      }
-      updateData.status = status;
-    }
-
-    // Payment status is set by the payment webhook; only admins may correct it by hand
-    if (paymentStatus !== undefined) {
+    if (data.action === 'setPaymentStatus') {
       if (!isAdmin) {
         return NextResponse.json(
           { error: 'Alleen admins kunnen de betaalstatus aanpassen' },
           { status: 403 }
         );
       }
-      if (!['UNPAID', 'PENDING', 'PAID', 'FAILED', 'CANCELLED', 'EXPIRED', 'REFUNDED'].includes(paymentStatus)) {
-        return NextResponse.json(
-          { error: 'Ongeldige betaalstatus' },
-          { status: 400 }
-        );
-      }
-      updateData.payment_status = paymentStatus;
+      const updated = await prisma.booking.update({
+        where: { id: bookingId },
+        data: { payment_status: data.paymentStatus },
+      });
+      return NextResponse.json({ success: true, booking: { id: updated.id, paymentStatus: updated.payment_status } });
     }
 
-    if (specialRequests !== undefined) {
-      if (specialRequests !== null && typeof specialRequests !== 'string') {
-        return NextResponse.json(
-          { error: 'Ongeldige speciale wensen' },
-          { status: 400 }
-        );
-      }
-      updateData.special_requests = specialRequests?.slice(0, 2000) ?? null;
+    // update: special requests by the customer or provider
+    if (!isCustomer && !isProvider && !isAdmin) {
+      return NextResponse.json({ error: 'Boeking niet gevonden' }, { status: 404 });
     }
-
-    // Update booking
-    const updatedBooking = await prisma.booking.update({
+    const updated = await prisma.booking.update({
       where: { id: bookingId },
-      data: updateData,
-      include: {
-        customer: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        provider: {
-          select: {
-            id: true,
-            business_name: true,
-          },
-        },
-      },
+      data: { special_requests: data.specialRequests },
     });
-
-    return NextResponse.json({
-      success: true,
-      booking: {
-        id: updatedBooking.id,
-        status: updatedBooking.status,
-        paymentStatus: updatedBooking.payment_status,
-        specialRequests: updatedBooking.special_requests,
-        customer: {
-          id: updatedBooking.customer.id,
-          name: updatedBooking.customer.name,
-        },
-        provider: {
-          id: updatedBooking.provider.id,
-          businessName: updatedBooking.provider.business_name,
-        },
-      },
-    });
+    return NextResponse.json({ success: true, booking: { id: updated.id, specialRequests: updated.special_requests } });
   } catch (error) {
+    const known = workflowErrorResponse(error);
+    if (known) return NextResponse.json(known.body, { status: known.status });
     console.error('Update booking error:', error);
     return NextResponse.json(
       { error: 'Er is iets misgegaan bij het updaten van de boeking' },

@@ -1,6 +1,23 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
+import { cancelEvent, workflowErrorResponse } from '@/lib/workflow';
+import { z } from 'zod';
+import { dateString } from '@/lib/validation';
+
+const optionalNumber = z.preprocess(
+  (v) => (v === '' || v === null ? null : v),
+  z.coerce.number().nonnegative().max(100_000_000).nullable()
+).optional();
+
+const updateEventSchema = z.object({
+  name: z.string().trim().min(1).max(200).optional(),
+  eventDate: z.union([dateString, z.literal(''), z.null()]).optional(),
+  location: z.string().trim().max(200).nullable().optional(),
+  guestCount: optionalNumber,
+  budgetMin: optionalNumber,
+  budgetMax: optionalNumber,
+});
 
 // GET - Get single event with all details
 export async function GET(
@@ -174,20 +191,40 @@ export async function PATCH(
       );
     }
 
-    const body = await request.json();
-    const { name, eventDate, location, guestCount, budgetMin, budgetMax, status } = body;
+    const parsed = updateEventSchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Ongeldige invoer' }, { status: 400 });
+    }
+    const { name, eventDate, location, guestCount, budgetMin, budgetMax } = parsed.data;
+
+    // Status is managed by the workflow (bookings, cancellation, cron), not edited by hand.
+    // A booked date can't silently move: providers agreed to the original date.
+    if (eventDate !== undefined) {
+      const confirmedBookings = await prisma.booking.count({
+        where: {
+          status: 'CONFIRMED',
+          request: { event_slot: { event_id: id } },
+        },
+      });
+      const current = await prisma.event.findUnique({ where: { id }, select: { event_date: true } });
+      const currentDay = current?.event_date?.toISOString().split('T')[0] ?? null;
+      const newDay = eventDate ? new Date(eventDate).toISOString().split('T')[0] : null;
+      if (confirmedBookings > 0 && currentDay !== newDay) {
+        return NextResponse.json(
+          { error: 'Dit event heeft al bevestigde boekingen. Overleg eerst met je providers en annuleer die boekingen voor je de datum wijzigt.' },
+          { status: 409 }
+        );
+      }
+    }
 
     // Build update data
-    const updateData: any = {};
-    if (name !== undefined) updateData.name = name.trim();
+    const updateData: Record<string, unknown> = {};
+    if (name !== undefined) updateData.name = name;
     if (eventDate !== undefined) updateData.event_date = eventDate ? new Date(eventDate) : null;
-    if (location !== undefined) updateData.location = location?.trim() || null;
-    if (guestCount !== undefined) updateData.guest_count = guestCount ? parseInt(guestCount) : null;
-    if (budgetMin !== undefined) updateData.budget_min = budgetMin ? parseFloat(budgetMin) : null;
-    if (budgetMax !== undefined) updateData.budget_max = budgetMax ? parseFloat(budgetMax) : null;
-    if (status !== undefined && ['PLANNING', 'ACTIVE', 'COMPLETED', 'CANCELLED'].includes(status)) {
-      updateData.status = status;
-    }
+    if (location !== undefined) updateData.location = location || null;
+    if (guestCount !== undefined) updateData.guest_count = guestCount ?? null;
+    if (budgetMin !== undefined) updateData.budget_min = budgetMin ?? null;
+    if (budgetMax !== undefined) updateData.budget_max = budgetMax ?? null;
 
     const updatedEvent = await prisma.event.update({
       where: { id },
@@ -222,7 +259,7 @@ export async function PATCH(
   }
 }
 
-// DELETE - Cancel/delete event
+// DELETE - Cancel an event (cascades to its open requests and bookings)
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -238,49 +275,15 @@ export async function DELETE(
       );
     }
 
-    // Check ownership
-    const existingEvent = await prisma.event.findUnique({
-      where: { id },
-      select: { customer_id: true },
-    });
+    await cancelEvent({ eventId: id, customer: session });
 
-    if (!existingEvent) {
-      return NextResponse.json(
-        { error: 'Event not found' },
-        { status: 404 }
-      );
-    }
-
-    if (existingEvent.customer_id !== session.id) {
-      return NextResponse.json(
-        { error: 'Not authorized to delete this event' },
-        { status: 403 }
-      );
-    }
-
-    // Soft delete by setting status to CANCELLED
-    await prisma.event.update({
-      where: { id },
-      data: { status: 'CANCELLED' },
-    });
-
-    // Unlink all quotes from this event's slots
-    await prisma.quote.updateMany({
-      where: {
-        event_slot: {
-          event_id: id,
-        },
-      },
-      data: {
-        event_slot_id: null,
-      },
-    });
-
-    return NextResponse.json({ success: true, message: 'Event cancelled' });
+    return NextResponse.json({ success: true, message: 'Event geannuleerd' });
   } catch (error) {
-    console.error('Error deleting event:', error);
+    const known = workflowErrorResponse(error);
+    if (known) return NextResponse.json(known.body, { status: known.status });
+    console.error('Error cancelling event:', error);
     return NextResponse.json(
-      { error: 'Failed to delete event' },
+      { error: 'Er is iets misgegaan bij het annuleren van het event' },
       { status: 500 }
     );
   }

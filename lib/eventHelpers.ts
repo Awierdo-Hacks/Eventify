@@ -1,3 +1,5 @@
+import { CATEGORIES, parseCategory } from '@/lib/categories';
+
 // Type definitions (matching Prisma schema)
 export type ProviderCategory =
   | 'CATERING'
@@ -22,43 +24,15 @@ export type SlotStatus = 'EMPTY' | 'SEARCHING' | 'QUOTES_REQUESTED' | 'QUOTES_RE
 
 export type EventStatus = 'PLANNING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
 
-// Category Icons mapping
-export const categoryIcons: Record<ProviderCategory, string> = {
-  CATERING: '🍽️',
-  MUSIC: '🎵',
-  PHOTOGRAPHY: '📸',
-  DECORATION: '✨',
-  VENUE: '🏛️',
-  ENTERTAINMENT: '🎭',
-  VIDEOGRAPHY: '🎬',
-  TRANSPORT: '🚗',
-  ACCOMMODATION: '🏨',
-  SECURITY: '🛡️',
-  SANITARY: '🚽',
-  CAKE: '🎂',
-  FLOWERS: '💐',
-  MC: '🎤',
-  OTHER: '📦',
-};
+// Category Icons mapping (from the shared list in lib/categories.ts)
+export const categoryIcons = Object.fromEntries(
+  CATEGORIES.map((c) => [c.value, c.icon])
+) as Record<ProviderCategory, string>;
 
-// Category Names in Dutch
-export const categoryNames: Record<ProviderCategory, string> = {
-  CATERING: 'Catering',
-  MUSIC: 'Muziek & DJ',
-  PHOTOGRAPHY: 'Fotografie',
-  DECORATION: 'Decoratie',
-  VENUE: 'Locatie',
-  ENTERTAINMENT: 'Entertainment',
-  VIDEOGRAPHY: 'Videografie',
-  TRANSPORT: 'Vervoer',
-  ACCOMMODATION: 'Accommodatie',
-  SECURITY: 'Beveiliging',
-  SANITARY: 'Sanitair',
-  CAKE: 'Taart',
-  FLOWERS: 'Bloemen',
-  MC: 'Ceremoniemeester',
-  OTHER: 'Overig',
-};
+// Category Names in Dutch (short form, from the shared list in lib/categories.ts)
+export const categoryNames = Object.fromEntries(
+  CATEGORIES.map((c) => [c.value, c.shortLabel])
+) as Record<ProviderCategory, string>;
 
 // Event Type Icons
 export const eventTypeIcons: Record<EventType, string> = {
@@ -223,49 +197,8 @@ export const calculateCostRange = (
   return { min, max };
 };
 
-// Map category string to ProviderCategory enum (for matching with existing providers)
-export const mapCategoryToEnum = (category: string): ProviderCategory | null => {
-  const categoryMap: Record<string, ProviderCategory> = {
-    catering: 'CATERING',
-    dj: 'MUSIC',
-    music: 'MUSIC',
-    photography: 'PHOTOGRAPHY',
-    decoration: 'DECORATION',
-    venues: 'VENUE',
-    venue: 'VENUE',
-    entertainment: 'ENTERTAINMENT',
-    videography: 'VIDEOGRAPHY',
-    transport: 'TRANSPORT',
-    accommodation: 'ACCOMMODATION',
-    security: 'SECURITY',
-    sanitary: 'SANITARY',
-    cake: 'CAKE',
-    flowers: 'FLOWERS',
-    mc: 'MC',
-  };
+// Map a category value or legacy slug ("dj", "video") to the ProviderCategory enum
+export const mapCategoryToEnum = (category: string): ProviderCategory | null => parseCategory(category);
 
-  return categoryMap[category.toLowerCase()] || null;
-};
-
-// Map ProviderCategory enum to category string (for querying providers)
-export const mapEnumToCategory = (category: ProviderCategory): string => {
-  const enumMap: Record<ProviderCategory, string> = {
-    CATERING: 'catering',
-    MUSIC: 'dj',
-    PHOTOGRAPHY: 'photography',
-    DECORATION: 'decoration',
-    VENUE: 'venues',
-    ENTERTAINMENT: 'entertainment',
-    VIDEOGRAPHY: 'videography',
-    TRANSPORT: 'transport',
-    ACCOMMODATION: 'accommodation',
-    SECURITY: 'security',
-    SANITARY: 'sanitary',
-    CAKE: 'cake',
-    FLOWERS: 'flowers',
-    MC: 'mc',
-    OTHER: 'other',
-  };
-
-  return enumMap[category];
-};
+// Providers store the ProviderCategory enum directly, so querying uses the enum value
+export const mapEnumToCategory = (category: ProviderCategory): string => category;

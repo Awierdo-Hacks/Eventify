@@ -9,7 +9,11 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Search, Calendar, CheckCircle, Star } from 'lucide-react';
-import { categories } from '@/lib/mockData';
+import { CATEGORIES } from '@/lib/categories';
+
+const FEATURED_CATEGORIES = CATEGORIES.filter((c) =>
+  ['VENUE', 'CATERING', 'MUSIC', 'PHOTOGRAPHY', 'DECORATION', 'ENTERTAINMENT'].includes(c.value)
+);
 
 const features = [
   {
@@ -82,9 +86,9 @@ export default function Home() {
                     className="rounded-xl border-2 border-gray-100 h-12 px-4 focus:border-purple-500 focus:outline-none"
                   >
                     <option value="">Alle categorieën</option>
-                    {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.icon} {cat.name}
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat.value} value={cat.value}>
+                        {cat.icon} {cat.label}
                       </option>
                     ))}
                   </select>
@@ -117,20 +121,18 @@ export default function Home() {
             Ontdek onze diensten
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-            {categories.map((category, index) => (
+            {FEATURED_CATEGORIES.map((category, index) => (
               <motion.div
-                key={category.name}
+                key={category.value}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
               >
-                <Link href={`/browse?category=${category.id}`}>
+                <Link href={`/browse?category=${category.value}`}>
                   <Card className="p-6 text-center hover:shadow-eventiphy-lg transition-all hover:-translate-y-1 cursor-pointer border-2 border-gray-100 rounded-3xl">
                     <div className="text-4xl mb-3">{category.icon}</div>
-                    <h3 className="font-semibold text-gray-900 mb-2">{category.name}</h3>
-                    <Badge variant="secondary" className="bg-purple-100 text-purple-700">
-                      {category.count} providers
-                    </Badge>
+                    <h3 className="font-semibold text-gray-900 mb-2">{category.shortLabel}</h3>
+                    <p className="text-xs text-gray-500">{category.description}</p>
                   </Card>
                 </Link>
               </motion.div>

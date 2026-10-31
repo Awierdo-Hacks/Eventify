@@ -125,7 +125,7 @@ model ServiceProvider {
   id             String     @id @default(cuid())
   user_id        String     @unique
   business_name  String
-  category       String
+  category       ProviderCategory
   location       String
   price_range    PriceRange @default(MEDIUM)
   description    String?
@@ -175,17 +175,22 @@ model ServiceRequest {
   customer_email    String
   customer_phone    String
   preferred_contact String?
+  event_slot_id     String?
+  decline_reason    String?
+  closed_at         DateTime?
   created_at        DateTime             @default(now())
   updated_at        DateTime             @updatedAt
 
   // Relations
-  customer User             @relation(fields: [customer_id], references: [id], onDelete: Cascade)
-  provider ServiceProvider? @relation(fields: [provider_id], references: [id], onDelete: SetNull)
-  quotes   Quote[]
-  booking  Booking?
+  customer   User             @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  provider   ServiceProvider? @relation(fields: [provider_id], references: [id], onDelete: SetNull)
+  event_slot EventSlot?       @relation("SlotRequests", fields: [event_slot_id], references: [id], onDelete: SetNull)
+  quotes     Quote[]
+  booking    Booking?
 
   @@index([customer_id])
   @@index([provider_id])
+  @@index([event_slot_id])
   @@index([created_at])
   @@map("service_requests")
 }
@@ -232,6 +237,10 @@ model Booking {
   agreement_accepted_at DateTime?
   agreement_ip         String?
   special_requests     String?
+  completed_at         DateTime?
+  cancelled_at         DateTime?
+  cancelled_by_id      String?
+  cancellation_reason  String?
   created_at      DateTime      @default(now())
   updated_at      DateTime      @updatedAt
 
@@ -240,6 +249,7 @@ model Booking {
   customer User            @relation(fields: [customer_id], references: [id], onDelete: Cascade)
   provider ServiceProvider @relation(fields: [provider_id], references: [id], onDelete: Cascade)
   payments Payment[]
+  review   Review?
 
   @@index([customer_id])
   @@index([provider_id])
@@ -288,6 +298,7 @@ model Review {
   id           String   @id @default(cuid())
   provider_id  String
   customer_id  String
+  booking_id   String?  @unique
   rating       Int
   title        String
   comment      String
@@ -299,6 +310,7 @@ model Review {
   // Relations
   provider ServiceProvider @relation(fields: [provider_id], references: [id], onDelete: Cascade)
   customer User            @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  booking  Booking?        @relation(fields: [booking_id], references: [id], onDelete: SetNull)
 
   @@index([provider_id])
   @@index([rating])
@@ -411,6 +423,7 @@ model EventSlot {
   // Relations
   event            Event            @relation(fields: [event_id], references: [id], onDelete: Cascade)
   quotes           Quote[]          @relation("SlotQuotes")
+  requests         ServiceRequest[] @relation("SlotRequests")
   booked_quote     Quote?           @relation("BookedQuote", fields: [booked_quote_id], references: [id])
 
   @@map("event_slots")

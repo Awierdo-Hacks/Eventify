@@ -28,6 +28,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import VisuallyHidden from '@/components/ui/visually-hidden';
 import { mapCategoryToEnum, ProviderCategory } from '@/lib/eventHelpers';
+import { eventTypeLabel } from '@/lib/labels';
 
 interface Attachment {
   id: string;
@@ -130,6 +131,29 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
   const [quoteServices, setQuoteServices] = useState<string[]>(['']);
   const [sendingQuote, setSendingQuote] = useState(false);
   const [quoteError, setQuoteError] = useState<string | null>(null);
+  // A chat quote either answers an open request or describes the event it is for
+  const [quoteRequests, setQuoteRequests] = useState<
+    { id: string; eventType: string; eventDate: string; eventLocation: string; guestCount: number; hasOpenQuote: boolean }[]
+  >([]);
+  const [quoteRequestId, setQuoteRequestId] = useState<string>('');
+  const [quoteEventType, setQuoteEventType] = useState('CUSTOM');
+  const [quoteEventDate, setQuoteEventDate] = useState('');
+  const [quoteEventLocation, setQuoteEventLocation] = useState('');
+  const [quoteGuestCount, setQuoteGuestCount] = useState('');
+
+  const openQuoteDialog = async () => {
+    setShowQuoteDialog(true);
+    setQuoteError(null);
+    try {
+      const res = await fetch(`/api/conversations/${conversationId}/quote`);
+      if (res.ok) {
+        const data = await res.json();
+        const open = (data.requests || []).filter((r: { hasOpenQuote: boolean }) => !r.hasOpenQuote);
+        setQuoteRequests(open);
+        setQuoteRequestId(open[0]?.id ?? '');
+      }
+    } catch { /* provider can still describe the event manually */ }
+  };
 
   // Resolve params
   useEffect(() => {
@@ -307,6 +331,10 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
   // Send quote via chat
   const handleSendQuote = async () => {
     if (!quotePrice || !quoteDescription || !conversationId) return;
+    if (!quoteRequestId && (!quoteEventDate || !quoteEventLocation.trim() || !quoteGuestCount)) {
+      setQuoteError('Vul de datum, locatie en het aantal gasten van het event in.');
+      return;
+    }
 
     setSendingQuote(true);
     setQuoteError(null);
@@ -320,6 +348,14 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
           message: quoteDescription,
           terms: quoteTerms || undefined,
           includedServices: quoteServices.filter((s) => s.trim() !== ''),
+          ...(quoteRequestId
+            ? { requestId: quoteRequestId }
+            : {
+                eventType: quoteEventType,
+                eventDate: quoteEventDate,
+                eventLocation: quoteEventLocation.trim(),
+                guestCount: Number(quoteGuestCount),
+              }),
         }),
       });
 
@@ -334,6 +370,9 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
         setQuoteDescription('');
         setQuoteTerms('');
         setQuoteServices(['']);
+        setQuoteEventDate('');
+        setQuoteEventLocation('');
+        setQuoteGuestCount('');
         setQuoteError(null);
       } else {
         const err = await res.json();
@@ -495,30 +534,15 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
     setAcceptingQuote(true);
     setAcceptError(null);
     try {
-      // If event slot selected, link the quote first so accept can book it
-      if (selectedSlotId) {
-        const linkRes = await fetch(`/api/quotes/${acceptingQuoteId}/link`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ eventSlotId: selectedSlotId }),
-        });
-
-        if (!linkRes.ok) {
-          const err = await linkRes.json();
-          setAcceptError(err.error || 'Er ging iets mis bij het koppelen aan het event.');
-          return;
-        }
-      }
-
-      // Then accept the quote
+      // Accept and (optionally) attach to the chosen event slot in one transaction
       const res = await fetch(`/api/quotes/${acceptingQuoteId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'accept' }),
+        body: JSON.stringify({ action: 'accept', eventSlotId: selectedSlotId || undefined }),
       });
 
       if (!res.ok) {
-        const err = await res.json();
+        const err = await res.json().catch(() => ({}));
         setAcceptError(err.error || 'Er ging iets mis bij het accepteren van de offerte.');
         return;
       }
@@ -552,6 +576,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
   };
 
   const handleRejectQuote = async (quoteId: string) => {
+    if (!window.confirm('Weet je zeker dat je deze offerte wilt afwijzen? De provider krijgt een bericht.')) return;
     try {
       const res = await fetch(`/api/quotes/${quoteId}`, {
         method: 'PATCH',
@@ -783,7 +808,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
                 variant="ghost"
                 size="sm"
                 className="rounded-xl flex-shrink-0 h-10 w-10 p-0"
-                onClick={() => setShowQuoteDialog(true)}
+                onClick={openQuoteDialog}
               >
                 <Euro className="w-5 h-5 text-purple-600" />
               </Button>
@@ -859,6 +884,63 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
             </div>
 
             <div className="space-y-4 pt-2">
+              {/* Which event is this quote for? */}
+              <div className="p-4 rounded-2xl bg-purple-50/60 border border-purple-100 space-y-3">
+                <label className="text-sm font-medium text-gray-700 block">Voor welk event?</label>
+                {quoteRequests.length > 0 && (
+                  <select
+                    value={quoteRequestId}
+                    onChange={(e) => setQuoteRequestId(e.target.value)}
+                    className="w-full h-11 rounded-xl border-2 border-gray-100 bg-white px-3 text-sm"
+                  >
+                    {quoteRequests.map((r) => (
+                      <option key={r.id} value={r.id}>
+                        {eventTypeLabel(r.eventType)} · {new Date(r.eventDate).toLocaleDateString('nl-BE')} · {r.eventLocation} · {r.guestCount} gasten
+                      </option>
+                    ))}
+                    <option value="">Ander event (gegevens invullen)</option>
+                  </select>
+                )}
+                {!quoteRequestId && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <select
+                      value={quoteEventType}
+                      onChange={(e) => setQuoteEventType(e.target.value)}
+                      className="h-11 rounded-xl border-2 border-gray-100 bg-white px-3 text-sm"
+                    >
+                      <option value="WEDDING">Bruiloft</option>
+                      <option value="BIRTHDAY">Verjaardag</option>
+                      <option value="CORPORATE">Zakelijk event</option>
+                      <option value="FESTIVAL">Festival</option>
+                      <option value="CUSTOM">Ander event</option>
+                    </select>
+                    <Input
+                      type="date"
+                      value={quoteEventDate}
+                      min={new Date().toISOString().split('T')[0]}
+                      onChange={(e) => setQuoteEventDate(e.target.value)}
+                      className="rounded-xl border-2 border-gray-100 h-11 bg-white"
+                      aria-label="Datum van het event"
+                    />
+                    <Input
+                      placeholder="Locatie (bv. Gent)"
+                      value={quoteEventLocation}
+                      onChange={(e) => setQuoteEventLocation(e.target.value)}
+                      className="rounded-xl border-2 border-gray-100 h-11 bg-white"
+                    />
+                    <Input
+                      type="number"
+                      min="1"
+                      placeholder="Aantal gasten"
+                      value={quoteGuestCount}
+                      onChange={(e) => setQuoteGuestCount(e.target.value)}
+                      className="rounded-xl border-2 border-gray-100 h-11 bg-white"
+                    />
+                  </div>
+                )}
+                <p className="text-xs text-gray-500">Deze gegevens komen in de boeking als de klant accepteert.</p>
+              </div>
+
               <div>
                 <label className="text-sm font-medium text-gray-700 mb-1 block">Totaalprijs (€)</label>
                 <Input

@@ -31,6 +31,7 @@ export async function GET(
       rating: review.rating,
       title: review.title,
       comment: review.comment,
+      verifiedBooking: !!review.booking_id,
       eventType: review.event_type,
       eventDate: review.event_date,
       createdAt: review.created_at,

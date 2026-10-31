@@ -2,24 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { Download, LogOut, Users, Briefcase, List } from 'lucide-react';
+import { categoryLabel } from '@/lib/categories';
 
-const CATEGORY_LABELS: Record<string, string> = {
-  CATERING: 'Catering',
-  MUSIC: 'Muziek / DJ',
-  PHOTOGRAPHY: 'Fotografie',
-  DECORATION: 'Decoratie',
-  VENUE: 'Locatie',
-  ENTERTAINMENT: 'Entertainment',
-  VIDEOGRAPHY: 'Videografie',
-  TRANSPORT: 'Transport',
-  ACCOMMODATION: 'Accommodatie',
-  SECURITY: 'Beveiliging',
-  SANITARY: 'Sanitair',
-  CAKE: 'Taart',
-  FLOWERS: 'Bloemen',
-  MC: 'MC',
-  OTHER: 'Overige',
-};
 
 interface WaitlistEntry {
   id: string;
@@ -40,7 +24,7 @@ function exportCSV(entries: WaitlistEntry[]) {
     e.name,
     e.email,
     e.phone ?? '',
-    e.categories.map((c) => CATEGORY_LABELS[c] ?? c).join(', '),
+    e.categories.map((c) => categoryLabel(c, true)).join(', '),
     e.message ?? '',
   ]);
   const csv = [headers, ...rows]
@@ -155,7 +139,7 @@ function Dashboard() {
                 <div className="space-y-3">
                   {sortedCategories.map(([cat, count]) => (
                     <div key={cat} className="flex items-center gap-3">
-                      <p className="text-sm text-gray-600 w-36 shrink-0">{CATEGORY_LABELS[cat] ?? cat}</p>
+                      <p className="text-sm text-gray-600 w-36 shrink-0">{categoryLabel(cat, true)}</p>
                       <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
                         <div
                           className="h-full rounded-full bg-gradient-to-r from-purple-500 to-purple-700 transition-all"
@@ -208,7 +192,7 @@ function Dashboard() {
                           <td className="px-4 py-3 text-gray-600">{entry.phone ?? '—'}</td>
                           <td className="px-4 py-3 text-gray-600 max-w-48">
                             {entry.categories.length > 0
-                              ? entry.categories.map((c) => CATEGORY_LABELS[c] ?? c).join(', ')
+                              ? entry.categories.map((c) => categoryLabel(c, true)).join(', ')
                               : '—'}
                           </td>
                           <td className="px-4 py-3 text-gray-600 max-w-48 truncate">

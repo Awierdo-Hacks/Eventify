@@ -1,3 +1,4 @@
+import { parseCategory } from '../../lib/categories';
 import { PrismaClient } from '@/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { getDatabaseUrl } from "@/lib/database-url";
@@ -72,7 +73,7 @@ async function createTestRequests() {
 
     for (const requestData of newRequests) {
       // Vind een provider in de juiste categorie
-      const provider = providers.find(p => p.category === requestData.category);
+      const provider = providers.find(p => p.category === parseCategory(requestData.category));
       
       if (!provider) {
         console.log(`⏭️  Geen provider gevonden voor ${requestData.category}`);

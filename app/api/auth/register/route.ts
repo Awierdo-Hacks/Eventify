@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { UserRole, PriceRange } from '@/generated/prisma/client';
 import { setSession } from '@/lib/auth';
+import { parseCategory } from '@/lib/categories';
 
 // Map price range string to PriceRange enum
 function mapPriceRange(range: string): PriceRange {
@@ -128,6 +129,13 @@ export async function POST(request: Request) {
       } = body;
 
       // Validaties
+      if (!parseCategory(category)) {
+        return NextResponse.json(
+          { error: 'Kies een geldige categorie' },
+          { status: 400 }
+        );
+      }
+
       if (!businessName || !category || !location || !contactName) {
         return NextResponse.json(
           { error: 'Alle bedrijfsvelden zijn verplicht' },
@@ -164,7 +172,7 @@ export async function POST(request: Request) {
           data: {
             user_id: user.id,
             business_name: businessName,
-            category,
+            category: parseCategory(category)!,
             location,
             price_range: mapPriceRange(priceRange || '€€'),
             description,

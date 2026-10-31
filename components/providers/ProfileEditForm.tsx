@@ -25,19 +25,9 @@ import {
   Eye,
   CheckCircle,
 } from 'lucide-react';
+import { CATEGORIES } from '@/lib/categories';
 
-const CATEGORIES = [
-  { value: 'catering', label: '🍽️ Catering & Food' },
-  { value: 'dj', label: '🎵 DJ & Muziek' },
-  { value: 'photography', label: '📸 Fotografie' },
-  { value: 'decoration', label: '✨ Decoratie & Styling' },
-  { value: 'venues', label: '🏛️ Locaties & Zalen' },
-  { value: 'entertainment', label: '🎭 Entertainment' },
-  { value: 'flowers', label: '💐 Bloemen & Arrangementen' },
-  { value: 'video', label: '🎥 Videografie' },
-  { value: 'planning', label: '📋 Event Planning' },
-  { value: 'transport', label: '🚗 Transport' },
-];
+const CATEGORY_OPTIONS = CATEGORIES.map((c) => ({ value: c.value, label: `${c.icon} ${c.label}` }));
 
 const PRICE_RANGES = [
   { value: 'LOW', label: '€ — Budget' },
@@ -331,7 +321,7 @@ export default function ProfileEditForm({ initialData, onSave }: ProfileEditForm
                 className={`${inputClass('category')} appearance-none bg-white`}
               >
                 <option value="">Selecteer een categorie</option>
-                {CATEGORIES.map((cat) => (
+                {CATEGORY_OPTIONS.map((cat) => (
                   <option key={cat.value} value={cat.value}>
                     {cat.label}
                   </option>

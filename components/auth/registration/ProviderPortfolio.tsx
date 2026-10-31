@@ -201,7 +201,7 @@ export default function ProviderPortfolio({
             >
               <div className="p-6 bg-gray-50 rounded-2xl border-2 border-dashed border-purple-200">
                 <p className="text-center text-sm text-gray-500 mb-4">
-                  📱 Zo zien klanten jouw profiel op de browse-pagina
+                  📱 Zo zien klanten jouw profiel na verificatie
                 </p>
                 <LivePreviewCard />
               </div>

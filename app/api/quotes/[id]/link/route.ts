@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
+import { assertSlotUsable, recomputeSlotStatus, workflowErrorResponse } from '@/lib/workflow';
 
-// POST - Link a quote to an event slot
+// POST - Link a quote (and its request) to an event slot of the same category
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -18,123 +19,90 @@ export async function POST(
       );
     }
 
-    const body = await request.json();
-    const { eventSlotId } = body;
+    const body = await request.json().catch(() => ({}));
+    const { eventSlotId } = body as { eventSlotId?: unknown };
 
-    if (!eventSlotId) {
+    if (!eventSlotId || typeof eventSlotId !== 'string') {
       return NextResponse.json(
-        { error: 'Event slot ID is required' },
+        { error: 'Kies een onderdeel van je event' },
         { status: 400 }
       );
     }
 
-    // Get the quote with its request to verify ownership
-    const quote = await prisma.quote.findUnique({
-      where: { id: quoteId },
-      include: {
-        request: {
-          select: {
-            customer_id: true,
-          },
-        },
-        provider: {
-          select: {
-            category: true,
-          },
-        },
-      },
-    });
-
-    if (!quote) {
-      return NextResponse.json(
-        { error: 'Quote not found' },
-        { status: 404 }
-      );
-    }
-
-    // Verify the customer owns this quote's request
-    if (quote.request.customer_id !== session.id) {
-      return NextResponse.json(
-        { error: 'Not authorized to link this quote' },
-        { status: 403 }
-      );
-    }
-
-    // Get the slot to verify ownership and category match
-    const slot = await prisma.eventSlot.findUnique({
-      where: { id: eventSlotId },
-      include: {
-        event: {
-          select: {
-            customer_id: true,
-          },
-        },
-      },
-    });
-
-    if (!slot) {
-      return NextResponse.json(
-        { error: 'Event slot not found' },
-        { status: 404 }
-      );
-    }
-
-    // Verify the customer owns this event
-    if (slot.event.customer_id !== session.id) {
-      return NextResponse.json(
-        { error: 'Not authorized to modify this event' },
-        { status: 403 }
-      );
-    }
-
-    // Update the quote with the slot link
-    const updatedQuote = await prisma.quote.update({
-      where: { id: quoteId },
-      data: {
-        event_slot_id: eventSlotId,
-      },
-      include: {
-        provider: {
-          select: {
-            business_name: true,
-          },
-        },
-      },
-    });
-
-    // Update the slot status based on whether quote is accepted
-    // If quote is accepted, set status to BOOKED and link as booked_quote
-    if (quote.accepted) {
-      await prisma.eventSlot.update({
-        where: { id: eventSlotId },
-        data: { 
-          status: 'BOOKED',
-          booked_quote_id: quoteId,
+    const result = await prisma.$transaction(async (tx) => {
+      const quote = await tx.quote.findUnique({
+        where: { id: quoteId },
+        include: {
+          request: { select: { id: true, customer_id: true } },
+          provider: { select: { category: true } },
         },
       });
-    } else if (slot.status === 'EMPTY') {
-      // If not accepted yet but slot was empty, mark as quotes received
-      await prisma.eventSlot.update({
-        where: { id: eventSlotId },
-        data: { status: 'QUOTES_RECEIVED' },
+
+      if (!quote || quote.request.customer_id !== session.id) {
+        return null;
+      }
+
+      // An accepted quote may (re)claim its slot; otherwise the slot must be free
+      await assertSlotUsable(tx, {
+        slotId: eventSlotId,
+        customerId: session.id,
+        providerCategory: quote.provider.category,
+        allowBookedByQuoteId: quote.id,
       });
+
+      const previousSlotId = quote.event_slot_id;
+      const updatedQuote = await tx.quote.update({
+        where: { id: quoteId },
+        data: { event_slot_id: eventSlotId },
+      });
+      await tx.serviceRequest.update({
+        where: { id: quote.request.id },
+        data: { event_slot_id: eventSlotId },
+      });
+
+      if (quote.accepted) {
+        const booking = await tx.booking.findUnique({
+          where: { request_id: quote.request.id },
+          select: { status: true },
+        });
+        if (booking?.status === 'CONFIRMED' || booking?.status === 'COMPLETED') {
+          if (previousSlotId && previousSlotId !== eventSlotId) {
+            await tx.eventSlot.updateMany({
+              where: { id: previousSlotId, booked_quote_id: quote.id },
+              data: { booked_quote_id: null },
+            });
+          }
+          await tx.eventSlot.update({ where: { id: eventSlotId }, data: { booked_quote_id: quote.id } });
+        }
+      }
+
+      if (previousSlotId && previousSlotId !== eventSlotId) await recomputeSlotStatus(tx, previousSlotId);
+      await recomputeSlotStatus(tx, eventSlotId);
+
+      return updatedQuote;
+    });
+
+    if (!result) {
+      return NextResponse.json({ error: 'Offerte niet gevonden' }, { status: 404 });
     }
 
     return NextResponse.json({
-      id: updatedQuote.id,
-      eventSlotId: updatedQuote.event_slot_id,
-      message: `Quote linked to event slot`,
+      id: result.id,
+      eventSlotId: result.event_slot_id,
+      message: 'Offerte gekoppeld aan je event',
     });
   } catch (error) {
+    const known = workflowErrorResponse(error);
+    if (known) return NextResponse.json(known.body, { status: known.status });
     console.error('Error linking quote:', error);
     return NextResponse.json(
-      { error: 'Failed to link quote' },
+      { error: 'Er is iets misgegaan bij het koppelen van de offerte' },
       { status: 500 }
     );
   }
 }
 
-// DELETE - Unlink a quote from an event slot
+// DELETE - Unlink a quote from an event slot (not possible while it is booked)
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -150,71 +118,55 @@ export async function DELETE(
       );
     }
 
-    // Get the quote with its request to verify ownership
     const quote = await prisma.quote.findUnique({
       where: { id: quoteId },
       include: {
-        request: {
-          select: {
-            customer_id: true,
-          },
-        },
+        request: { select: { id: true, customer_id: true } },
+        booked_for_slot: { select: { id: true } },
       },
     });
 
-    if (!quote) {
+    if (!quote || quote.request.customer_id !== session.id) {
       return NextResponse.json(
-        { error: 'Quote not found' },
+        { error: 'Offerte niet gevonden' },
         { status: 404 }
-      );
-    }
-
-    // Verify the customer owns this quote's request
-    if (quote.request.customer_id !== session.id) {
-      return NextResponse.json(
-        { error: 'Not authorized to unlink this quote' },
-        { status: 403 }
       );
     }
 
     if (!quote.event_slot_id) {
       return NextResponse.json(
-        { error: 'Quote is not linked to any event slot' },
+        { error: 'Deze offerte is niet gekoppeld aan een event' },
+        { status: 400 }
+      );
+    }
+
+    if (quote.booked_for_slot) {
+      return NextResponse.json(
+        { error: 'Deze offerte is geboekt. Annuleer eerst de boeking.' },
         { status: 400 }
       );
     }
 
     const previousSlotId = quote.event_slot_id;
 
-    // Unlink the quote
-    await prisma.quote.update({
-      where: { id: quoteId },
-      data: {
-        event_slot_id: null,
-      },
-    });
-
-    // Check if slot still has quotes and update status accordingly
-    const remainingQuotes = await prisma.quote.count({
-      where: { event_slot_id: previousSlotId },
-    });
-
-    if (remainingQuotes === 0) {
-      await prisma.eventSlot.update({
-        where: { id: previousSlotId },
-        data: { status: 'EMPTY' },
+    await prisma.$transaction(async (tx) => {
+      await tx.quote.update({ where: { id: quoteId }, data: { event_slot_id: null } });
+      await tx.serviceRequest.updateMany({
+        where: { id: quote.request.id, event_slot_id: previousSlotId },
+        data: { event_slot_id: null },
       });
-    }
+      await recomputeSlotStatus(tx, previousSlotId);
+    });
 
     return NextResponse.json({
       id: quoteId,
       eventSlotId: null,
-      message: 'Quote unlinked from event slot',
+      message: 'Offerte losgekoppeld van het event',
     });
   } catch (error) {
     console.error('Error unlinking quote:', error);
     return NextResponse.json(
-      { error: 'Failed to unlink quote' },
+      { error: 'Er is iets misgegaan bij het loskoppelen van de offerte' },
       { status: 500 }
     );
   }

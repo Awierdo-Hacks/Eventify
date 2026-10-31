@@ -29,11 +29,14 @@ import {
   Calendar,
   ArrowLeft,
 } from 'lucide-react';
+import { categoryLabel } from '@/lib/categories';
+import { eventTypeLabel } from '@/lib/labels';
 
 interface Review {
   id: string;
   rating: number;
   title: string;
+  verifiedBooking?: boolean;
   comment: string;
   eventType: string;
   eventDate: string;
@@ -75,6 +78,14 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
   const [provider, setProvider] = useState<Provider | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  // Event context (?eventId&slotId) from browse is passed on to the quote request
+  const [contextQuery, setContextQuery] = useState('');
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const eventId = params.get('eventId');
+    const slotId = params.get('slotId');
+    if (eventId && slotId) setContextQuery(`?eventId=${encodeURIComponent(eventId)}&slotId=${encodeURIComponent(slotId)}`);
+  }, []);
   const [error, setError] = useState<string | null>(null);
   const [providerId, setProviderId] = useState<string | null>(null);
   const [contactLoading, setContactLoading] = useState(false);
@@ -152,12 +163,12 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ recipientId: provider.user.id }),
       });
-      if (!res.ok) throw new Error('Kon gesprek niet starten');
-      const conversation = await res.json();
-      router.push(`/messages/${conversation.id}`);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Kon gesprek niet starten');
+      router.push(`/messages/${data.conversation.id}`);
     } catch (err) {
       console.error('Error starting conversation:', err);
-      alert('Er is iets misgegaan bij het starten van het gesprek');
+      alert(err instanceof Error ? err.message : 'Er is iets misgegaan bij het starten van het gesprek');
     } finally {
       setContactLoading(false);
     }
@@ -284,7 +295,7 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
                       {provider.location}
                     </div>
                     <Badge variant="secondary" className="bg-purple-100 text-purple-700">
-                      {provider.category}
+                      {categoryLabel(provider.category)}
                     </Badge>
                   </div>
                 </div>
@@ -395,10 +406,16 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
                         <div>
                           <h4 className="font-semibold text-gray-900">{review.customer.name}</h4>
                           <div className="flex items-center gap-2 text-sm text-gray-500">
-                            <span>{review.eventType}</span>
+                            <span>{eventTypeLabel(review.eventType)}</span>
                             <span>•</span>
-                            <span>{new Date(review.eventDate).toLocaleDateString('nl-NL')}</span>
+                            <span>{new Date(review.eventDate).toLocaleDateString('nl-BE')}</span>
                           </div>
+                          {review.verifiedBooking && (
+                            <span className="inline-flex items-center gap-1 mt-1 text-xs font-medium text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5">
+                              <CheckCircle className="w-3 h-3" />
+                              Geverifieerde boeking
+                            </span>
+                          )}
                         </div>
                         <div className="flex items-center gap-1">
                           {[...Array(5)].map((_, i) => (
@@ -441,7 +458,7 @@ export default function ProviderDetailPage({ params }: { params: Promise<{ id: s
             <Card className="p-3 sm:p-4 border-2 border-gray-100 rounded-3xl lg:sticky lg:top-4">
               <h3 className="text-lg font-bold mb-3 text-gray-900">Aanvragen</h3>
 
-              <Link href={`/request-quote/${provider.id}`}>
+              <Link href={`/request-quote/${provider.id}${contextQuery}`}>
                 <Button className="w-full rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-10 text-sm mb-2 shadow-sm">
                   Offerte Aanvragen
                 </Button>

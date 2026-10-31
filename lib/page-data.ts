@@ -1,3 +1,6 @@
+import { parseCategory } from '@/lib/categories';
+import { isQuoteExpired, isQuoteOpen, isRequestOpen } from '@/lib/workflow';
+import { getUnavailableDates, toDayKey } from '@/lib/availability';
 import { prisma } from '@/lib/prisma';
 import type { SessionUser } from '@/lib/auth';
 
@@ -40,6 +43,10 @@ export interface BrowseProviderFilters {
   priceRange?: string | null;
   search?: string | null;
   isActive?: string | null;
+  /** Only providers free on this day (YYYY-MM-DD), used when browsing for an event */
+  availableOn?: string | null;
+  /** Only providers whose min/max guest range fits this number */
+  guests?: number | null;
   page?: number;
   pageSize?: number;
 }
@@ -127,14 +134,34 @@ export async function getServiceRequestsForSession(session: SessionUser, filters
           id: true,
           total_price: true,
           accepted: true,
+          rejected_at: true,
+          valid_until: true,
         },
+      },
+      event_slot: {
+        select: { id: true, category: true, event: { select: { id: true, name: true } } },
       },
     },
     orderBy: { created_at: 'desc' },
   });
 
+  // For providers: is the agenda still free on the day of each open request?
+  let unavailableDays: Set<string> | null = null;
+  if (session.role === 'PROVIDER' && session.providerId) {
+    const openDates = requests.filter((r) => isRequestOpen(r)).map((r) => r.event_date.getTime());
+    if (openDates.length > 0) {
+      const days = await getUnavailableDates(session.providerId, {
+        from: new Date(Math.min(...openDates) - 24 * 60 * 60 * 1000),
+        to: new Date(Math.max(...openDates) + 24 * 60 * 60 * 1000),
+      });
+      unavailableDays = new Set(days);
+    }
+  }
+
   return requests.map((req) => ({
     id: req.id,
+    providerAvailable:
+      unavailableDays && isRequestOpen(req) ? !unavailableDays.has(toDayKey(req.event_date)) : null,
     category: req.category,
     eventType: req.event_type,
     eventDate: toIso(req.event_date),
@@ -147,6 +174,11 @@ export async function getServiceRequestsForSession(session: SessionUser, filters
     customerEmail: req.customer_email,
     customerPhone: req.customer_phone,
     preferredContact: req.preferred_contact,
+    declineReason: req.decline_reason,
+    closedAt: toNullableIso(req.closed_at),
+    eventSlotId: req.event_slot_id,
+    // The event name is only shown to the customer who owns it
+    eventName: session.role === 'CUSTOMER' ? req.event_slot?.event.name ?? null : null,
     createdAt: toIso(req.created_at),
     customer: {
       id: req.customer.id,
@@ -167,6 +199,8 @@ export async function getServiceRequestsForSession(session: SessionUser, filters
       id: quote.id,
       totalPrice: quote.total_price,
       accepted: quote.accepted,
+      rejected: !!quote.rejected_at,
+      open: isQuoteOpen(quote),
     })),
   }));
 }
@@ -196,14 +230,22 @@ export async function getQuotesForSession(session: SessionUser, filters: { reque
           category: true,
           location: true,
           user_id: true,
+          rating_avg: true,
+          review_count: true,
+          verified: true,
         },
+      },
+      event_slot: {
+        select: { id: true, category: true, event: { select: { id: true, name: true } } },
       },
       request: {
         select: {
           id: true,
+          status: true,
           event_type: true,
           event_date: true,
           event_location: true,
+          guest_count: true,
           customer: {
             select: {
               id: true,
@@ -224,22 +266,33 @@ export async function getQuotesForSession(session: SessionUser, filters: { reque
     includedServices: quote.included_services,
     validUntil: toIso(quote.valid_until),
     status: quote.rejected_at ? 'REJECTED' : quote.accepted ? 'ACCEPTED' : 'PENDING',
+    expired: !quote.accepted && !quote.rejected_at && isQuoteExpired(quote),
+    // Can still be accepted: open quote on an open request
+    canAccept: isQuoteOpen(quote) && isRequestOpen(quote.request),
     createdAt: toIso(quote.created_at),
     rejectedAt: toNullableIso(quote.rejected_at),
     rejectionReason: quote.rejection_reason,
     eventSlotId: quote.event_slot_id,
+    eventSlot: quote.event_slot && session.role === 'CUSTOMER'
+      ? { id: quote.event_slot.id, category: quote.event_slot.category, eventId: quote.event_slot.event.id, eventName: quote.event_slot.event.name }
+      : null,
     provider: {
       id: quote.provider.id,
       businessName: quote.provider.business_name,
       category: quote.provider.category,
       location: quote.provider.location,
       userId: quote.provider.user_id,
+      rating: Math.round(quote.provider.rating_avg * 10) / 10,
+      reviewCount: quote.provider.review_count,
+      verified: quote.provider.verified,
     },
     serviceRequest: {
       id: quote.request.id,
+      status: quote.request.status,
       eventType: quote.request.event_type,
       eventDate: toIso(quote.request.event_date),
       eventLocation: quote.request.event_location,
+      guestCount: quote.request.guest_count,
       customer: {
         id: quote.request.customer.id,
         name: quote.request.customer.name,
@@ -281,6 +334,7 @@ export async function getBookingsForSession(session: SessionUser, filters: { sta
           user_id: true,
         },
       },
+      review: { select: { id: true, rating: true } },
       request: {
         select: {
           id: true,
@@ -312,6 +366,11 @@ export async function getBookingsForSession(session: SessionUser, filters: { sta
     status: booking.status,
     paymentStatus: booking.payment_status,
     specialRequests: booking.special_requests,
+    completedAt: toNullableIso(booking.completed_at),
+    cancelledAt: toNullableIso(booking.cancelled_at),
+    cancellationReason: booking.cancellation_reason,
+    cancelledByMe: !!booking.cancelled_by_id && booking.cancelled_by_id === session.id,
+    review: booking.review ? { id: booking.review.id, rating: booking.review.rating } : null,
     createdAt: toIso(booking.created_at),
     customer: {
       id: booking.customer.id,
@@ -456,14 +515,61 @@ export async function getCustomerDashboardData(session: SessionUser) {
   return { requests, quotes, bookings, events, unreadCount };
 }
 
+export interface ProviderProfileStatus {
+  verified: boolean;
+  isActive: boolean;
+  completeness: number;
+  missing: string[];
+}
+
+/** Verification state + what is still missing for a convincing public profile. */
+export async function getProviderProfileStatus(providerId: string): Promise<ProviderProfileStatus | null> {
+  const provider = await prisma.serviceProvider.findUnique({
+    where: { id: providerId },
+    select: {
+      verified: true,
+      is_active: true,
+      description: true,
+      images: true,
+      portfolio_images: true,
+      services: true,
+      phone: true,
+      website: true,
+      min_guests: true,
+      max_guests: true,
+      _count: { select: { provider_services: true } },
+    },
+  });
+  if (!provider) return null;
+
+  const checks: [boolean, string][] = [
+    [(provider.description ?? '').trim().length >= 100, 'Een beschrijving van minstens 100 tekens'],
+    [provider.images.length > 0, 'Een profielfoto'],
+    [provider.portfolio_images.length >= 3, 'Minstens 3 portfoliofoto’s'],
+    [provider.services.length > 0 || provider._count.provider_services > 0, 'Je diensten en prijzen'],
+    [!!provider.phone, 'Een telefoonnummer'],
+    [provider.min_guests !== null || provider.max_guests !== null, 'Het aantal gasten dat je aankan'],
+    [!!provider.website, 'Je website of sociale media'],
+  ];
+  const done = checks.filter(([ok]) => ok).length;
+
+  return {
+    verified: provider.verified,
+    isActive: provider.is_active,
+    completeness: Math.round((done / checks.length) * 100),
+    missing: checks.filter(([ok]) => !ok).map(([, label]) => label),
+  };
+}
+
 export async function getProviderDashboardData(session: SessionUser) {
-  const [requests, quotes, bookings] = await Promise.all([
+  const [requests, quotes, bookings, profile] = await Promise.all([
     getServiceRequestsForSession(session),
     getQuotesForSession(session),
     getBookingsForSession(session),
+    session.providerId ? getProviderProfileStatus(session.providerId) : Promise.resolve(null),
   ]);
 
-  return { requests, quotes, bookings };
+  return { requests, quotes, bookings, profile };
 }
 
 export async function getAdminStats() {
@@ -724,12 +830,52 @@ export async function getAdminProviders(params: { page?: number | string | null;
   return { items, total, page, pageSize, hasMore: skip + items.length < total };
 }
 
+export interface BrowseEventContext {
+  eventId: string;
+  slotId: string;
+  eventName: string;
+  slotCategory: string;
+  eventType: string;
+  eventDate: string | null;
+  location: string | null;
+  guestCount: number | null;
+  budgetMin: number | null;
+  budgetMax: number | null;
+}
+
+/** The customer's own event + slot they are searching a provider for (null if not theirs). */
+export async function getBrowseEventContext(
+  session: SessionUser | null,
+  eventId: string | null | undefined,
+  slotId: string | null | undefined
+): Promise<BrowseEventContext | null> {
+  if (!session || session.role !== 'CUSTOMER' || !eventId || !slotId) return null;
+  const slot = await prisma.eventSlot.findFirst({
+    where: { id: slotId, event_id: eventId, event: { customer_id: session.id, status: { in: ['PLANNING', 'ACTIVE'] } } },
+    include: { event: true },
+  });
+  if (!slot) return null;
+  return {
+    eventId: slot.event.id,
+    slotId: slot.id,
+    eventName: slot.event.name,
+    slotCategory: slot.category,
+    eventType: slot.event.event_type,
+    eventDate: toNullableIso(slot.event.event_date),
+    location: slot.event.location,
+    guestCount: slot.event.guest_count,
+    budgetMin: slot.event.budget_min,
+    budgetMax: slot.event.budget_max,
+  };
+}
+
 export async function getBrowseProviders(filters: BrowseProviderFilters = {}): Promise<PaginationResult<BrowseProviderCard>> {
   const page = normalizePage(filters.page);
   const pageSize = normalizePageSize(filters.pageSize, DEFAULT_BROWSE_PAGE_SIZE);
   const skip = (page - 1) * pageSize;
 
-  const category = filters.category && filters.category !== 'all' ? filters.category : null;
+  // Accepts enum values and legacy slugs ("dj", "video") from old links
+  const category = filters.category && filters.category !== 'all' ? parseCategory(filters.category) : null;
   const location = filters.location && filters.location !== 'all' ? filters.location : null;
   const priceRange = filters.priceRange && filters.priceRange !== 'all' ? filters.priceRange : null;
   const search = filters.search?.trim();
@@ -752,6 +898,21 @@ export async function getBrowseProviders(filters: BrowseProviderFilters = {}): P
   if (filters.isActive !== 'false') {
     where.verified = true;
     where.is_active = true;
+  }
+  if (filters.guests && filters.guests > 0) {
+    where.AND = [
+      { OR: [{ min_guests: null }, { min_guests: { lte: filters.guests } }] },
+      { OR: [{ max_guests: null }, { max_guests: { gte: filters.guests } }] },
+    ];
+  }
+  if (filters.availableOn && /^\d{4}-\d{2}-\d{2}$/.test(filters.availableOn)) {
+    const dayStart = new Date(`${filters.availableOn}T00:00:00.000Z`);
+    const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+    where.blocked_dates = { none: { date: { gte: dayStart, lt: dayEnd } } };
+    where.bookings = { none: { status: { in: ['PENDING', 'CONFIRMED'] }, event_date: { gte: dayStart, lt: dayEnd } } };
+    where.calendar_integrations = {
+      none: { is_active: true, synced_events: { some: { start_date: { gte: dayStart, lt: dayEnd } } } },
+    };
   }
 
   const [providers, total] = await Promise.all([

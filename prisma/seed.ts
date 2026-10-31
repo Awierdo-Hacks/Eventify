@@ -86,7 +86,7 @@ async function main() {
     data: {
       user_id: provider1User.id,
       business_name: 'Culinaire Creaties',
-      category: 'catering',
+      category: 'CATERING',
       location: 'Amsterdam',
       price_range: PriceRange.HIGH,
       description: 'Specialist in exclusieve catering voor bruiloften en zakelijke evenementen. Wij bieden een breed scala aan menu\'s, van traditioneel Nederlands tot internationale fusion.',
@@ -119,7 +119,7 @@ async function main() {
     data: {
       user_id: provider2User.id,
       business_name: 'DJ Mike Productions',
-      category: 'dj',
+      category: 'MUSIC',
       location: 'Rotterdam',
       price_range: PriceRange.MEDIUM,
       description: 'Professionele DJ met 15 jaar ervaring in bruiloften, bedrijfsfeesten en privé events. Breed repertoire van dance tot lounge muziek.',
@@ -151,7 +151,7 @@ async function main() {
     data: {
       user_id: provider3User.id,
       business_name: 'Lens & Moments',
-      category: 'photography',
+      category: 'PHOTOGRAPHY',
       location: 'Utrecht',
       price_range: PriceRange.HIGH,
       description: 'Award-winning fotografie studio gespecialiseerd in bruiloftsfotografie en event coverage. Creatieve en natuurlijke stijl.',
@@ -183,7 +183,7 @@ async function main() {
     data: {
       user_id: provider4User.id,
       business_name: 'Bloemen & Stijl',
-      category: 'decoration',
+      category: 'DECORATION',
       location: 'Amsterdam',
       price_range: PriceRange.MEDIUM,
       description: 'Complete styling en decoratie voor elk type evenement. Van bloemen tot compleet interieurontwerp.',
@@ -209,7 +209,7 @@ async function main() {
     data: {
       customer_id: customer1.id,
       provider_id: provider1.id,
-      category: 'catering',
+      category: 'CATERING',
       event_type: 'Bruiloft',
       event_date: new Date('2024-08-15'),
       event_location: 'Amsterdam',
@@ -228,7 +228,7 @@ async function main() {
     data: {
       customer_id: customer2.id,
       provider_id: provider2.id,
-      category: 'dj',
+      category: 'MUSIC',
       event_type: 'Bedrijfsfeest',
       event_date: new Date('2024-12-20'),
       event_location: 'Rotterdam',
@@ -246,7 +246,7 @@ async function main() {
   const request3 = await prisma.serviceRequest.create({
     data: {
       customer_id: customer3.id,
-      category: 'photography',
+      category: 'PHOTOGRAPHY',
       event_type: 'Verjaardag',
       event_date: new Date('2024-09-10'),
       event_location: 'Utrecht',
@@ -538,7 +538,7 @@ async function main() {
     data: {
       customer_id: customer1.id,
       provider_id: provider1.id,
-      category: 'catering',
+      category: 'CATERING',
       event_type: 'Verjaardag',
       event_date: new Date('2026-05-20'),
       event_location: 'Restaurant De Kas, Amsterdam',
@@ -1256,6 +1256,12 @@ async function main() {
   });
 
   console.log('🏢 Created provider services');
+
+  // Ratings always reflect the real reviews (no invented review counts)
+  await prisma.$executeRaw`
+    UPDATE "service_providers" sp SET
+      "rating_avg" = COALESCE((SELECT AVG(r."rating")::float FROM "reviews" r WHERE r."provider_id" = sp."id"), 0),
+      "review_count" = (SELECT COUNT(*)::int FROM "reviews" r WHERE r."provider_id" = sp."id")`;
 
   console.log('✅ Seeding completed successfully!');
   console.log('\n📊 Summary:');

@@ -1,3 +1,4 @@
+import { parseCategory } from '../../lib/categories';
 import { PrismaClient } from '@/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { getDatabaseUrl } from "@/lib/database-url";
@@ -55,7 +56,7 @@ async function addTestQuotes() {
         // Zoek een andere provider in dezelfde categorie
         provider = await prisma.serviceProvider.findFirst({
           where: {
-            category: serviceRequest.category,
+            category: parseCategory(serviceRequest.category) ?? undefined,
             verified: true,
             id: {
               notIn: existingProviderIds,

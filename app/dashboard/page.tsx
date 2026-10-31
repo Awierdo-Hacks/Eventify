@@ -35,6 +35,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       initialUser={toPageUser(session)}
       initialTab={firstParam(params.tab) || 'events'}
       initialSuccess={firstParam(params.success)}
+      initialEventId={firstParam(params.event)}
     />
   );
 }

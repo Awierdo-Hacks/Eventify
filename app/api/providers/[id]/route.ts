@@ -4,6 +4,7 @@ import { requireProvider } from '@/lib/middleware/auth';
 import { canAccessProviderResource } from '@/lib/middleware/auth';
 import { getSession } from '@/lib/auth';
 import { PriceRange } from '@/generated/prisma/client';
+import { parseCategory } from '@/lib/categories';
 
 export async function GET(
   request: Request,
@@ -98,6 +99,7 @@ export async function GET(
         id: review.id,
         rating: review.rating,
         comment: review.comment,
+        verifiedBooking: !!review.booking_id,
         createdAt: review.created_at,
         customer: {
           id: review.customer.id,
@@ -165,8 +167,8 @@ export async function PATCH(
     if (body.location !== undefined && !body.location?.trim()) {
       errors.location = 'Locatie is verplicht';
     }
-    if (body.category !== undefined && !body.category?.trim()) {
-      errors.category = 'Categorie is verplicht';
+    if (body.category !== undefined && !parseCategory(body.category)) {
+      errors.category = 'Kies een geldige categorie';
     }
     if (body.description !== undefined && body.description.trim().length < 50) {
       errors.description = 'Beschrijving moet minimaal 50 karakters zijn';
@@ -189,7 +191,7 @@ export async function PATCH(
     const updateData: Record<string, unknown> = {};
 
     if (body.businessName !== undefined) updateData.business_name = body.businessName.trim();
-    if (body.category !== undefined) updateData.category = body.category.trim();
+    if (body.category !== undefined) updateData.category = parseCategory(body.category);
     if (body.location !== undefined) updateData.location = body.location.trim();
     if (body.description !== undefined) updateData.description = body.description.trim();
     if (body.priceRange !== undefined) updateData.price_range = body.priceRange;

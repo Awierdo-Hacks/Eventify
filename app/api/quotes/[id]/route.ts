@@ -1,8 +1,32 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
+import { parseBody, dateString } from '@/lib/validation';
+import {
+  acceptQuote,
+  rejectQuote,
+  isQuoteOpen,
+  postSystemMessage,
+  recomputeSlotStatus,
+  workflowErrorResponse,
+} from '@/lib/workflow';
+import { formatEuro } from '@/lib/labels';
 
-// PATCH - Accept or reject quote
+const patchSchema = z.discriminatedUnion('action', [
+  z.object({ action: z.literal('accept'), eventSlotId: z.string().min(1).nullish() }),
+  z.object({ action: z.literal('reject'), reason: z.string().max(500).nullish() }),
+  z.object({
+    action: z.literal('update'),
+    totalPrice: z.number().positive().max(1_000_000).optional(),
+    packageName: z.string().trim().max(200).optional(),
+    terms: z.string().trim().max(5000).nullish(),
+    includedServices: z.array(z.string().trim().min(1).max(200)).max(50).optional(),
+    validUntil: dateString.optional(),
+  }),
+]);
+
+// PATCH - Customer accepts/rejects a quote; provider updates an open quote
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -18,177 +42,75 @@ export async function PATCH(
     }
 
     const { id: quoteId } = await params;
-    const body = await request.json();
-    const { action, reason } = body; // 'accept' or 'reject', optional rejection reason
+    const { data, error } = await parseBody(request, patchSchema);
+    if (error) return error;
 
-    if (!action || (action !== 'accept' && action !== 'reject')) {
-      return NextResponse.json(
-        { error: 'Invalid action. Use "accept" or "reject"' },
-        { status: 400 }
-      );
-    }
-
-    // Get quote with service request
-    const quote = await prisma.quote.findUnique({
-      where: { id: quoteId },
-      include: {
-        request: {
-          select: {
-            id: true,
-            customer_id: true,
-            event_date: true,
-            event_location: true,
-            event_type: true,
-            guest_count: true,
-          },
-        },
-      },
-    });
-
-    if (!quote) {
-      return NextResponse.json(
-        { error: 'Offerte niet gevonden' },
-        { status: 404 }
-      );
-    }
-
-    // Check if user is the customer who made the request
-    if (quote.request.customer_id !== session.id) {
-      return NextResponse.json(
-        { error: 'Forbidden - alleen de klant kan deze offerte accepteren' },
-        { status: 403 }
-      );
-    }
-
-    if (action === 'accept') {
-      // Check if there's already a booking for this request
-      const existingBooking = await prisma.booking.findUnique({
-        where: { request_id: quote.request_id },
-      });
-
-      if (existingBooking) {
-        // Allow idempotent accept for the same provider/quote
-        if (quote.accepted && existingBooking.provider_id === quote.provider_id) {
-          if (quote.event_slot_id) {
-            await prisma.eventSlot.update({
-              where: { id: quote.event_slot_id },
-              data: {
-                status: 'BOOKED',
-                booked_quote_id: quoteId,
-              },
-            });
-          }
-
-          return NextResponse.json({
-            success: true,
-            message: 'Offerte is al geaccepteerd',
-            quote: {
-              id: quote.id,
-              accepted: true,
-            },
-            booking: {
-              id: existingBooking.id,
-              eventDate: existingBooking.event_date,
-              status: existingBooking.status,
-            },
-          });
-        }
-
-        return NextResponse.json(
-          { error: 'Er is al een boeking voor deze aanvraag. Je kunt maar één offerte per aanvraag accepteren.' },
-          { status: 400 }
-        );
-      }
-
-      // Check if another quote for this request is already accepted
-      const acceptedQuote = await prisma.quote.findFirst({
-        where: {
-          request_id: quote.request_id,
-          accepted: true,
-          id: { not: quoteId },
-        },
-      });
-
-      if (acceptedQuote) {
-        return NextResponse.json(
-          { error: 'Er is al een andere offerte geaccepteerd voor deze aanvraag.' },
-          { status: 400 }
-        );
-      }
-
-      // Accept quote - create booking and update statuses atomically
-      const [updatedQuote, booking] = await prisma.$transaction([
-        // Update quote accepted status
-        prisma.quote.update({
-          where: { id: quoteId },
-          data: { accepted: true },
-        }),
-        // Create booking
-        prisma.booking.create({
-          data: {
-            request_id: quote.request_id,
-            customer_id: quote.request.customer_id,
-            provider_id: quote.provider_id,
-            event_date: quote.request.event_date,
-            event_location: quote.request.event_location,
-            guest_count: quote.request.guest_count,
-            final_price: quote.total_price,
-            status: 'CONFIRMED',
-            payment_status: 'UNPAID',
-          },
-        }),
-        // Update service request status
-        prisma.serviceRequest.update({
-          where: { id: quote.request_id },
-          data: { status: 'ACCEPTED' },
-        }),
-      ]);
-
-      // If quote is linked to an event slot, update slot status to BOOKED
-      if (quote.event_slot_id) {
-        await prisma.eventSlot.update({
-          where: { id: quote.event_slot_id },
-          data: { 
-            status: 'BOOKED',
-            booked_quote_id: quoteId,
-          },
-        });
-      }
-
+    if (data.action === 'accept') {
+      const result = await acceptQuote({ quoteId, customer: session, eventSlotId: data.eventSlotId });
       return NextResponse.json({
         success: true,
-        message: 'Offerte geaccepteerd en boeking aangemaakt',
-        quote: {
-          id: updatedQuote.id,
-          accepted: updatedQuote.accepted,
-        },
+        message: result.alreadyAccepted ? 'Offerte is al geaccepteerd' : 'Offerte geaccepteerd en boeking aangemaakt',
+        quote: { id: result.quote.id, accepted: true },
         booking: {
-          id: booking.id,
-          eventDate: booking.event_date,
-          status: booking.status,
+          id: result.booking.id,
+          eventDate: result.booking.event_date,
+          status: result.booking.status,
         },
       });
-    } else {
-      // Reject quote - mark as rejected with timestamp and optional reason
-      const updatedQuote = await prisma.quote.update({
-        where: { id: quoteId },
-        data: {
-          rejected_at: new Date(),
-          rejection_reason: reason || null,
-        },
-      });
-      
+    }
+
+    if (data.action === 'reject') {
+      const updatedQuote = await rejectQuote({ quoteId, customer: session, reason: data.reason });
       return NextResponse.json({
         success: true,
         message: 'Offerte afgewezen',
-        quote: {
-          id: updatedQuote.id,
-          accepted: false,
-          rejectedAt: updatedQuote.rejected_at,
-        },
+        quote: { id: updatedQuote.id, accepted: false, rejectedAt: updatedQuote.rejected_at },
       });
     }
+
+    // update: only the provider, only while the quote is still open
+    const quote = await prisma.quote.findUnique({
+      where: { id: quoteId },
+      include: { request: { select: { customer_id: true, status: true } } },
+    });
+
+    if (!quote || !session.providerId || quote.provider_id !== session.providerId) {
+      return NextResponse.json({ error: 'Offerte niet gevonden' }, { status: 404 });
+    }
+    if (!isQuoteOpen(quote) || !['PENDING', 'QUOTED'].includes(quote.request.status)) {
+      return NextResponse.json(
+        { error: 'Alleen openstaande offertes kunnen aangepast worden' },
+        { status: 400 }
+      );
+    }
+    if (data.validUntil && new Date(data.validUntil) < new Date(new Date().toDateString())) {
+      return NextResponse.json({ error: 'De geldigheidsdatum ligt in het verleden' }, { status: 400 });
+    }
+
+    const updated = await prisma.$transaction(async (tx) => {
+      const result = await tx.quote.update({
+        where: { id: quote.id },
+        data: {
+          ...(data.totalPrice !== undefined ? { total_price: data.totalPrice } : {}),
+          ...(data.packageName !== undefined ? { message: data.packageName || null } : {}),
+          ...(data.terms !== undefined ? { terms: data.terms || null } : {}),
+          ...(data.includedServices !== undefined ? { included_services: data.includedServices } : {}),
+          ...(data.validUntil !== undefined ? { valid_until: new Date(data.validUntil) } : {}),
+        },
+      });
+      await postSystemMessage(
+        tx,
+        session.id,
+        quote.request.customer_id,
+        `✏️ De offerte is aangepast: ${formatEuro(result.total_price)}, geldig tot ${result.valid_until.toLocaleDateString('nl-BE')}.`
+      );
+      return result;
+    });
+
+    return NextResponse.json({ success: true, quote: { id: updated.id } });
   } catch (error) {
+    const known = workflowErrorResponse(error);
+    if (known) return NextResponse.json(known.body, { status: known.status });
     console.error('Quote action error:', error);
     return NextResponse.json(
       { error: 'Er is iets misgegaan bij het verwerken van de offerte' },
@@ -197,7 +119,7 @@ export async function PATCH(
   }
 }
 
-// DELETE - Cancel/delete a quote (Provider only, for rejected quotes)
+// DELETE - Provider withdraws an open quote or removes a rejected one
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -214,54 +136,62 @@ export async function DELETE(
 
     if (session.role !== 'PROVIDER' || !session.providerId) {
       return NextResponse.json(
-        { error: 'Forbidden - only providers can delete quotes' },
+        { error: 'Forbidden - only providers can withdraw quotes' },
         { status: 403 }
       );
     }
 
     const { id: quoteId } = await params;
 
-    // Get quote
     const quote = await prisma.quote.findUnique({
       where: { id: quoteId },
+      include: { request: { select: { id: true, customer_id: true, status: true } } },
     });
 
-    if (!quote) {
+    if (!quote || quote.provider_id !== session.providerId) {
       return NextResponse.json(
         { error: 'Offerte niet gevonden' },
         { status: 404 }
       );
     }
 
-    // Check if this is the provider's quote
-    if (quote.provider_id !== session.providerId) {
+    if (quote.accepted) {
       return NextResponse.json(
-        { error: 'Je kunt alleen je eigen offertes annuleren' },
-        { status: 403 }
-      );
-    }
-
-    // Only allow deleting rejected quotes
-    if (!quote.rejected_at) {
-      return NextResponse.json(
-        { error: 'Je kunt alleen afgewezen offertes annuleren' },
+        { error: 'Een geaccepteerde offerte kan niet ingetrokken worden. Annuleer de boeking.' },
         { status: 400 }
       );
     }
 
-    // Delete the quote
-    await prisma.quote.delete({
-      where: { id: quoteId },
+    const wasOpen = !quote.rejected_at;
+
+    await prisma.$transaction(async (tx) => {
+      await tx.quote.delete({ where: { id: quoteId } });
+
+      // Request goes back to "new" when the provider has no other quotes on it
+      if (quote.request.status === 'QUOTED') {
+        const remaining = await tx.quote.count({
+          where: { request_id: quote.request.id, rejected_at: null },
+        });
+        if (remaining === 0) {
+          await tx.serviceRequest.update({ where: { id: quote.request.id }, data: { status: 'PENDING' } });
+        }
+      }
+
+      if (quote.event_slot_id) await recomputeSlotStatus(tx, quote.event_slot_id);
+
+      if (wasOpen) {
+        await postSystemMessage(tx, session.id, quote.request.customer_id, 'De provider heeft de offerte ingetrokken.');
+      }
     });
 
     return NextResponse.json({
       success: true,
-      message: 'Offerte succesvol geannuleerd',
+      message: wasOpen ? 'Offerte ingetrokken' : 'Offerte verwijderd',
     });
   } catch (error) {
     console.error('Delete quote error:', error);
     return NextResponse.json(
-      { error: 'Er is iets misgegaan bij het annuleren van de offerte' },
+      { error: 'Er is iets misgegaan bij het intrekken van de offerte' },
       { status: 500 }
     );
   }

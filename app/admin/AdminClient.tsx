@@ -37,6 +37,7 @@ import {
   Star,
   ShieldCheck,
 } from 'lucide-react';
+import { categoryLabel } from '@/lib/categories';
 
 interface User {
   id: string;
@@ -90,29 +91,15 @@ interface PlatformStats {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  catering: 'bg-orange-100 text-orange-700 border-orange-200',
-  dj: 'bg-purple-100 text-purple-700 border-purple-200',
-  photography: 'bg-pink-100 text-pink-700 border-pink-200',
-  decoration: 'bg-green-100 text-green-700 border-green-200',
-  venues: 'bg-blue-100 text-blue-700 border-blue-200',
-  entertainment: 'bg-violet-100 text-violet-700 border-violet-200',
-  flowers: 'bg-rose-100 text-rose-700 border-rose-200',
-  video: 'bg-cyan-100 text-cyan-700 border-cyan-200',
-  planning: 'bg-indigo-100 text-indigo-700 border-indigo-200',
-  transport: 'bg-slate-100 text-slate-700 border-slate-200',
-};
-
-const CATEGORY_LABELS: Record<string, string> = {
-  catering: 'Catering',
-  dj: 'DJ & Muziek',
-  photography: 'Photography',
-  decoration: 'Decoration',
-  venues: 'Venue',
-  entertainment: 'Entertainment',
-  flowers: 'Flowers',
-  video: 'Video',
-  planning: 'Planning',
-  transport: 'Transport',
+  CATERING: 'bg-orange-100 text-orange-700 border-orange-200',
+  MUSIC: 'bg-purple-100 text-purple-700 border-purple-200',
+  PHOTOGRAPHY: 'bg-pink-100 text-pink-700 border-pink-200',
+  DECORATION: 'bg-green-100 text-green-700 border-green-200',
+  VENUE: 'bg-blue-100 text-blue-700 border-blue-200',
+  ENTERTAINMENT: 'bg-violet-100 text-violet-700 border-violet-200',
+  FLOWERS: 'bg-rose-100 text-rose-700 border-rose-200',
+  VIDEOGRAPHY: 'bg-cyan-100 text-cyan-700 border-cyan-200',
+  TRANSPORT: 'bg-slate-100 text-slate-700 border-slate-200',
 };
 
 const ACTIVITY_ICONS: Record<string, { icon: string; color: string }> = {
@@ -568,7 +555,7 @@ export default function AdminClient({ initialStats }: AdminClientProps) {
                             <p className="text-xs text-gray-500 truncate">{provider.user.email}</p>
                           </div>
                           <Badge className={`text-xs ${CATEGORY_COLORS[provider.category] || 'bg-gray-100 text-gray-700'}`}>
-                            {CATEGORY_LABELS[provider.category] || provider.category}
+                            {categoryLabel(provider.category, true)}
                           </Badge>
                         </div>
                         <div className="flex items-center justify-between">
@@ -627,7 +614,7 @@ export default function AdminClient({ initialStats }: AdminClientProps) {
                             </td>
                             <td className="px-4 py-3">
                               <Badge className={`text-xs font-medium ${CATEGORY_COLORS[provider.category] || 'bg-gray-100 text-gray-700'}`}>
-                                {CATEGORY_LABELS[provider.category] || provider.category}
+                                {categoryLabel(provider.category, true)}
                               </Badge>
                             </td>
                             <td className="px-4 py-3">
@@ -921,7 +908,7 @@ export default function AdminClient({ initialStats }: AdminClientProps) {
               {/* Status badges */}
               <div className="flex flex-wrap gap-2">
                 <Badge className={`${CATEGORY_COLORS[selectedProvider.category] || 'bg-gray-100 text-gray-700'}`}>
-                  {CATEGORY_LABELS[selectedProvider.category] || selectedProvider.category}
+                  {categoryLabel(selectedProvider.category, true)}
                 </Badge>
                 {selectedProvider.verified ? (
                   <Badge className="bg-green-100 text-green-800"><CheckCircle className="w-3 h-3 mr-1" />Geverifieerd</Badge>
@@ -1030,7 +1017,7 @@ export default function AdminClient({ initialStats }: AdminClientProps) {
             <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-5 border border-purple-100">
               <h4 className="text-xl font-bold text-gray-900 mb-2">{verifyingProvider.businessName}</h4>
               <div className="space-y-1.5 text-sm text-gray-700">
-                <p>Categorie: {CATEGORY_LABELS[verifyingProvider.category] || verifyingProvider.category}</p>
+                <p>Categorie: {categoryLabel(verifyingProvider.category, true)}</p>
                 <p>Locatie: {verifyingProvider.location}</p>
                 <p>Contact: {verifyingProvider.user.name}</p>
                 <p>Email: {verifyingProvider.user.email}</p>

@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -182,8 +184,8 @@ export function UnlinkedQuotes({ quotes, events, onLinkQuote }: UnlinkedQuotesPr
                         <p className="text-sm text-gray-500 mb-3">
                           Geen passende event slots gevonden voor deze categorie.
                         </p>
-                        <Button variant="outline" size="sm" className="rounded-xl">
-                          Nieuw Event Aanmaken
+                        <Button asChild variant="outline" size="sm" className="rounded-xl">
+                          <Link href="/events/new">Nieuw Event Aanmaken</Link>
                         </Button>
                       </div>
                     ) : (

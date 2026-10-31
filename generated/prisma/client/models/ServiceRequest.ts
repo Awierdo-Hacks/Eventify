@@ -50,6 +50,9 @@ export type ServiceRequestMinAggregateOutputType = {
   customer_email: string | null
   customer_phone: string | null
   preferred_contact: string | null
+  event_slot_id: string | null
+  decline_reason: string | null
+  closed_at: Date | null
   created_at: Date | null
   updated_at: Date | null
 }
@@ -70,6 +73,9 @@ export type ServiceRequestMaxAggregateOutputType = {
   customer_email: string | null
   customer_phone: string | null
   preferred_contact: string | null
+  event_slot_id: string | null
+  decline_reason: string | null
+  closed_at: Date | null
   created_at: Date | null
   updated_at: Date | null
 }
@@ -90,6 +96,9 @@ export type ServiceRequestCountAggregateOutputType = {
   customer_email: number
   customer_phone: number
   preferred_contact: number
+  event_slot_id: number
+  decline_reason: number
+  closed_at: number
   created_at: number
   updated_at: number
   _all: number
@@ -120,6 +129,9 @@ export type ServiceRequestMinAggregateInputType = {
   customer_email?: true
   customer_phone?: true
   preferred_contact?: true
+  event_slot_id?: true
+  decline_reason?: true
+  closed_at?: true
   created_at?: true
   updated_at?: true
 }
@@ -140,6 +152,9 @@ export type ServiceRequestMaxAggregateInputType = {
   customer_email?: true
   customer_phone?: true
   preferred_contact?: true
+  event_slot_id?: true
+  decline_reason?: true
+  closed_at?: true
   created_at?: true
   updated_at?: true
 }
@@ -160,6 +175,9 @@ export type ServiceRequestCountAggregateInputType = {
   customer_email?: true
   customer_phone?: true
   preferred_contact?: true
+  event_slot_id?: true
+  decline_reason?: true
+  closed_at?: true
   created_at?: true
   updated_at?: true
   _all?: true
@@ -267,6 +285,9 @@ export type ServiceRequestGroupByOutputType = {
   customer_email: string
   customer_phone: string
   preferred_contact: string | null
+  event_slot_id: string | null
+  decline_reason: string | null
+  closed_at: Date | null
   created_at: Date
   updated_at: Date
   _count: ServiceRequestCountAggregateOutputType | null
@@ -310,10 +331,14 @@ export type ServiceRequestWhereInput = {
   customer_email?: Prisma.StringFilter<"ServiceRequest"> | string
   customer_phone?: Prisma.StringFilter<"ServiceRequest"> | string
   preferred_contact?: Prisma.StringNullableFilter<"ServiceRequest"> | string | null
+  event_slot_id?: Prisma.StringNullableFilter<"ServiceRequest"> | string | null
+  decline_reason?: Prisma.StringNullableFilter<"ServiceRequest"> | string | null
+  closed_at?: Prisma.DateTimeNullableFilter<"ServiceRequest"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"ServiceRequest"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"ServiceRequest"> | Date | string
   customer?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   provider?: Prisma.XOR<Prisma.ServiceProviderNullableScalarRelationFilter, Prisma.ServiceProviderWhereInput> | null
+  event_slot?: Prisma.XOR<Prisma.EventSlotNullableScalarRelationFilter, Prisma.EventSlotWhereInput> | null
   quotes?: Prisma.QuoteListRelationFilter
   booking?: Prisma.XOR<Prisma.BookingNullableScalarRelationFilter, Prisma.BookingWhereInput> | null
 }
@@ -334,10 +359,14 @@ export type ServiceRequestOrderByWithRelationInput = {
   customer_email?: Prisma.SortOrder
   customer_phone?: Prisma.SortOrder
   preferred_contact?: Prisma.SortOrderInput | Prisma.SortOrder
+  event_slot_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  decline_reason?: Prisma.SortOrderInput | Prisma.SortOrder
+  closed_at?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   customer?: Prisma.UserOrderByWithRelationInput
   provider?: Prisma.ServiceProviderOrderByWithRelationInput
+  event_slot?: Prisma.EventSlotOrderByWithRelationInput
   quotes?: Prisma.QuoteOrderByRelationAggregateInput
   booking?: Prisma.BookingOrderByWithRelationInput
 }
@@ -361,10 +390,14 @@ export type ServiceRequestWhereUniqueInput = Prisma.AtLeast<{
   customer_email?: Prisma.StringFilter<"ServiceRequest"> | string
   customer_phone?: Prisma.StringFilter<"ServiceRequest"> | string
   preferred_contact?: Prisma.StringNullableFilter<"ServiceRequest"> | string | null
+  event_slot_id?: Prisma.StringNullableFilter<"ServiceRequest"> | string | null
+  decline_reason?: Prisma.StringNullableFilter<"ServiceRequest"> | string | null
+  closed_at?: Prisma.DateTimeNullableFilter<"ServiceRequest"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"ServiceRequest"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"ServiceRequest"> | Date | string
   customer?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   provider?: Prisma.XOR<Prisma.ServiceProviderNullableScalarRelationFilter, Prisma.ServiceProviderWhereInput> | null
+  event_slot?: Prisma.XOR<Prisma.EventSlotNullableScalarRelationFilter, Prisma.EventSlotWhereInput> | null
   quotes?: Prisma.QuoteListRelationFilter
   booking?: Prisma.XOR<Prisma.BookingNullableScalarRelationFilter, Prisma.BookingWhereInput> | null
 }, "id">
@@ -385,6 +418,9 @@ export type ServiceRequestOrderByWithAggregationInput = {
   customer_email?: Prisma.SortOrder
   customer_phone?: Prisma.SortOrder
   preferred_contact?: Prisma.SortOrderInput | Prisma.SortOrder
+  event_slot_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  decline_reason?: Prisma.SortOrderInput | Prisma.SortOrder
+  closed_at?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   _count?: Prisma.ServiceRequestCountOrderByAggregateInput
@@ -413,6 +449,9 @@ export type ServiceRequestScalarWhereWithAggregatesInput = {
   customer_email?: Prisma.StringWithAggregatesFilter<"ServiceRequest"> | string
   customer_phone?: Prisma.StringWithAggregatesFilter<"ServiceRequest"> | string
   preferred_contact?: Prisma.StringNullableWithAggregatesFilter<"ServiceRequest"> | string | null
+  event_slot_id?: Prisma.StringNullableWithAggregatesFilter<"ServiceRequest"> | string | null
+  decline_reason?: Prisma.StringNullableWithAggregatesFilter<"ServiceRequest"> | string | null
+  closed_at?: Prisma.DateTimeNullableWithAggregatesFilter<"ServiceRequest"> | Date | string | null
   created_at?: Prisma.DateTimeWithAggregatesFilter<"ServiceRequest"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"ServiceRequest"> | Date | string
 }
@@ -431,10 +470,13 @@ export type ServiceRequestCreateInput = {
   customer_email: string
   customer_phone: string
   preferred_contact?: string | null
+  decline_reason?: string | null
+  closed_at?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   customer: Prisma.UserCreateNestedOneWithoutService_requestsInput
   provider?: Prisma.ServiceProviderCreateNestedOneWithoutService_requestsInput
+  event_slot?: Prisma.EventSlotCreateNestedOneWithoutRequestsInput
   quotes?: Prisma.QuoteCreateNestedManyWithoutRequestInput
   booking?: Prisma.BookingCreateNestedOneWithoutRequestInput
 }
@@ -455,6 +497,9 @@ export type ServiceRequestUncheckedCreateInput = {
   customer_email: string
   customer_phone: string
   preferred_contact?: string | null
+  event_slot_id?: string | null
+  decline_reason?: string | null
+  closed_at?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   quotes?: Prisma.QuoteUncheckedCreateNestedManyWithoutRequestInput
@@ -475,10 +520,13 @@ export type ServiceRequestUpdateInput = {
   customer_email?: Prisma.StringFieldUpdateOperationsInput | string
   customer_phone?: Prisma.StringFieldUpdateOperationsInput | string
   preferred_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decline_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customer?: Prisma.UserUpdateOneRequiredWithoutService_requestsNestedInput
   provider?: Prisma.ServiceProviderUpdateOneWithoutService_requestsNestedInput
+  event_slot?: Prisma.EventSlotUpdateOneWithoutRequestsNestedInput
   quotes?: Prisma.QuoteUpdateManyWithoutRequestNestedInput
   booking?: Prisma.BookingUpdateOneWithoutRequestNestedInput
 }
@@ -499,6 +547,9 @@ export type ServiceRequestUncheckedUpdateInput = {
   customer_email?: Prisma.StringFieldUpdateOperationsInput | string
   customer_phone?: Prisma.StringFieldUpdateOperationsInput | string
   preferred_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  event_slot_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decline_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quotes?: Prisma.QuoteUncheckedUpdateManyWithoutRequestNestedInput
@@ -521,6 +572,9 @@ export type ServiceRequestCreateManyInput = {
   customer_email: string
   customer_phone: string
   preferred_contact?: string | null
+  event_slot_id?: string | null
+  decline_reason?: string | null
+  closed_at?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -539,6 +593,8 @@ export type ServiceRequestUpdateManyMutationInput = {
   customer_email?: Prisma.StringFieldUpdateOperationsInput | string
   customer_phone?: Prisma.StringFieldUpdateOperationsInput | string
   preferred_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decline_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -559,6 +615,9 @@ export type ServiceRequestUncheckedUpdateManyInput = {
   customer_email?: Prisma.StringFieldUpdateOperationsInput | string
   customer_phone?: Prisma.StringFieldUpdateOperationsInput | string
   preferred_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  event_slot_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decline_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -589,6 +648,9 @@ export type ServiceRequestCountOrderByAggregateInput = {
   customer_email?: Prisma.SortOrder
   customer_phone?: Prisma.SortOrder
   preferred_contact?: Prisma.SortOrder
+  event_slot_id?: Prisma.SortOrder
+  decline_reason?: Prisma.SortOrder
+  closed_at?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -613,6 +675,9 @@ export type ServiceRequestMaxOrderByAggregateInput = {
   customer_email?: Prisma.SortOrder
   customer_phone?: Prisma.SortOrder
   preferred_contact?: Prisma.SortOrder
+  event_slot_id?: Prisma.SortOrder
+  decline_reason?: Prisma.SortOrder
+  closed_at?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -633,6 +698,9 @@ export type ServiceRequestMinOrderByAggregateInput = {
   customer_email?: Prisma.SortOrder
   customer_phone?: Prisma.SortOrder
   preferred_contact?: Prisma.SortOrder
+  event_slot_id?: Prisma.SortOrder
+  decline_reason?: Prisma.SortOrder
+  closed_at?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -766,6 +834,48 @@ export type ServiceRequestUpdateOneRequiredWithoutBookingNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ServiceRequestUpdateToOneWithWhereWithoutBookingInput, Prisma.ServiceRequestUpdateWithoutBookingInput>, Prisma.ServiceRequestUncheckedUpdateWithoutBookingInput>
 }
 
+export type ServiceRequestCreateNestedManyWithoutEvent_slotInput = {
+  create?: Prisma.XOR<Prisma.ServiceRequestCreateWithoutEvent_slotInput, Prisma.ServiceRequestUncheckedCreateWithoutEvent_slotInput> | Prisma.ServiceRequestCreateWithoutEvent_slotInput[] | Prisma.ServiceRequestUncheckedCreateWithoutEvent_slotInput[]
+  connectOrCreate?: Prisma.ServiceRequestCreateOrConnectWithoutEvent_slotInput | Prisma.ServiceRequestCreateOrConnectWithoutEvent_slotInput[]
+  createMany?: Prisma.ServiceRequestCreateManyEvent_slotInputEnvelope
+  connect?: Prisma.ServiceRequestWhereUniqueInput | Prisma.ServiceRequestWhereUniqueInput[]
+}
+
+export type ServiceRequestUncheckedCreateNestedManyWithoutEvent_slotInput = {
+  create?: Prisma.XOR<Prisma.ServiceRequestCreateWithoutEvent_slotInput, Prisma.ServiceRequestUncheckedCreateWithoutEvent_slotInput> | Prisma.ServiceRequestCreateWithoutEvent_slotInput[] | Prisma.ServiceRequestUncheckedCreateWithoutEvent_slotInput[]
+  connectOrCreate?: Prisma.ServiceRequestCreateOrConnectWithoutEvent_slotInput | Prisma.ServiceRequestCreateOrConnectWithoutEvent_slotInput[]
+  createMany?: Prisma.ServiceRequestCreateManyEvent_slotInputEnvelope
+  connect?: Prisma.ServiceRequestWhereUniqueInput | Prisma.ServiceRequestWhereUniqueInput[]
+}
+
+export type ServiceRequestUpdateManyWithoutEvent_slotNestedInput = {
+  create?: Prisma.XOR<Prisma.ServiceRequestCreateWithoutEvent_slotInput, Prisma.ServiceRequestUncheckedCreateWithoutEvent_slotInput> | Prisma.ServiceRequestCreateWithoutEvent_slotInput[] | Prisma.ServiceRequestUncheckedCreateWithoutEvent_slotInput[]
+  connectOrCreate?: Prisma.ServiceRequestCreateOrConnectWithoutEvent_slotInput | Prisma.ServiceRequestCreateOrConnectWithoutEvent_slotInput[]
+  upsert?: Prisma.ServiceRequestUpsertWithWhereUniqueWithoutEvent_slotInput | Prisma.ServiceRequestUpsertWithWhereUniqueWithoutEvent_slotInput[]
+  createMany?: Prisma.ServiceRequestCreateManyEvent_slotInputEnvelope
+  set?: Prisma.ServiceRequestWhereUniqueInput | Prisma.ServiceRequestWhereUniqueInput[]
+  disconnect?: Prisma.ServiceRequestWhereUniqueInput | Prisma.ServiceRequestWhereUniqueInput[]
+  delete?: Prisma.ServiceRequestWhereUniqueInput | Prisma.ServiceRequestWhereUniqueInput[]
+  connect?: Prisma.ServiceRequestWhereUniqueInput | Prisma.ServiceRequestWhereUniqueInput[]
+  update?: Prisma.ServiceRequestUpdateWithWhereUniqueWithoutEvent_slotInput | Prisma.ServiceRequestUpdateWithWhereUniqueWithoutEvent_slotInput[]
+  updateMany?: Prisma.ServiceRequestUpdateManyWithWhereWithoutEvent_slotInput | Prisma.ServiceRequestUpdateManyWithWhereWithoutEvent_slotInput[]
+  deleteMany?: Prisma.ServiceRequestScalarWhereInput | Prisma.ServiceRequestScalarWhereInput[]
+}
+
+export type ServiceRequestUncheckedUpdateManyWithoutEvent_slotNestedInput = {
+  create?: Prisma.XOR<Prisma.ServiceRequestCreateWithoutEvent_slotInput, Prisma.ServiceRequestUncheckedCreateWithoutEvent_slotInput> | Prisma.ServiceRequestCreateWithoutEvent_slotInput[] | Prisma.ServiceRequestUncheckedCreateWithoutEvent_slotInput[]
+  connectOrCreate?: Prisma.ServiceRequestCreateOrConnectWithoutEvent_slotInput | Prisma.ServiceRequestCreateOrConnectWithoutEvent_slotInput[]
+  upsert?: Prisma.ServiceRequestUpsertWithWhereUniqueWithoutEvent_slotInput | Prisma.ServiceRequestUpsertWithWhereUniqueWithoutEvent_slotInput[]
+  createMany?: Prisma.ServiceRequestCreateManyEvent_slotInputEnvelope
+  set?: Prisma.ServiceRequestWhereUniqueInput | Prisma.ServiceRequestWhereUniqueInput[]
+  disconnect?: Prisma.ServiceRequestWhereUniqueInput | Prisma.ServiceRequestWhereUniqueInput[]
+  delete?: Prisma.ServiceRequestWhereUniqueInput | Prisma.ServiceRequestWhereUniqueInput[]
+  connect?: Prisma.ServiceRequestWhereUniqueInput | Prisma.ServiceRequestWhereUniqueInput[]
+  update?: Prisma.ServiceRequestUpdateWithWhereUniqueWithoutEvent_slotInput | Prisma.ServiceRequestUpdateWithWhereUniqueWithoutEvent_slotInput[]
+  updateMany?: Prisma.ServiceRequestUpdateManyWithWhereWithoutEvent_slotInput | Prisma.ServiceRequestUpdateManyWithWhereWithoutEvent_slotInput[]
+  deleteMany?: Prisma.ServiceRequestScalarWhereInput | Prisma.ServiceRequestScalarWhereInput[]
+}
+
 export type ServiceRequestCreateWithoutCustomerInput = {
   id?: string
   category: string
@@ -780,9 +890,12 @@ export type ServiceRequestCreateWithoutCustomerInput = {
   customer_email: string
   customer_phone: string
   preferred_contact?: string | null
+  decline_reason?: string | null
+  closed_at?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   provider?: Prisma.ServiceProviderCreateNestedOneWithoutService_requestsInput
+  event_slot?: Prisma.EventSlotCreateNestedOneWithoutRequestsInput
   quotes?: Prisma.QuoteCreateNestedManyWithoutRequestInput
   booking?: Prisma.BookingCreateNestedOneWithoutRequestInput
 }
@@ -802,6 +915,9 @@ export type ServiceRequestUncheckedCreateWithoutCustomerInput = {
   customer_email: string
   customer_phone: string
   preferred_contact?: string | null
+  event_slot_id?: string | null
+  decline_reason?: string | null
+  closed_at?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   quotes?: Prisma.QuoteUncheckedCreateNestedManyWithoutRequestInput
@@ -853,6 +969,9 @@ export type ServiceRequestScalarWhereInput = {
   customer_email?: Prisma.StringFilter<"ServiceRequest"> | string
   customer_phone?: Prisma.StringFilter<"ServiceRequest"> | string
   preferred_contact?: Prisma.StringNullableFilter<"ServiceRequest"> | string | null
+  event_slot_id?: Prisma.StringNullableFilter<"ServiceRequest"> | string | null
+  decline_reason?: Prisma.StringNullableFilter<"ServiceRequest"> | string | null
+  closed_at?: Prisma.DateTimeNullableFilter<"ServiceRequest"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"ServiceRequest"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"ServiceRequest"> | Date | string
 }
@@ -871,9 +990,12 @@ export type ServiceRequestCreateWithoutProviderInput = {
   customer_email: string
   customer_phone: string
   preferred_contact?: string | null
+  decline_reason?: string | null
+  closed_at?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   customer: Prisma.UserCreateNestedOneWithoutService_requestsInput
+  event_slot?: Prisma.EventSlotCreateNestedOneWithoutRequestsInput
   quotes?: Prisma.QuoteCreateNestedManyWithoutRequestInput
   booking?: Prisma.BookingCreateNestedOneWithoutRequestInput
 }
@@ -893,6 +1015,9 @@ export type ServiceRequestUncheckedCreateWithoutProviderInput = {
   customer_email: string
   customer_phone: string
   preferred_contact?: string | null
+  event_slot_id?: string | null
+  decline_reason?: string | null
+  closed_at?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   quotes?: Prisma.QuoteUncheckedCreateNestedManyWithoutRequestInput
@@ -939,10 +1064,13 @@ export type ServiceRequestCreateWithoutQuotesInput = {
   customer_email: string
   customer_phone: string
   preferred_contact?: string | null
+  decline_reason?: string | null
+  closed_at?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   customer: Prisma.UserCreateNestedOneWithoutService_requestsInput
   provider?: Prisma.ServiceProviderCreateNestedOneWithoutService_requestsInput
+  event_slot?: Prisma.EventSlotCreateNestedOneWithoutRequestsInput
   booking?: Prisma.BookingCreateNestedOneWithoutRequestInput
 }
 
@@ -962,6 +1090,9 @@ export type ServiceRequestUncheckedCreateWithoutQuotesInput = {
   customer_email: string
   customer_phone: string
   preferred_contact?: string | null
+  event_slot_id?: string | null
+  decline_reason?: string | null
+  closed_at?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   booking?: Prisma.BookingUncheckedCreateNestedOneWithoutRequestInput
@@ -997,10 +1128,13 @@ export type ServiceRequestUpdateWithoutQuotesInput = {
   customer_email?: Prisma.StringFieldUpdateOperationsInput | string
   customer_phone?: Prisma.StringFieldUpdateOperationsInput | string
   preferred_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decline_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customer?: Prisma.UserUpdateOneRequiredWithoutService_requestsNestedInput
   provider?: Prisma.ServiceProviderUpdateOneWithoutService_requestsNestedInput
+  event_slot?: Prisma.EventSlotUpdateOneWithoutRequestsNestedInput
   booking?: Prisma.BookingUpdateOneWithoutRequestNestedInput
 }
 
@@ -1020,6 +1154,9 @@ export type ServiceRequestUncheckedUpdateWithoutQuotesInput = {
   customer_email?: Prisma.StringFieldUpdateOperationsInput | string
   customer_phone?: Prisma.StringFieldUpdateOperationsInput | string
   preferred_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  event_slot_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decline_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   booking?: Prisma.BookingUncheckedUpdateOneWithoutRequestNestedInput
@@ -1039,10 +1176,13 @@ export type ServiceRequestCreateWithoutBookingInput = {
   customer_email: string
   customer_phone: string
   preferred_contact?: string | null
+  decline_reason?: string | null
+  closed_at?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   customer: Prisma.UserCreateNestedOneWithoutService_requestsInput
   provider?: Prisma.ServiceProviderCreateNestedOneWithoutService_requestsInput
+  event_slot?: Prisma.EventSlotCreateNestedOneWithoutRequestsInput
   quotes?: Prisma.QuoteCreateNestedManyWithoutRequestInput
 }
 
@@ -1062,6 +1202,9 @@ export type ServiceRequestUncheckedCreateWithoutBookingInput = {
   customer_email: string
   customer_phone: string
   preferred_contact?: string | null
+  event_slot_id?: string | null
+  decline_reason?: string | null
+  closed_at?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   quotes?: Prisma.QuoteUncheckedCreateNestedManyWithoutRequestInput
@@ -1097,10 +1240,13 @@ export type ServiceRequestUpdateWithoutBookingInput = {
   customer_email?: Prisma.StringFieldUpdateOperationsInput | string
   customer_phone?: Prisma.StringFieldUpdateOperationsInput | string
   preferred_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decline_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customer?: Prisma.UserUpdateOneRequiredWithoutService_requestsNestedInput
   provider?: Prisma.ServiceProviderUpdateOneWithoutService_requestsNestedInput
+  event_slot?: Prisma.EventSlotUpdateOneWithoutRequestsNestedInput
   quotes?: Prisma.QuoteUpdateManyWithoutRequestNestedInput
 }
 
@@ -1120,9 +1266,86 @@ export type ServiceRequestUncheckedUpdateWithoutBookingInput = {
   customer_email?: Prisma.StringFieldUpdateOperationsInput | string
   customer_phone?: Prisma.StringFieldUpdateOperationsInput | string
   preferred_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  event_slot_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decline_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quotes?: Prisma.QuoteUncheckedUpdateManyWithoutRequestNestedInput
+}
+
+export type ServiceRequestCreateWithoutEvent_slotInput = {
+  id?: string
+  category: string
+  event_type: string
+  event_date: Date | string
+  event_location: string
+  guest_count: number
+  budget_range?: $Enums.PriceRange | null
+  description: string
+  status?: $Enums.ServiceRequestStatus
+  customer_name: string
+  customer_email: string
+  customer_phone: string
+  preferred_contact?: string | null
+  decline_reason?: string | null
+  closed_at?: Date | string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  customer: Prisma.UserCreateNestedOneWithoutService_requestsInput
+  provider?: Prisma.ServiceProviderCreateNestedOneWithoutService_requestsInput
+  quotes?: Prisma.QuoteCreateNestedManyWithoutRequestInput
+  booking?: Prisma.BookingCreateNestedOneWithoutRequestInput
+}
+
+export type ServiceRequestUncheckedCreateWithoutEvent_slotInput = {
+  id?: string
+  customer_id: string
+  provider_id?: string | null
+  category: string
+  event_type: string
+  event_date: Date | string
+  event_location: string
+  guest_count: number
+  budget_range?: $Enums.PriceRange | null
+  description: string
+  status?: $Enums.ServiceRequestStatus
+  customer_name: string
+  customer_email: string
+  customer_phone: string
+  preferred_contact?: string | null
+  decline_reason?: string | null
+  closed_at?: Date | string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  quotes?: Prisma.QuoteUncheckedCreateNestedManyWithoutRequestInput
+  booking?: Prisma.BookingUncheckedCreateNestedOneWithoutRequestInput
+}
+
+export type ServiceRequestCreateOrConnectWithoutEvent_slotInput = {
+  where: Prisma.ServiceRequestWhereUniqueInput
+  create: Prisma.XOR<Prisma.ServiceRequestCreateWithoutEvent_slotInput, Prisma.ServiceRequestUncheckedCreateWithoutEvent_slotInput>
+}
+
+export type ServiceRequestCreateManyEvent_slotInputEnvelope = {
+  data: Prisma.ServiceRequestCreateManyEvent_slotInput | Prisma.ServiceRequestCreateManyEvent_slotInput[]
+  skipDuplicates?: boolean
+}
+
+export type ServiceRequestUpsertWithWhereUniqueWithoutEvent_slotInput = {
+  where: Prisma.ServiceRequestWhereUniqueInput
+  update: Prisma.XOR<Prisma.ServiceRequestUpdateWithoutEvent_slotInput, Prisma.ServiceRequestUncheckedUpdateWithoutEvent_slotInput>
+  create: Prisma.XOR<Prisma.ServiceRequestCreateWithoutEvent_slotInput, Prisma.ServiceRequestUncheckedCreateWithoutEvent_slotInput>
+}
+
+export type ServiceRequestUpdateWithWhereUniqueWithoutEvent_slotInput = {
+  where: Prisma.ServiceRequestWhereUniqueInput
+  data: Prisma.XOR<Prisma.ServiceRequestUpdateWithoutEvent_slotInput, Prisma.ServiceRequestUncheckedUpdateWithoutEvent_slotInput>
+}
+
+export type ServiceRequestUpdateManyWithWhereWithoutEvent_slotInput = {
+  where: Prisma.ServiceRequestScalarWhereInput
+  data: Prisma.XOR<Prisma.ServiceRequestUpdateManyMutationInput, Prisma.ServiceRequestUncheckedUpdateManyWithoutEvent_slotInput>
 }
 
 export type ServiceRequestCreateManyCustomerInput = {
@@ -1140,6 +1363,9 @@ export type ServiceRequestCreateManyCustomerInput = {
   customer_email: string
   customer_phone: string
   preferred_contact?: string | null
+  event_slot_id?: string | null
+  decline_reason?: string | null
+  closed_at?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -1158,9 +1384,12 @@ export type ServiceRequestUpdateWithoutCustomerInput = {
   customer_email?: Prisma.StringFieldUpdateOperationsInput | string
   customer_phone?: Prisma.StringFieldUpdateOperationsInput | string
   preferred_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decline_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   provider?: Prisma.ServiceProviderUpdateOneWithoutService_requestsNestedInput
+  event_slot?: Prisma.EventSlotUpdateOneWithoutRequestsNestedInput
   quotes?: Prisma.QuoteUpdateManyWithoutRequestNestedInput
   booking?: Prisma.BookingUpdateOneWithoutRequestNestedInput
 }
@@ -1180,6 +1409,9 @@ export type ServiceRequestUncheckedUpdateWithoutCustomerInput = {
   customer_email?: Prisma.StringFieldUpdateOperationsInput | string
   customer_phone?: Prisma.StringFieldUpdateOperationsInput | string
   preferred_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  event_slot_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decline_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quotes?: Prisma.QuoteUncheckedUpdateManyWithoutRequestNestedInput
@@ -1201,6 +1433,9 @@ export type ServiceRequestUncheckedUpdateManyWithoutCustomerInput = {
   customer_email?: Prisma.StringFieldUpdateOperationsInput | string
   customer_phone?: Prisma.StringFieldUpdateOperationsInput | string
   preferred_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  event_slot_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decline_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1220,6 +1455,9 @@ export type ServiceRequestCreateManyProviderInput = {
   customer_email: string
   customer_phone: string
   preferred_contact?: string | null
+  event_slot_id?: string | null
+  decline_reason?: string | null
+  closed_at?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -1238,9 +1476,12 @@ export type ServiceRequestUpdateWithoutProviderInput = {
   customer_email?: Prisma.StringFieldUpdateOperationsInput | string
   customer_phone?: Prisma.StringFieldUpdateOperationsInput | string
   preferred_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decline_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customer?: Prisma.UserUpdateOneRequiredWithoutService_requestsNestedInput
+  event_slot?: Prisma.EventSlotUpdateOneWithoutRequestsNestedInput
   quotes?: Prisma.QuoteUpdateManyWithoutRequestNestedInput
   booking?: Prisma.BookingUpdateOneWithoutRequestNestedInput
 }
@@ -1260,6 +1501,9 @@ export type ServiceRequestUncheckedUpdateWithoutProviderInput = {
   customer_email?: Prisma.StringFieldUpdateOperationsInput | string
   customer_phone?: Prisma.StringFieldUpdateOperationsInput | string
   preferred_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  event_slot_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decline_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quotes?: Prisma.QuoteUncheckedUpdateManyWithoutRequestNestedInput
@@ -1281,6 +1525,101 @@ export type ServiceRequestUncheckedUpdateManyWithoutProviderInput = {
   customer_email?: Prisma.StringFieldUpdateOperationsInput | string
   customer_phone?: Prisma.StringFieldUpdateOperationsInput | string
   preferred_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  event_slot_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decline_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ServiceRequestCreateManyEvent_slotInput = {
+  id?: string
+  customer_id: string
+  provider_id?: string | null
+  category: string
+  event_type: string
+  event_date: Date | string
+  event_location: string
+  guest_count: number
+  budget_range?: $Enums.PriceRange | null
+  description: string
+  status?: $Enums.ServiceRequestStatus
+  customer_name: string
+  customer_email: string
+  customer_phone: string
+  preferred_contact?: string | null
+  decline_reason?: string | null
+  closed_at?: Date | string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+}
+
+export type ServiceRequestUpdateWithoutEvent_slotInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  event_type?: Prisma.StringFieldUpdateOperationsInput | string
+  event_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  event_location?: Prisma.StringFieldUpdateOperationsInput | string
+  guest_count?: Prisma.IntFieldUpdateOperationsInput | number
+  budget_range?: Prisma.NullableEnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange | null
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumServiceRequestStatusFieldUpdateOperationsInput | $Enums.ServiceRequestStatus
+  customer_name?: Prisma.StringFieldUpdateOperationsInput | string
+  customer_email?: Prisma.StringFieldUpdateOperationsInput | string
+  customer_phone?: Prisma.StringFieldUpdateOperationsInput | string
+  preferred_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decline_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  customer?: Prisma.UserUpdateOneRequiredWithoutService_requestsNestedInput
+  provider?: Prisma.ServiceProviderUpdateOneWithoutService_requestsNestedInput
+  quotes?: Prisma.QuoteUpdateManyWithoutRequestNestedInput
+  booking?: Prisma.BookingUpdateOneWithoutRequestNestedInput
+}
+
+export type ServiceRequestUncheckedUpdateWithoutEvent_slotInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  customer_id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  event_type?: Prisma.StringFieldUpdateOperationsInput | string
+  event_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  event_location?: Prisma.StringFieldUpdateOperationsInput | string
+  guest_count?: Prisma.IntFieldUpdateOperationsInput | number
+  budget_range?: Prisma.NullableEnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange | null
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumServiceRequestStatusFieldUpdateOperationsInput | $Enums.ServiceRequestStatus
+  customer_name?: Prisma.StringFieldUpdateOperationsInput | string
+  customer_email?: Prisma.StringFieldUpdateOperationsInput | string
+  customer_phone?: Prisma.StringFieldUpdateOperationsInput | string
+  preferred_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decline_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  quotes?: Prisma.QuoteUncheckedUpdateManyWithoutRequestNestedInput
+  booking?: Prisma.BookingUncheckedUpdateOneWithoutRequestNestedInput
+}
+
+export type ServiceRequestUncheckedUpdateManyWithoutEvent_slotInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  customer_id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  event_type?: Prisma.StringFieldUpdateOperationsInput | string
+  event_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  event_location?: Prisma.StringFieldUpdateOperationsInput | string
+  guest_count?: Prisma.IntFieldUpdateOperationsInput | number
+  budget_range?: Prisma.NullableEnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange | null
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumServiceRequestStatusFieldUpdateOperationsInput | $Enums.ServiceRequestStatus
+  customer_name?: Prisma.StringFieldUpdateOperationsInput | string
+  customer_email?: Prisma.StringFieldUpdateOperationsInput | string
+  customer_phone?: Prisma.StringFieldUpdateOperationsInput | string
+  preferred_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decline_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1332,10 +1671,14 @@ export type ServiceRequestSelect<ExtArgs extends runtime.Types.Extensions.Intern
   customer_email?: boolean
   customer_phone?: boolean
   preferred_contact?: boolean
+  event_slot_id?: boolean
+  decline_reason?: boolean
+  closed_at?: boolean
   created_at?: boolean
   updated_at?: boolean
   customer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   provider?: boolean | Prisma.ServiceRequest$providerArgs<ExtArgs>
+  event_slot?: boolean | Prisma.ServiceRequest$event_slotArgs<ExtArgs>
   quotes?: boolean | Prisma.ServiceRequest$quotesArgs<ExtArgs>
   booking?: boolean | Prisma.ServiceRequest$bookingArgs<ExtArgs>
   _count?: boolean | Prisma.ServiceRequestCountOutputTypeDefaultArgs<ExtArgs>
@@ -1357,10 +1700,14 @@ export type ServiceRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   customer_email?: boolean
   customer_phone?: boolean
   preferred_contact?: boolean
+  event_slot_id?: boolean
+  decline_reason?: boolean
+  closed_at?: boolean
   created_at?: boolean
   updated_at?: boolean
   customer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   provider?: boolean | Prisma.ServiceRequest$providerArgs<ExtArgs>
+  event_slot?: boolean | Prisma.ServiceRequest$event_slotArgs<ExtArgs>
 }, ExtArgs["result"]["serviceRequest"]>
 
 export type ServiceRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1379,10 +1726,14 @@ export type ServiceRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   customer_email?: boolean
   customer_phone?: boolean
   preferred_contact?: boolean
+  event_slot_id?: boolean
+  decline_reason?: boolean
+  closed_at?: boolean
   created_at?: boolean
   updated_at?: boolean
   customer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   provider?: boolean | Prisma.ServiceRequest$providerArgs<ExtArgs>
+  event_slot?: boolean | Prisma.ServiceRequest$event_slotArgs<ExtArgs>
 }, ExtArgs["result"]["serviceRequest"]>
 
 export type ServiceRequestSelectScalar = {
@@ -1401,14 +1752,18 @@ export type ServiceRequestSelectScalar = {
   customer_email?: boolean
   customer_phone?: boolean
   preferred_contact?: boolean
+  event_slot_id?: boolean
+  decline_reason?: boolean
+  closed_at?: boolean
   created_at?: boolean
   updated_at?: boolean
 }
 
-export type ServiceRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "customer_id" | "provider_id" | "category" | "event_type" | "event_date" | "event_location" | "guest_count" | "budget_range" | "description" | "status" | "customer_name" | "customer_email" | "customer_phone" | "preferred_contact" | "created_at" | "updated_at", ExtArgs["result"]["serviceRequest"]>
+export type ServiceRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "customer_id" | "provider_id" | "category" | "event_type" | "event_date" | "event_location" | "guest_count" | "budget_range" | "description" | "status" | "customer_name" | "customer_email" | "customer_phone" | "preferred_contact" | "event_slot_id" | "decline_reason" | "closed_at" | "created_at" | "updated_at", ExtArgs["result"]["serviceRequest"]>
 export type ServiceRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   customer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   provider?: boolean | Prisma.ServiceRequest$providerArgs<ExtArgs>
+  event_slot?: boolean | Prisma.ServiceRequest$event_slotArgs<ExtArgs>
   quotes?: boolean | Prisma.ServiceRequest$quotesArgs<ExtArgs>
   booking?: boolean | Prisma.ServiceRequest$bookingArgs<ExtArgs>
   _count?: boolean | Prisma.ServiceRequestCountOutputTypeDefaultArgs<ExtArgs>
@@ -1416,10 +1771,12 @@ export type ServiceRequestInclude<ExtArgs extends runtime.Types.Extensions.Inter
 export type ServiceRequestIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   customer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   provider?: boolean | Prisma.ServiceRequest$providerArgs<ExtArgs>
+  event_slot?: boolean | Prisma.ServiceRequest$event_slotArgs<ExtArgs>
 }
 export type ServiceRequestIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   customer?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   provider?: boolean | Prisma.ServiceRequest$providerArgs<ExtArgs>
+  event_slot?: boolean | Prisma.ServiceRequest$event_slotArgs<ExtArgs>
 }
 
 export type $ServiceRequestPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1427,6 +1784,7 @@ export type $ServiceRequestPayload<ExtArgs extends runtime.Types.Extensions.Inte
   objects: {
     customer: Prisma.$UserPayload<ExtArgs>
     provider: Prisma.$ServiceProviderPayload<ExtArgs> | null
+    event_slot: Prisma.$EventSlotPayload<ExtArgs> | null
     quotes: Prisma.$QuotePayload<ExtArgs>[]
     booking: Prisma.$BookingPayload<ExtArgs> | null
   }
@@ -1446,6 +1804,9 @@ export type $ServiceRequestPayload<ExtArgs extends runtime.Types.Extensions.Inte
     customer_email: string
     customer_phone: string
     preferred_contact: string | null
+    event_slot_id: string | null
+    decline_reason: string | null
+    closed_at: Date | null
     created_at: Date
     updated_at: Date
   }, ExtArgs["result"]["serviceRequest"]>
@@ -1844,6 +2205,7 @@ export interface Prisma__ServiceRequestClient<T, Null = never, ExtArgs extends r
   readonly [Symbol.toStringTag]: "PrismaPromise"
   customer<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   provider<T extends Prisma.ServiceRequest$providerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ServiceRequest$providerArgs<ExtArgs>>): Prisma.Prisma__ServiceProviderClient<runtime.Types.Result.GetResult<Prisma.$ServiceProviderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  event_slot<T extends Prisma.ServiceRequest$event_slotArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ServiceRequest$event_slotArgs<ExtArgs>>): Prisma.Prisma__EventSlotClient<runtime.Types.Result.GetResult<Prisma.$EventSlotPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   quotes<T extends Prisma.ServiceRequest$quotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ServiceRequest$quotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$QuotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   booking<T extends Prisma.ServiceRequest$bookingArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ServiceRequest$bookingArgs<ExtArgs>>): Prisma.Prisma__BookingClient<runtime.Types.Result.GetResult<Prisma.$BookingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
@@ -1890,6 +2252,9 @@ export interface ServiceRequestFieldRefs {
   readonly customer_email: Prisma.FieldRef<"ServiceRequest", 'String'>
   readonly customer_phone: Prisma.FieldRef<"ServiceRequest", 'String'>
   readonly preferred_contact: Prisma.FieldRef<"ServiceRequest", 'String'>
+  readonly event_slot_id: Prisma.FieldRef<"ServiceRequest", 'String'>
+  readonly decline_reason: Prisma.FieldRef<"ServiceRequest", 'String'>
+  readonly closed_at: Prisma.FieldRef<"ServiceRequest", 'DateTime'>
   readonly created_at: Prisma.FieldRef<"ServiceRequest", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"ServiceRequest", 'DateTime'>
 }
@@ -2304,6 +2669,25 @@ export type ServiceRequest$providerArgs<ExtArgs extends runtime.Types.Extensions
    */
   include?: Prisma.ServiceProviderInclude<ExtArgs> | null
   where?: Prisma.ServiceProviderWhereInput
+}
+
+/**
+ * ServiceRequest.event_slot
+ */
+export type ServiceRequest$event_slotArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EventSlot
+   */
+  select?: Prisma.EventSlotSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EventSlot
+   */
+  omit?: Prisma.EventSlotOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EventSlotInclude<ExtArgs> | null
+  where?: Prisma.EventSlotWhereInput
 }
 
 /**

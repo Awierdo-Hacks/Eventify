@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
+import { z } from 'zod';
+import { parseBody } from '@/lib/validation';
 
 // GET - List reviews (for a specific provider)
 export async function GET(request: Request) {
@@ -37,6 +39,7 @@ export async function GET(request: Request) {
       rating: review.rating,
       title: review.title,
       comment: review.comment,
+      verifiedBooking: !!review.booking_id,
       eventType: review.event_type,
       eventDate: review.event_date,
       createdAt: review.created_at,
@@ -66,7 +69,14 @@ export async function GET(request: Request) {
   }
 }
 
-// POST - Create review (only after completed booking)
+const createReviewSchema = z.object({
+  bookingId: z.string().min(1),
+  rating: z.number().int().min(1).max(5),
+  title: z.string().trim().min(2).max(120),
+  comment: z.string().trim().min(10).max(2000),
+});
+
+// POST - Create review: only the customer of a completed booking, once per booking
 export async function POST(request: Request) {
   try {
     const session = await getSession();
@@ -85,113 +95,62 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = await request.json();
-    const { providerId, bookingId, rating, title, comment, eventType, eventDate } = body;
+    const { data, error } = await parseBody(request, createReviewSchema);
+    if (error) return error;
 
-    // Validatie
-    if (!providerId || !rating || !title || !comment) {
-      return NextResponse.json(
-        { error: 'Verplichte velden ontbreken' },
-        { status: 400 }
-      );
-    }
-
-    if (rating < 1 || rating > 5) {
-      return NextResponse.json(
-        { error: 'Rating moet tussen 1 en 5 zijn' },
-        { status: 400 }
-      );
-    }
-
-    // Check if booking exists and is completed (if bookingId provided)
-    if (bookingId) {
-      const booking = await prisma.booking.findUnique({
-        where: { id: bookingId },
-      });
-
-      if (!booking) {
-        return NextResponse.json(
-          { error: 'Boeking niet gevonden' },
-          { status: 404 }
-        );
-      }
-
-      if (booking.customer_id !== session.id) {
-        return NextResponse.json(
-          { error: 'Dit is niet jouw boeking' },
-          { status: 403 }
-        );
-      }
-
-      if (booking.status !== 'COMPLETED') {
-        return NextResponse.json(
-          { error: 'Je kunt alleen reviews plaatsen voor afgeronde boekingen' },
-          { status: 400 }
-        );
-      }
-
-      // Check if review already exists for this booking
-      const existingReview = await prisma.review.findFirst({
-        where: {
-          customer_id: session.id,
-          provider_id: providerId,
-          event_date: booking.event_date,
-        },
-      });
-
-      if (existingReview) {
-        return NextResponse.json(
-          { error: 'Je hebt al een review geplaatst voor deze boeking' },
-          { status: 400 }
-        );
-      }
-    }
-
-    // Create review
-    const review = await prisma.review.create({
-      data: {
-        customer_id: session.id,
-        provider_id: providerId,
-        rating,
-        title,
-        comment,
-        event_type: eventType || 'General',
-        event_date: eventDate ? new Date(eventDate) : new Date(),
-      },
-      include: {
-        customer: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        provider: {
-          select: {
-            id: true,
-            business_name: true,
-          },
-        },
-      },
+    const booking = await prisma.booking.findUnique({
+      where: { id: data.bookingId },
+      include: { request: { select: { event_type: true } }, review: { select: { id: true } } },
     });
 
-    // Update provider's average rating and review count using DB aggregation
-    const [reviewStats] = await Promise.all([
-      prisma.review.aggregate({
-        where: { provider_id: providerId },
-        _avg: { rating: true },
-        _count: { id: true },
-      }),
-    ]);
+    if (!booking || booking.customer_id !== session.id) {
+      return NextResponse.json(
+        { error: 'Boeking niet gevonden' },
+        { status: 404 }
+      );
+    }
 
-    const averageRating = reviewStats._avg.rating ?? 0;
-    const reviewCount = reviewStats._count.id;
+    if (booking.status !== 'COMPLETED') {
+      return NextResponse.json(
+        { error: 'Je kunt pas een review plaatsen nadat de boeking voltooid is' },
+        { status: 403 }
+      );
+    }
 
-    await prisma.serviceProvider.update({
-      where: { id: providerId },
-      data: {
-        rating_avg: averageRating,
-        review_count: reviewCount,
-      },
+    if (booking.review) {
+      return NextResponse.json(
+        { error: 'Je hebt al een review geplaatst voor deze boeking' },
+        { status: 409 }
+      );
+    }
+
+    const review = await prisma.$transaction(async (tx) => {
+      const created = await tx.review.create({
+        data: {
+          booking_id: booking.id,
+          customer_id: session.id,
+          provider_id: booking.provider_id,
+          rating: data.rating,
+          title: data.title,
+          comment: data.comment,
+          event_type: booking.request.event_type,
+          event_date: booking.event_date,
+        },
+        include: {
+          customer: { select: { id: true, name: true } },
+          provider: { select: { id: true, business_name: true } },
+        },
+      });
+
+      // Recompute the average in a single statement so concurrent reviews can't overwrite each other
+      await tx.$executeRaw`
+        UPDATE "service_providers" SET
+          "rating_avg" = COALESCE((SELECT AVG("rating")::float FROM "reviews" WHERE "provider_id" = ${booking.provider_id}), 0),
+          "review_count" = (SELECT COUNT(*)::int FROM "reviews" WHERE "provider_id" = ${booking.provider_id}),
+          "updated_at" = NOW()
+        WHERE "id" = ${booking.provider_id}`;
+
+      return created;
     });
 
     return NextResponse.json({
@@ -204,6 +163,7 @@ export async function POST(request: Request) {
         eventType: review.event_type,
         eventDate: review.event_date,
         createdAt: review.created_at,
+        verifiedBooking: true,
         customer: {
           id: review.customer.id,
           name: review.customer.name,
@@ -215,6 +175,13 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
+    // Unique constraint on booking_id: a second review for the same booking
+    if (error instanceof Error && 'code' in error && (error as { code?: string }).code === 'P2002') {
+      return NextResponse.json(
+        { error: 'Je hebt al een review geplaatst voor deze boeking' },
+        { status: 409 }
+      );
+    }
     console.error('Create review error:', error);
     return NextResponse.json(
       { error: 'Er is iets misgegaan bij het plaatsen van de review' },

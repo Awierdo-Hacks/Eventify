@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
+import { z } from 'zod';
+import { parseBody } from '@/lib/validation';
+import { closeRequest, workflowErrorResponse } from '@/lib/workflow';
 
 export async function GET(
   request: Request,
@@ -118,6 +121,44 @@ export async function GET(
     console.error('Service request detail API error:', error);
     return NextResponse.json(
       { error: 'Er is iets misgegaan bij het ophalen van de aanvraag' },
+      { status: 500 }
+    );
+  }
+}
+
+const actionSchema = z.object({
+  action: z.enum(['decline', 'cancel']),
+  reason: z.string().max(500).nullish(),
+});
+
+// PATCH - Provider declines ("niet beschikbaar") or customer cancels a request
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized - login required' }, { status: 401 });
+    }
+
+    const { id: requestId } = await params;
+    const { data, error } = await parseBody(request, actionSchema);
+    if (error) return error;
+
+    const updated = await closeRequest({ requestId, actor: session, action: data.action, reason: data.reason });
+
+    return NextResponse.json({
+      success: true,
+      message: data.action === 'decline' ? 'Aanvraag afgewezen' : 'Aanvraag geannuleerd',
+      request: { id: updated.id, status: updated.status },
+    });
+  } catch (error) {
+    const known = workflowErrorResponse(error);
+    if (known) return NextResponse.json(known.body, { status: known.status });
+    console.error('Service request action error:', error);
+    return NextResponse.json(
+      { error: 'Er is iets misgegaan bij het bijwerken van de aanvraag' },
       { status: 500 }
     );
   }

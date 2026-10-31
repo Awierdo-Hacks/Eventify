@@ -27,7 +27,10 @@ const EventDetailView = dynamic(
   () => import('@/components/events/EventDetailView').then((m) => ({ default: m.EventDetailView })),
   { ssr: false, loading: () => <Skeleton className="h-96 w-full rounded-3xl" /> }
 );
-import { eventTypeIcons, calculateEventProgress } from '@/lib/eventHelpers';
+import { categoryIcon, categoryLabel } from '@/lib/categories';
+import { eventTypeLabel, formatEuro, paymentStatusLabel } from '@/lib/labels';
+import { downloadIcs } from '@/lib/ics';
+import { ReviewDialog } from '@/components/reviews/ReviewDialog';
 import {
   FileText,
   MessageSquare,
@@ -39,6 +42,7 @@ import {
   MapPin,
   PartyPopper,
   Plus,
+  Star,
 } from 'lucide-react';
 
 interface ServiceRequest {
@@ -51,6 +55,8 @@ interface ServiceRequest {
   budgetRange: string | null;
   status: string;
   createdAt: string;
+  declineReason?: string | null;
+  eventName?: string | null;
   provider?: {
     id: string;
     businessName: string;
@@ -61,6 +67,9 @@ interface ServiceRequest {
   quotes: Array<{
     id: string;
     totalPrice: number;
+    accepted?: boolean;
+    rejected?: boolean;
+    open?: boolean;
   }>;
 }
 
@@ -72,19 +81,27 @@ interface Quote {
   includedServices: string[];
   validUntil: string;
   status: string;
+  expired?: boolean;
+  canAccept?: boolean;
   createdAt: string;
   eventSlotId?: string | null; // Added for filtering linked quotes
+  eventSlot?: { id: string; category: string; eventId: string; eventName: string } | null;
   provider: {
     id: string;
     businessName: string;
     category: string;
     userId: string;
+    rating?: number;
+    reviewCount?: number;
+    verified?: boolean;
   };
   serviceRequest: {
     id: string;
+    status?: string;
     eventType: string;
     eventDate: string;
     eventLocation: string;
+    guestCount?: number;
     customer: {
       name: string;
     };
@@ -100,6 +117,10 @@ interface Booking {
   status: string;
   paymentStatus: string | null;
   createdAt: string;
+  cancellationReason?: string | null;
+  cancelledByMe?: boolean;
+  review?: { id: string; rating: number } | null;
+  request?: { id: string; eventType: string } | null;
   provider: {
     id: string;
     businessName: string;
@@ -181,6 +202,17 @@ interface DashboardClientProps {
   initialUser: PageUser;
   initialTab?: string;
   initialSuccess?: string;
+  initialEventId?: string;
+}
+
+const SUCCESS_MESSAGES: Record<string, string> = {
+  true: 'Je aanvraag is verstuurd! De provider stuurt je een offerte; je vindt ze straks onder Offertes.',
+  request: 'Je aanvraag is verstuurd! De provider stuurt je een offerte; je vindt ze straks onder Offertes.',
+  created: 'Je event is aangemaakt. Zoek nu per onderdeel de juiste providers.',
+};
+
+function daysUntil(dateString: string): number {
+  return Math.ceil((new Date(dateString).getTime() - Date.now()) / (24 * 60 * 60 * 1000));
 }
 
 export default function DashboardClient({
@@ -188,6 +220,7 @@ export default function DashboardClient({
   initialUser,
   initialTab = 'events',
   initialSuccess,
+  initialEventId,
 }: DashboardClientProps) {
   const router = useRouter();
   const user = initialUser;
@@ -195,22 +228,109 @@ export default function DashboardClient({
   const [loading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(
-    initialSuccess === 'true'
-      ? 'Je aanvraag is succesvol verstuurd! Je ontvangt binnen 24 uur een offerte.'
-      : null
+    initialSuccess ? SUCCESS_MESSAGES[initialSuccess] ?? null : null
   );
-  
+
   const [requests, setRequests] = useState<ServiceRequest[]>(initialData.requests);
   const [quotes, setQuotes] = useState<Quote[]>(initialData.quotes);
   const [bookings, setBookings] = useState<Booking[]>(initialData.bookings);
   const [events, setEvents] = useState<Event[]>(initialData.events);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  // Open the event that was just created in the event builder
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(
+    () => (initialEventId ? initialData.events.find((e) => e.id === initialEventId) ?? null : null)
+  );
   const [acceptingQuote, setAcceptingQuote] = useState<string | null>(null);
   const [rejectingQuote, setRejectingQuote] = useState<Quote | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
   const [unreadCount, setUnreadCount] = useState(initialData.unreadCount);
   const [deletingEvent, setDeletingEvent] = useState<Event | null>(null);
   const [isDeletingEvent, setIsDeletingEvent] = useState(false);
+  const [cancellingRequest, setCancellingRequest] = useState<ServiceRequest | null>(null);
+  const [cancellingBooking, setCancellingBooking] = useState<Booking | null>(null);
+  const [cancelReason, setCancelReason] = useState('');
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [reviewingBooking, setReviewingBooking] = useState<Booking | null>(null);
+
+  const showSuccess = (message: string) => {
+    setSuccessMessage(message);
+    setTimeout(() => setSuccessMessage(null), 5000);
+  };
+
+  const showError = (message: string) => {
+    setError(message);
+    setTimeout(() => setError(null), 6000);
+  };
+
+  // Reload everything after a workflow action (statuses ripple across tabs)
+  const refreshAll = async () => {
+    const [requestsRes, quotesRes, bookingsRes, eventsRes] = await Promise.all([
+      fetch('/api/requests'),
+      fetch('/api/quotes'),
+      fetch('/api/bookings'),
+      fetch('/api/events'),
+    ]);
+    const [requestsData, quotesData, bookingsData, eventsData] = await Promise.all([
+      requestsRes.json(),
+      quotesRes.json(),
+      bookingsRes.json(),
+      eventsRes.json(),
+    ]);
+    setRequests(requestsData.requests || []);
+    setQuotes(quotesData.quotes || []);
+    setBookings(bookingsData.bookings || []);
+    setEvents(eventsData.events || []);
+    setSelectedEvent((current) =>
+      current ? (eventsData.events || []).find((e: Event) => e.id === current.id) ?? null : null
+    );
+  };
+
+  const handleCancelRequest = async () => {
+    if (!cancellingRequest) return;
+    setIsCancelling(true);
+    try {
+      const res = await fetch(`/api/requests/${cancellingRequest.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'cancel', reason: cancelReason || undefined }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Kon de aanvraag niet annuleren');
+      await refreshAll();
+      setCancellingRequest(null);
+      setCancelReason('');
+      showSuccess('Je aanvraag is geannuleerd. De provider is op de hoogte gebracht.');
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Kon de aanvraag niet annuleren');
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
+  const handleCancelBooking = async () => {
+    if (!cancellingBooking) return;
+    if (cancelReason.trim().length < 3) {
+      showError('Geef een korte reden voor de annulering');
+      return;
+    }
+    setIsCancelling(true);
+    try {
+      const res = await fetch(`/api/bookings/${cancellingBooking.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'cancel', reason: cancelReason.trim() }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Kon de boeking niet annuleren');
+      await refreshAll();
+      setCancellingBooking(null);
+      setCancelReason('');
+      showSuccess('De boeking is geannuleerd. Het onderdeel van je event is weer vrij.');
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Kon de boeking niet annuleren');
+    } finally {
+      setIsCancelling(false);
+    }
+  };
 
   // Poll for unread message count
   useEffect(() => {
@@ -243,21 +363,8 @@ export default function DashboardClient({
         throw new Error(data.error || 'Er is iets misgegaan');
       }
 
-      // Refresh data
-      const [quotesRes, bookingsRes] = await Promise.all([
-        fetch('/api/quotes'),
-        fetch('/api/bookings'),
-      ]);
-
-      const [quotesData, bookingsData] = await Promise.all([
-        quotesRes.json(),
-        bookingsRes.json(),
-      ]);
-
-      setQuotes(quotesData.quotes || []);
-      setBookings(bookingsData.bookings || []);
-      setSuccessMessage('Offerte geaccepteerd! Je boeking is bevestigd.');
-      setTimeout(() => setSuccessMessage(null), 5000);
+      await refreshAll();
+      showSuccess('Offerte geaccepteerd! Je boeking is bevestigd. Je vindt ze onder Boekingen.');
     } catch (err) {
       console.error('Error accepting quote:', err);
       setError(err instanceof Error ? err.message : 'Er is iets misgegaan bij het accepteren van de offerte');
@@ -286,14 +393,8 @@ export default function DashboardClient({
         throw new Error(data.error || 'Er is iets misgegaan');
       }
 
-      // Refresh quotes
-      const quotesRes = await fetch('/api/quotes');
-      const quotesData = await quotesRes.json();
-      setQuotes(quotesData.quotes || []);
-      
-      // Toon success message
-      setSuccessMessage('Offerte afgewezen');
-      setTimeout(() => setSuccessMessage(null), 5000);
+      await refreshAll();
+      showSuccess('Offerte afgewezen. De provider is op de hoogte gebracht.');
       
       // Reset dialog
       setRejectingQuote(null);
@@ -314,20 +415,15 @@ export default function DashboardClient({
       const res = await fetch(`/api/events/${deletingEvent.id}`, {
         method: 'DELETE',
       });
-      if (!res.ok) throw new Error('Kon event niet verwijderen');
-      
-      // Refresh events list
-      const eventsRes = await fetch('/api/events');
-      const eventsData = await eventsRes.json();
-      setEvents(eventsData.events || []);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Kon het event niet annuleren');
+
       setSelectedEvent(null);
       setDeletingEvent(null);
-      setSuccessMessage('Event is succesvol verwijderd');
-      setTimeout(() => setSuccessMessage(null), 3000);
+      await refreshAll();
+      showSuccess('Het event is geannuleerd. Betrokken providers zijn op de hoogte gebracht.');
     } catch (err) {
-      console.error('Error deleting event:', err);
-      setError('Er is iets misgegaan bij het verwijderen van het event');
-      setTimeout(() => setError(null), 5000);
+      showError(err instanceof Error ? err.message : 'Er is iets misgegaan bij het annuleren van het event');
     } finally {
       setIsDeletingEvent(false);
     }
@@ -341,31 +437,63 @@ export default function DashboardClient({
         body: JSON.stringify({ recipientId: providerUserId }),
       });
       if (!res.ok) throw new Error('Kon gesprek niet openen');
-      const conversation = await res.json();
-      router.push(`/messages/${conversation.id}`);
+      const data = await res.json();
+      router.push(`/messages/${data.conversation.id}`);
     } catch (err) {
       console.error('Error opening chat:', err);
+      showError('Kon het gesprek niet openen');
     }
   };
 
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { label: string; className: string }> = {
-      PENDING: { label: 'In behandeling', className: 'bg-blue-100 text-blue-800' },
-      QUOTED: { label: 'Offertes ontvangen', className: 'bg-purple-100 text-purple-800' },
-      ACCEPTED: { label: 'Geaccepteerd', className: 'bg-green-100 text-green-800' },
-      REJECTED: { label: 'Afgewezen', className: 'bg-red-100 text-red-800' },
+      PENDING: { label: 'Wacht op offerte', className: 'bg-blue-100 text-blue-800' },
+      QUOTED: { label: 'Offerte ontvangen', className: 'bg-purple-100 text-purple-800' },
+      ACCEPTED: { label: 'Geboekt', className: 'bg-green-100 text-green-800' },
+      REJECTED: { label: 'Provider niet beschikbaar', className: 'bg-red-100 text-red-800' },
       CONFIRMED: { label: 'Bevestigd', className: 'bg-green-100 text-green-800' },
       COMPLETED: { label: 'Voltooid', className: 'bg-gray-100 text-gray-800' },
       CANCELLED: { label: 'Geannuleerd', className: 'bg-red-100 text-red-800' },
-      PAID: { label: 'Betaald', className: 'bg-green-100 text-green-800' },
-      UNPAID: { label: 'Nog te betalen', className: 'bg-amber-100 text-amber-800' },
     };
     const config = statusConfig[status] || statusConfig.PENDING;
     return <Badge className={config.className}>{config.label}</Badge>;
   };
 
+  // "Geboekt" is not "betaald": the payment line is shown separately and honestly
+  const getPaymentBadge = (status: string | null) => {
+    const value = status || 'UNPAID';
+    const className =
+      value === 'PAID' ? 'bg-green-100 text-green-800' : value === 'REFUNDED' ? 'bg-gray-100 text-gray-700' : 'bg-amber-100 text-amber-800';
+    return <Badge className={className}>{paymentStatusLabel(value)}</Badge>;
+  };
+
+  // Quotes grouped per event part (slot), or per category when not linked to an event
+  const quoteGroups = (() => {
+    const visible = quotes.filter((q) => q.status !== 'REJECTED');
+    const groups = new Map<string, { title: string; subtitle: string; quotes: Quote[] }>();
+    for (const quote of visible) {
+      const key = quote.eventSlot ? `slot:${quote.eventSlot.id}` : `cat:${quote.provider.category}`;
+      if (!groups.has(key)) {
+        groups.set(key, {
+          title: quote.eventSlot
+            ? `${categoryIcon(quote.eventSlot.category)} ${categoryLabel(quote.eventSlot.category)}`
+            : `${categoryIcon(quote.provider.category)} ${categoryLabel(quote.provider.category)}`,
+          subtitle: quote.eventSlot ? quote.eventSlot.eventName : 'Niet gekoppeld aan een event',
+          quotes: [],
+        });
+      }
+      groups.get(key)!.quotes.push(quote);
+    }
+    return Array.from(groups.values()).map((group) => ({
+      ...group,
+      quotes: group.quotes.sort((a, b) => Number(b.status === 'ACCEPTED') - Number(a.status === 'ACCEPTED') || a.totalPrice - b.totalPrice),
+    }));
+  })();
+
+  const openQuotesCount = quotes.filter((q) => q.canAccept).length;
+
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('nl-NL', {
+    return new Date(dateString).toLocaleDateString('nl-BE', {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
@@ -383,13 +511,13 @@ export default function DashboardClient({
       onClick: () => setActiveTab('events'),
     },
     {
-      label: 'Actieve Aanvragen',
-      value: requests.filter((r) => r.status === 'PENDING').length,
+      label: 'Offertes te bekijken',
+      value: openQuotesCount,
       icon: FileText,
       iconColor: 'text-blue-600',
       iconBg: 'bg-blue-100',
       borderColor: 'border-blue-400',
-      onClick: () => setActiveTab('requests'),
+      onClick: () => setActiveTab('quotes'),
     },
     {
       label: 'Ongelezen Berichten',
@@ -488,13 +616,21 @@ export default function DashboardClient({
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-white border border-gray-200 p-1 rounded-full w-full max-w-lg mx-auto flex gap-1 mb-6">
-            <TabsTrigger value="events" className="rounded-full flex-1 text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white">
-              <PartyPopper className="w-4 h-4 mr-1" />
+          <TabsList className="bg-white border border-gray-200 p-1 rounded-full w-full max-w-2xl mx-auto flex gap-1 mb-6 overflow-x-auto">
+            <TabsTrigger value="events" className="rounded-full flex-1 text-xs sm:text-sm whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white">
+              <PartyPopper className="w-4 h-4 mr-1 hidden sm:inline" />
               Mijn Events
             </TabsTrigger>
-            <TabsTrigger value="requests" className="rounded-full flex-1 text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white">Aanvragen</TabsTrigger>
-            <TabsTrigger value="bookings" className="rounded-full flex-1 text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white">Boekingen</TabsTrigger>
+            <TabsTrigger value="quotes" className="rounded-full flex-1 text-xs sm:text-sm whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white">
+              Offertes
+              {openQuotesCount > 0 && (
+                <span className="ml-1.5 inline-flex items-center justify-center min-w-5 h-5 px-1 rounded-full bg-amber-400 text-[10px] font-bold text-gray-900">
+                  {openQuotesCount}
+                </span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="requests" className="rounded-full flex-1 text-xs sm:text-sm whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white">Aanvragen</TabsTrigger>
+            <TabsTrigger value="bookings" className="rounded-full flex-1 text-xs sm:text-sm whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white">Boekingen</TabsTrigger>
           </TabsList>
 
           {/* Events Tab */}
@@ -520,7 +656,7 @@ export default function DashboardClient({
                     })),
                   })),
                 }}
-                quotes={quotes.filter((q) => q.status === 'PENDING').map((q) => ({
+                quotes={quotes.filter((q) => q.canAccept).map((q) => ({
                   id: q.id,
                   totalPrice: q.totalPrice,
                   accepted: q.status === 'ACCEPTED',
@@ -557,7 +693,10 @@ export default function DashboardClient({
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ eventSlotId: slotId }),
                     });
-                    if (!response.ok) throw new Error('Failed to link quote');
+                    if (!response.ok) {
+                      const data = await response.json().catch(() => ({}));
+                      throw new Error(data.error || 'Kon offerte niet koppelen');
+                    }
                     // Refresh events and quotes
                     const [eventsRes, quotesRes] = await Promise.all([
                       fetch('/api/events'),
@@ -572,12 +711,9 @@ export default function DashboardClient({
                     // Update selected event
                     const updatedEvent = eventsData.events?.find((e: Event) => e.id === selectedEvent.id);
                     if (updatedEvent) setSelectedEvent(updatedEvent);
-                    setSuccessMessage('Offerte gekoppeld aan event slot');
-                    setTimeout(() => setSuccessMessage(null), 3000);
+                    showSuccess('Offerte gekoppeld aan je event');
                   } catch (err) {
-                    console.error('Error linking quote:', err);
-                    setError('Kon offerte niet koppelen');
-                    setTimeout(() => setError(null), 3000);
+                    showError(err instanceof Error ? err.message : 'Kon offerte niet koppelen');
                   }
                 }}
                 onDeleteEvent={() => setDeletingEvent(selectedEvent)}
@@ -637,11 +773,11 @@ export default function DashboardClient({
                 )}
 
                 {/* Unlinked Quotes Section */}
-                {quotes.filter((q) => q.status === 'PENDING' && !q.eventSlotId).length > 0 && (
+                {quotes.filter((q) => q.canAccept && !q.eventSlotId).length > 0 && (
                   <div className="mt-8">
                     <h3 className="text-xl font-bold text-gray-900 mb-4">Ongekoppelde Offertes</h3>
                     <UnlinkedQuotes
-                      quotes={quotes.filter((q) => q.status === 'PENDING' && !q.eventSlotId)}
+                      quotes={quotes.filter((q) => q.canAccept && !q.eventSlotId)}
                       events={events.map((e) => ({
                         ...e,
                         eventType: e.eventType as any,
@@ -657,7 +793,10 @@ export default function DashboardClient({
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ eventSlotId: slotId }),
                           });
-                          if (!response.ok) throw new Error('Failed to link quote');
+                          if (!response.ok) {
+                            const data = await response.json().catch(() => ({}));
+                            throw new Error(data.error || 'Kon offerte niet koppelen');
+                          }
                           // Refresh events and quotes
                           const [eventsRes, quotesRes] = await Promise.all([
                             fetch('/api/events'),
@@ -669,18 +808,148 @@ export default function DashboardClient({
                           ]);
                           setEvents(eventsData.events || []);
                           setQuotes(quotesData.quotes || []);
-                          setSuccessMessage('Offerte gekoppeld aan event slot');
-                          setTimeout(() => setSuccessMessage(null), 3000);
+                          showSuccess('Offerte gekoppeld aan je event');
                         } catch (err) {
-                          console.error('Error linking quote:', err);
-                          setError('Kon offerte niet koppelen');
-                          setTimeout(() => setError(null), 3000);
+                          showError(err instanceof Error ? err.message : 'Kon offerte niet koppelen');
                         }
                       }}
                     />
                   </div>
                 )}
               </>
+            )}
+          </TabsContent>
+
+          {/* Quotes Tab: compare quotes per event part */}
+          <TabsContent value="quotes" className="space-y-6">
+            {quoteGroups.length === 0 ? (
+              <Card className="p-12 border-2 border-gray-100 rounded-3xl text-center">
+                <Euro className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Nog geen offertes</h3>
+                <p className="text-gray-600 mb-6">
+                  Vraag offertes aan bij providers; hier vergelijk je ze naast elkaar.
+                </p>
+                <Button
+                  onClick={() => router.push('/browse')}
+                  className="rounded-xl border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 transition-colors h-10 px-6 text-sm shadow-sm"
+                >
+                  Providers zoeken
+                </Button>
+              </Card>
+            ) : (
+              quoteGroups.map((group) => {
+                const cheapestOpen = group.quotes.filter((q) => q.canAccept).sort((a, b) => a.totalPrice - b.totalPrice)[0];
+                return (
+                  <section key={group.title + group.subtitle}>
+                    <div className="mb-3">
+                      <h3 className="text-lg font-bold text-gray-900">{group.title}</h3>
+                      <p className="text-sm text-gray-500">
+                        {group.subtitle} · {group.quotes.length} offerte{group.quotes.length === 1 ? '' : 's'}
+                      </p>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                      {group.quotes.map((quote) => {
+                        const daysLeft = daysUntil(quote.validUntil);
+                        const isCheapest = cheapestOpen?.id === quote.id && group.quotes.filter((q) => q.canAccept).length > 1;
+                        return (
+                          <Card
+                            key={quote.id}
+                            className={`p-5 border-2 rounded-3xl flex flex-col ${
+                              quote.status === 'ACCEPTED' ? 'border-green-300 bg-green-50/40' : 'border-gray-100'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-2 mb-3">
+                              <div className="min-w-0">
+                                <p className="font-bold text-gray-900 truncate">{quote.provider.businessName}</p>
+                                <div className="flex items-center gap-2 text-xs text-gray-500 mt-0.5">
+                                  {quote.provider.verified && (
+                                    <span className="inline-flex items-center gap-0.5 text-green-700">
+                                      <CheckCircle className="w-3 h-3" /> Geverifieerd
+                                    </span>
+                                  )}
+                                  {(quote.provider.reviewCount ?? 0) > 0 && (
+                                    <span className="inline-flex items-center gap-0.5">
+                                      <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                                      {quote.provider.rating} ({quote.provider.reviewCount})
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              {quote.status === 'ACCEPTED' ? (
+                                <Badge className="bg-green-100 text-green-800 shrink-0">Geboekt</Badge>
+                              ) : quote.expired ? (
+                                <Badge className="bg-gray-100 text-gray-600 shrink-0">Verlopen</Badge>
+                              ) : isCheapest ? (
+                                <Badge className="bg-amber-100 text-amber-800 shrink-0">Laagste prijs</Badge>
+                              ) : null}
+                            </div>
+
+                            <p className="text-3xl font-bold text-gray-900">{formatEuro(quote.totalPrice)}</p>
+                            <p className="text-sm font-medium text-gray-700 mb-3">{quote.packageName}</p>
+
+                            {quote.includedServices.length > 0 && (
+                              <ul className="space-y-1 mb-3">
+                                {quote.includedServices.slice(0, 5).map((service, idx) => (
+                                  <li key={idx} className="text-sm text-gray-600 flex items-start gap-2">
+                                    <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                                    {service}
+                                  </li>
+                                ))}
+                                {quote.includedServices.length > 5 && (
+                                  <li className="text-xs text-gray-500">+ {quote.includedServices.length - 5} meer</li>
+                                )}
+                              </ul>
+                            )}
+
+                            <div className="text-xs text-gray-500 mb-4 space-y-0.5">
+                              <p>
+                                {eventTypeLabel(quote.serviceRequest.eventType)} · {formatDate(quote.serviceRequest.eventDate)}
+                              </p>
+                              {quote.status !== 'ACCEPTED' && !quote.expired && (
+                                <p className={daysLeft <= 3 ? 'text-amber-700 font-medium' : ''}>
+                                  Geldig tot {formatDate(quote.validUntil)}
+                                  {daysLeft <= 3 && daysLeft >= 0 ? ` (nog ${daysLeft} dag${daysLeft === 1 ? '' : 'en'})` : ''}
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="mt-auto flex flex-col gap-2">
+                              {quote.canAccept && (
+                                <div className="flex gap-2">
+                                  <Button
+                                    onClick={() => handleAcceptQuote(quote.id)}
+                                    disabled={!!acceptingQuote}
+                                    className="flex-1 rounded-xl bg-gradient-to-r from-purple-600 to-purple-500 text-white hover:from-purple-700 hover:to-purple-600"
+                                  >
+                                    {acceptingQuote === quote.id ? 'Bezig...' : 'Accepteren'}
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => setRejectingQuote(quote)}
+                                    disabled={!!acceptingQuote}
+                                    className="rounded-xl"
+                                  >
+                                    Afwijzen
+                                  </Button>
+                                </div>
+                              )}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="rounded-xl text-purple-700"
+                                onClick={() => handleOpenChat(quote.provider.userId)}
+                              >
+                                <MessageSquare className="w-4 h-4 mr-1" />
+                                Vraag iets aan {quote.provider.businessName}
+                              </Button>
+                            </div>
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  </section>
+                );
+              })
             )}
           </TabsContent>
 
@@ -704,7 +973,10 @@ export default function DashboardClient({
                   <Card key={request.id} className="p-6 border-2 border-gray-100 rounded-3xl hover:shadow-eventiphy-md transition-shadow">
                     <div className="flex items-start justify-between mb-4">
                       <div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">{request.eventType}</h3>
+                        <h3 className="text-xl font-bold text-gray-900 mb-1">{eventTypeLabel(request.eventType)}</h3>
+                        {request.eventName && (
+                          <p className="text-sm text-purple-700 font-medium mb-1">Voor: {request.eventName}</p>
+                        )}
                         <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-4 h-4" />
@@ -729,7 +1001,7 @@ export default function DashboardClient({
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <Badge variant="secondary" className="bg-purple-100 text-purple-700">
-                              {request.provider.category}
+                              {categoryLabel(request.provider.category, true)}
                             </Badge>
                             <span className="font-semibold text-gray-900">{request.provider.businessName}</span>
                           </div>
@@ -746,12 +1018,38 @@ export default function DashboardClient({
                       </div>
                     )}
 
-                    {request.quotes.length > 0 && (
-                      <div className="mt-4 p-3 bg-purple-50 rounded-xl">
-                        <p className="text-sm text-purple-800">
-                          <MessageSquare className="w-4 h-4 inline mr-1" />
-                          {request.quotes.length} offerte{request.quotes.length > 1 ? 's' : ''} ontvangen
-                        </p>
+                    {request.status === 'REJECTED' && (
+                      <div className="mt-4 p-3 bg-red-50 rounded-xl text-sm text-red-800">
+                        De provider is niet beschikbaar voor deze aanvraag
+                        {request.declineReason ? `: "${request.declineReason}"` : '.'} Zoek een andere provider voor dit onderdeel.
+                      </div>
+                    )}
+
+                    {request.quotes.some((q) => q.open) && (
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('quotes')}
+                        className="mt-4 w-full text-left p-3 bg-purple-50 hover:bg-purple-100 transition-colors rounded-xl text-sm text-purple-800 font-medium"
+                      >
+                        <MessageSquare className="w-4 h-4 inline mr-1" />
+                        {request.quotes.filter((q) => q.open).length} offerte
+                        {request.quotes.filter((q) => q.open).length > 1 ? 's' : ''} ontvangen. Bekijk en vergelijk →
+                      </button>
+                    )}
+
+                    {['PENDING', 'QUOTED'].includes(request.status) && (
+                      <div className="mt-4 flex justify-end">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="rounded-xl text-gray-500 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => {
+                            setCancelReason('');
+                            setCancellingRequest(request);
+                          }}
+                        >
+                          Aanvraag annuleren
+                        </Button>
                       </div>
                     )}
                   </Card>
@@ -776,7 +1074,7 @@ export default function DashboardClient({
                       <div className="w-full">
                         <div className="flex items-center gap-3 mb-2">
                           <Badge variant="secondary" className="bg-purple-100 text-purple-700">
-                            {booking.provider.category}
+                            {categoryLabel(booking.provider.category, true)}
                           </Badge>
                           <span className="font-bold text-gray-900 text-lg">{booking.provider.businessName}</span>
                         </div>
@@ -798,12 +1096,12 @@ export default function DashboardClient({
                           </span>
                         </div>
                         <p className="text-2xl font-bold text-gray-900 mb-4">
-                          €{booking.finalPrice.toLocaleString()}
+                          {formatEuro(booking.finalPrice)}
                         </p>
                       </div>
                       <div className="flex flex-col gap-2 items-end">
                         {getStatusBadge(booking.status)}
-                        {getStatusBadge(booking.paymentStatus || 'UNPAID')}
+                        {booking.status !== 'CANCELLED' && getPaymentBadge(booking.paymentStatus)}
                       </div>
                     </div>
 
@@ -851,15 +1149,75 @@ export default function DashboardClient({
                       </div>
                     )}
 
-                    <div className="mt-4 pt-4 border-t border-gray-200">
+                    {booking.status === 'CANCELLED' && (
+                      <div className="mt-4 p-3 bg-red-50 rounded-xl text-sm text-red-800">
+                        Geannuleerd {booking.cancelledByMe ? 'door jou' : 'door de provider'}
+                        {booking.cancellationReason ? `: "${booking.cancellationReason}"` : ''}
+                      </div>
+                    )}
+
+                    {booking.status === 'COMPLETED' && (
+                      <div className="mt-4 p-3 bg-purple-50 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        {booking.review ? (
+                          <p className="text-sm text-purple-800 flex items-center gap-1">
+                            <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                            Je gaf {booking.review.rating}/5. Bedankt voor je review!
+                          </p>
+                        ) : (
+                          <>
+                            <p className="text-sm text-purple-800">Hoe was het? Help andere klanten met je review.</p>
+                            <Button
+                              size="sm"
+                              onClick={() => setReviewingBooking(booking)}
+                              className="rounded-xl bg-gradient-to-r from-purple-600 to-purple-500 text-white"
+                            >
+                              <Star className="w-4 h-4 mr-1" />
+                              Schrijf een review
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="mt-4 pt-4 border-t border-gray-200 flex flex-col sm:flex-row gap-2">
                       <Button
                         onClick={() => handleOpenChat(booking.provider.userId)}
                         variant="outline"
-                        className="w-full rounded-xl"
+                        className="flex-1 rounded-xl"
                       >
                         <MessageSquare className="w-4 h-4 mr-2" />
                         Chat met {booking.provider.businessName}
                       </Button>
+                      {booking.status === 'CONFIRMED' && (
+                        <>
+                          <Button
+                            variant="outline"
+                            className="rounded-xl"
+                            onClick={() =>
+                              downloadIcs({
+                                id: booking.id,
+                                title: `${booking.provider.businessName}: ${booking.quote?.packageName ?? 'Boeking'}`,
+                                date: booking.eventDate,
+                                location: booking.eventLocation,
+                                description: 'Geboekt via Eventiphy',
+                              })
+                            }
+                          >
+                            <Calendar className="w-4 h-4 mr-2" />
+                            In mijn agenda
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            className="rounded-xl text-gray-500 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => {
+                              setCancelReason('');
+                              setCancellingBooking(booking);
+                            }}
+                          >
+                            Annuleren
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </Card>
                 ))}
@@ -925,12 +1283,107 @@ export default function DashboardClient({
         )}
       </ConfirmationDialog>
 
-      {/* Delete Event Confirmation Dialog */}
+      {/* Cancel Request Dialog */}
+      <ConfirmationDialog
+        open={!!cancellingRequest}
+        onOpenChange={(open) => {
+          if (!open) {
+            setCancellingRequest(null);
+            setCancelReason('');
+          }
+        }}
+        title="Aanvraag annuleren?"
+        description="De provider krijgt een bericht dat je de aanvraag intrekt. Openstaande offertes voor deze aanvraag vervallen."
+      >
+        {cancellingRequest && (
+          <>
+            <DialogTextField
+              label="Reden (optioneel)"
+              value={cancelReason}
+              onChange={setCancelReason}
+              placeholder="Bijv. 'Andere provider gekozen' of 'Event gaat niet door'"
+            />
+            <DialogActions>
+              <DialogButton onClick={handleCancelRequest} variant="danger" loading={isCancelling} disabled={isCancelling}>
+                Aanvraag annuleren
+              </DialogButton>
+              <DialogButton
+                onClick={() => {
+                  setCancellingRequest(null);
+                  setCancelReason('');
+                }}
+                variant="outline"
+                disabled={isCancelling}
+              >
+                Terug
+              </DialogButton>
+            </DialogActions>
+          </>
+        )}
+      </ConfirmationDialog>
+
+      {/* Cancel Booking Dialog */}
+      <ConfirmationDialog
+        open={!!cancellingBooking}
+        onOpenChange={(open) => {
+          if (!open) {
+            setCancellingBooking(null);
+            setCancelReason('');
+          }
+        }}
+        title="Boeking annuleren?"
+        description="De provider krijgt meteen een bericht. Spreek afspraken over een eventueel voorschot rechtstreeks met de provider af."
+      >
+        {cancellingBooking && (
+          <>
+            <div className="p-4 bg-gray-50 rounded-xl mb-4 text-sm">
+              <p className="font-semibold text-gray-900">{cancellingBooking.provider.businessName}</p>
+              <p className="text-gray-600">
+                {formatDate(cancellingBooking.eventDate)} · {formatEuro(cancellingBooking.finalPrice)}
+              </p>
+            </div>
+            <DialogTextField
+              label="Waarom annuleer je?"
+              value={cancelReason}
+              onChange={setCancelReason}
+              placeholder="Bijv. 'Datum van het event is verschoven'"
+              required
+            />
+            <DialogActions>
+              <DialogButton onClick={handleCancelBooking} variant="danger" loading={isCancelling} disabled={isCancelling}>
+                Boeking annuleren
+              </DialogButton>
+              <DialogButton
+                onClick={() => {
+                  setCancellingBooking(null);
+                  setCancelReason('');
+                }}
+                variant="outline"
+                disabled={isCancelling}
+              >
+                Boeking behouden
+              </DialogButton>
+            </DialogActions>
+          </>
+        )}
+      </ConfirmationDialog>
+
+      <ReviewDialog
+        booking={reviewingBooking ? { id: reviewingBooking.id, providerName: reviewingBooking.provider.businessName } : null}
+        onClose={() => setReviewingBooking(null)}
+        onSubmitted={async () => {
+          setReviewingBooking(null);
+          await refreshAll();
+          showSuccess('Bedankt! Je review staat nu op het profiel van de provider.');
+        }}
+      />
+
+      {/* Cancel Event Confirmation Dialog */}
       <ConfirmationDialog
         open={!!deletingEvent}
         onOpenChange={(open) => !open && setDeletingEvent(null)}
-        title="Event verwijderen?"
-        description="Weet je zeker dat je dit event wilt verwijderen? Alle gekoppelde offertes worden losgekoppeld."
+        title="Event annuleren?"
+        description="Openstaande aanvragen en bevestigde boekingen van dit event worden geannuleerd, en de providers krijgen een bericht."
       >
         {deletingEvent && (
           <>
@@ -949,14 +1402,14 @@ export default function DashboardClient({
                 onClick={() => setDeletingEvent(null)}
                 variant="outline"
               >
-                Annuleren
+                Terug
               </DialogButton>
               <DialogButton
                 onClick={handleDeleteEvent}
                 variant="danger"
                 loading={isDeletingEvent}
               >
-                Verwijder Evenement
+                Event annuleren
               </DialogButton>
             </DialogActions>
           </>

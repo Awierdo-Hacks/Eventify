@@ -5,24 +5,9 @@ import { Container, PageHeader, Section } from '@/components/layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Users, Briefcase } from 'lucide-react';
+import { CATEGORIES } from '@/lib/categories';
 
-const SERVICE_CATEGORIES = [
-  { value: 'CATERING', label: 'Catering' },
-  { value: 'MUSIC', label: 'Muziek / DJ' },
-  { value: 'PHOTOGRAPHY', label: 'Fotografie' },
-  { value: 'DECORATION', label: 'Decoratie' },
-  { value: 'VENUE', label: 'Locatie' },
-  { value: 'ENTERTAINMENT', label: 'Entertainment' },
-  { value: 'VIDEOGRAPHY', label: 'Videografie' },
-  { value: 'TRANSPORT', label: 'Transport' },
-  { value: 'ACCOMMODATION', label: 'Accommodatie' },
-  { value: 'SECURITY', label: 'Beveiliging' },
-  { value: 'SANITARY', label: 'Sanitair' },
-  { value: 'CAKE', label: 'Taart' },
-  { value: 'FLOWERS', label: 'Bloemen' },
-  { value: 'MC', label: 'MC' },
-  { value: 'OTHER', label: 'Overige' },
-];
+const SERVICE_CATEGORIES = CATEGORIES.map((c) => ({ value: c.value, label: c.shortLabel }));
 
 export default function WaitlistPage() {
   const [type, setType] = useState<'CUSTOMER' | 'PROVIDER'>('CUSTOMER');

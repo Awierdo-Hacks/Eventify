@@ -44,7 +44,7 @@ export type ServiceProviderMinAggregateOutputType = {
   id: string | null
   user_id: string | null
   business_name: string | null
-  category: string | null
+  category: $Enums.ProviderCategory | null
   location: string | null
   price_range: $Enums.PriceRange | null
   description: string | null
@@ -67,7 +67,7 @@ export type ServiceProviderMaxAggregateOutputType = {
   id: string | null
   user_id: string | null
   business_name: string | null
-  category: string | null
+  category: $Enums.ProviderCategory | null
   location: string | null
   price_range: $Enums.PriceRange | null
   description: string | null
@@ -291,7 +291,7 @@ export type ServiceProviderGroupByOutputType = {
   id: string
   user_id: string
   business_name: string
-  category: string
+  category: $Enums.ProviderCategory
   location: string
   price_range: $Enums.PriceRange
   description: string | null
@@ -340,7 +340,7 @@ export type ServiceProviderWhereInput = {
   id?: Prisma.StringFilter<"ServiceProvider"> | string
   user_id?: Prisma.StringFilter<"ServiceProvider"> | string
   business_name?: Prisma.StringFilter<"ServiceProvider"> | string
-  category?: Prisma.StringFilter<"ServiceProvider"> | string
+  category?: Prisma.EnumProviderCategoryFilter<"ServiceProvider"> | $Enums.ProviderCategory
   location?: Prisma.StringFilter<"ServiceProvider"> | string
   price_range?: Prisma.EnumPriceRangeFilter<"ServiceProvider"> | $Enums.PriceRange
   description?: Prisma.StringNullableFilter<"ServiceProvider"> | string | null
@@ -411,7 +411,7 @@ export type ServiceProviderWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ServiceProviderWhereInput[]
   NOT?: Prisma.ServiceProviderWhereInput | Prisma.ServiceProviderWhereInput[]
   business_name?: Prisma.StringFilter<"ServiceProvider"> | string
-  category?: Prisma.StringFilter<"ServiceProvider"> | string
+  category?: Prisma.EnumProviderCategoryFilter<"ServiceProvider"> | $Enums.ProviderCategory
   location?: Prisma.StringFilter<"ServiceProvider"> | string
   price_range?: Prisma.EnumPriceRangeFilter<"ServiceProvider"> | $Enums.PriceRange
   description?: Prisma.StringNullableFilter<"ServiceProvider"> | string | null
@@ -479,7 +479,7 @@ export type ServiceProviderScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"ServiceProvider"> | string
   user_id?: Prisma.StringWithAggregatesFilter<"ServiceProvider"> | string
   business_name?: Prisma.StringWithAggregatesFilter<"ServiceProvider"> | string
-  category?: Prisma.StringWithAggregatesFilter<"ServiceProvider"> | string
+  category?: Prisma.EnumProviderCategoryWithAggregatesFilter<"ServiceProvider"> | $Enums.ProviderCategory
   location?: Prisma.StringWithAggregatesFilter<"ServiceProvider"> | string
   price_range?: Prisma.EnumPriceRangeWithAggregatesFilter<"ServiceProvider"> | $Enums.PriceRange
   description?: Prisma.StringNullableWithAggregatesFilter<"ServiceProvider"> | string | null
@@ -504,7 +504,7 @@ export type ServiceProviderScalarWhereWithAggregatesInput = {
 export type ServiceProviderCreateInput = {
   id?: string
   business_name: string
-  category: string
+  category: $Enums.ProviderCategory
   location: string
   price_range?: $Enums.PriceRange
   description?: string | null
@@ -538,7 +538,7 @@ export type ServiceProviderUncheckedCreateInput = {
   id?: string
   user_id: string
   business_name: string
-  category: string
+  category: $Enums.ProviderCategory
   location: string
   price_range?: $Enums.PriceRange
   description?: string | null
@@ -570,7 +570,7 @@ export type ServiceProviderUncheckedCreateInput = {
 export type ServiceProviderUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
   location?: Prisma.StringFieldUpdateOperationsInput | string
   price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -604,7 +604,7 @@ export type ServiceProviderUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
   location?: Prisma.StringFieldUpdateOperationsInput | string
   price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -637,7 +637,7 @@ export type ServiceProviderCreateManyInput = {
   id?: string
   user_id: string
   business_name: string
-  category: string
+  category: $Enums.ProviderCategory
   location: string
   price_range?: $Enums.PriceRange
   description?: string | null
@@ -662,7 +662,7 @@ export type ServiceProviderCreateManyInput = {
 export type ServiceProviderUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
   location?: Prisma.StringFieldUpdateOperationsInput | string
   price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -688,7 +688,7 @@ export type ServiceProviderUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
   location?: Prisma.StringFieldUpdateOperationsInput | string
   price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -858,6 +858,10 @@ export type ServiceProviderCreateportfolio_imagesInput = {
   set: string[]
 }
 
+export type EnumProviderCategoryFieldUpdateOperationsInput = {
+  set?: $Enums.ProviderCategory
+}
+
 export type EnumPriceRangeFieldUpdateOperationsInput = {
   set?: $Enums.PriceRange
 }
@@ -1008,7 +1012,7 @@ export type ServiceProviderUpdateOneRequiredWithoutCalendar_integrationsNestedIn
 export type ServiceProviderCreateWithoutUserInput = {
   id?: string
   business_name: string
-  category: string
+  category: $Enums.ProviderCategory
   location: string
   price_range?: $Enums.PriceRange
   description?: string | null
@@ -1040,7 +1044,7 @@ export type ServiceProviderCreateWithoutUserInput = {
 export type ServiceProviderUncheckedCreateWithoutUserInput = {
   id?: string
   business_name: string
-  category: string
+  category: $Enums.ProviderCategory
   location: string
   price_range?: $Enums.PriceRange
   description?: string | null
@@ -1088,7 +1092,7 @@ export type ServiceProviderUpdateToOneWithWhereWithoutUserInput = {
 export type ServiceProviderUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
   location?: Prisma.StringFieldUpdateOperationsInput | string
   price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1120,7 +1124,7 @@ export type ServiceProviderUpdateWithoutUserInput = {
 export type ServiceProviderUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
   location?: Prisma.StringFieldUpdateOperationsInput | string
   price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1152,7 +1156,7 @@ export type ServiceProviderUncheckedUpdateWithoutUserInput = {
 export type ServiceProviderCreateWithoutService_requestsInput = {
   id?: string
   business_name: string
-  category: string
+  category: $Enums.ProviderCategory
   location: string
   price_range?: $Enums.PriceRange
   description?: string | null
@@ -1185,7 +1189,7 @@ export type ServiceProviderUncheckedCreateWithoutService_requestsInput = {
   id?: string
   user_id: string
   business_name: string
-  category: string
+  category: $Enums.ProviderCategory
   location: string
   price_range?: $Enums.PriceRange
   description?: string | null
@@ -1232,7 +1236,7 @@ export type ServiceProviderUpdateToOneWithWhereWithoutService_requestsInput = {
 export type ServiceProviderUpdateWithoutService_requestsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
   location?: Prisma.StringFieldUpdateOperationsInput | string
   price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1265,7 +1269,7 @@ export type ServiceProviderUncheckedUpdateWithoutService_requestsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
   location?: Prisma.StringFieldUpdateOperationsInput | string
   price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1296,7 +1300,7 @@ export type ServiceProviderUncheckedUpdateWithoutService_requestsInput = {
 export type ServiceProviderCreateWithoutQuotesInput = {
   id?: string
   business_name: string
-  category: string
+  category: $Enums.ProviderCategory
   location: string
   price_range?: $Enums.PriceRange
   description?: string | null
@@ -1329,7 +1333,7 @@ export type ServiceProviderUncheckedCreateWithoutQuotesInput = {
   id?: string
   user_id: string
   business_name: string
-  category: string
+  category: $Enums.ProviderCategory
   location: string
   price_range?: $Enums.PriceRange
   description?: string | null
@@ -1376,7 +1380,7 @@ export type ServiceProviderUpdateToOneWithWhereWithoutQuotesInput = {
 export type ServiceProviderUpdateWithoutQuotesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
   location?: Prisma.StringFieldUpdateOperationsInput | string
   price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1409,7 +1413,7 @@ export type ServiceProviderUncheckedUpdateWithoutQuotesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
   location?: Prisma.StringFieldUpdateOperationsInput | string
   price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1440,7 +1444,7 @@ export type ServiceProviderUncheckedUpdateWithoutQuotesInput = {
 export type ServiceProviderCreateWithoutBookingsInput = {
   id?: string
   business_name: string
-  category: string
+  category: $Enums.ProviderCategory
   location: string
   price_range?: $Enums.PriceRange
   description?: string | null
@@ -1473,7 +1477,7 @@ export type ServiceProviderUncheckedCreateWithoutBookingsInput = {
   id?: string
   user_id: string
   business_name: string
-  category: string
+  category: $Enums.ProviderCategory
   location: string
   price_range?: $Enums.PriceRange
   description?: string | null
@@ -1520,7 +1524,7 @@ export type ServiceProviderUpdateToOneWithWhereWithoutBookingsInput = {
 export type ServiceProviderUpdateWithoutBookingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
   location?: Prisma.StringFieldUpdateOperationsInput | string
   price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1553,7 +1557,7 @@ export type ServiceProviderUncheckedUpdateWithoutBookingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
   location?: Prisma.StringFieldUpdateOperationsInput | string
   price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1584,7 +1588,7 @@ export type ServiceProviderUncheckedUpdateWithoutBookingsInput = {
 export type ServiceProviderCreateWithoutReviewsInput = {
   id?: string
   business_name: string
-  category: string
+  category: $Enums.ProviderCategory
   location: string
   price_range?: $Enums.PriceRange
   description?: string | null
@@ -1617,7 +1621,7 @@ export type ServiceProviderUncheckedCreateWithoutReviewsInput = {
   id?: string
   user_id: string
   business_name: string
-  category: string
+  category: $Enums.ProviderCategory
   location: string
   price_range?: $Enums.PriceRange
   description?: string | null
@@ -1664,7 +1668,7 @@ export type ServiceProviderUpdateToOneWithWhereWithoutReviewsInput = {
 export type ServiceProviderUpdateWithoutReviewsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
   location?: Prisma.StringFieldUpdateOperationsInput | string
   price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1697,7 +1701,7 @@ export type ServiceProviderUncheckedUpdateWithoutReviewsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
   location?: Prisma.StringFieldUpdateOperationsInput | string
   price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1728,7 +1732,7 @@ export type ServiceProviderUncheckedUpdateWithoutReviewsInput = {
 export type ServiceProviderCreateWithoutProvider_servicesInput = {
   id?: string
   business_name: string
-  category: string
+  category: $Enums.ProviderCategory
   location: string
   price_range?: $Enums.PriceRange
   description?: string | null
@@ -1761,7 +1765,7 @@ export type ServiceProviderUncheckedCreateWithoutProvider_servicesInput = {
   id?: string
   user_id: string
   business_name: string
-  category: string
+  category: $Enums.ProviderCategory
   location: string
   price_range?: $Enums.PriceRange
   description?: string | null
@@ -1808,7 +1812,7 @@ export type ServiceProviderUpdateToOneWithWhereWithoutProvider_servicesInput = {
 export type ServiceProviderUpdateWithoutProvider_servicesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
   location?: Prisma.StringFieldUpdateOperationsInput | string
   price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1841,7 +1845,7 @@ export type ServiceProviderUncheckedUpdateWithoutProvider_servicesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
   location?: Prisma.StringFieldUpdateOperationsInput | string
   price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1872,7 +1876,7 @@ export type ServiceProviderUncheckedUpdateWithoutProvider_servicesInput = {
 export type ServiceProviderCreateWithoutBlocked_datesInput = {
   id?: string
   business_name: string
-  category: string
+  category: $Enums.ProviderCategory
   location: string
   price_range?: $Enums.PriceRange
   description?: string | null
@@ -1905,7 +1909,7 @@ export type ServiceProviderUncheckedCreateWithoutBlocked_datesInput = {
   id?: string
   user_id: string
   business_name: string
-  category: string
+  category: $Enums.ProviderCategory
   location: string
   price_range?: $Enums.PriceRange
   description?: string | null
@@ -1952,7 +1956,7 @@ export type ServiceProviderUpdateToOneWithWhereWithoutBlocked_datesInput = {
 export type ServiceProviderUpdateWithoutBlocked_datesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
   location?: Prisma.StringFieldUpdateOperationsInput | string
   price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1985,7 +1989,7 @@ export type ServiceProviderUncheckedUpdateWithoutBlocked_datesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
   location?: Prisma.StringFieldUpdateOperationsInput | string
   price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2016,7 +2020,7 @@ export type ServiceProviderUncheckedUpdateWithoutBlocked_datesInput = {
 export type ServiceProviderCreateWithoutCalendar_integrationsInput = {
   id?: string
   business_name: string
-  category: string
+  category: $Enums.ProviderCategory
   location: string
   price_range?: $Enums.PriceRange
   description?: string | null
@@ -2049,7 +2053,7 @@ export type ServiceProviderUncheckedCreateWithoutCalendar_integrationsInput = {
   id?: string
   user_id: string
   business_name: string
-  category: string
+  category: $Enums.ProviderCategory
   location: string
   price_range?: $Enums.PriceRange
   description?: string | null
@@ -2096,7 +2100,7 @@ export type ServiceProviderUpdateToOneWithWhereWithoutCalendar_integrationsInput
 export type ServiceProviderUpdateWithoutCalendar_integrationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
   location?: Prisma.StringFieldUpdateOperationsInput | string
   price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2129,7 +2133,7 @@ export type ServiceProviderUncheckedUpdateWithoutCalendar_integrationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProviderCategoryFieldUpdateOperationsInput | $Enums.ProviderCategory
   location?: Prisma.StringFieldUpdateOperationsInput | string
   price_range?: Prisma.EnumPriceRangeFieldUpdateOperationsInput | $Enums.PriceRange
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2392,7 +2396,7 @@ export type $ServiceProviderPayload<ExtArgs extends runtime.Types.Extensions.Int
     id: string
     user_id: string
     business_name: string
-    category: string
+    category: $Enums.ProviderCategory
     location: string
     price_range: $Enums.PriceRange
     description: string | null
@@ -2846,7 +2850,7 @@ export interface ServiceProviderFieldRefs {
   readonly id: Prisma.FieldRef<"ServiceProvider", 'String'>
   readonly user_id: Prisma.FieldRef<"ServiceProvider", 'String'>
   readonly business_name: Prisma.FieldRef<"ServiceProvider", 'String'>
-  readonly category: Prisma.FieldRef<"ServiceProvider", 'String'>
+  readonly category: Prisma.FieldRef<"ServiceProvider", 'ProviderCategory'>
   readonly location: Prisma.FieldRef<"ServiceProvider", 'String'>
   readonly price_range: Prisma.FieldRef<"ServiceProvider", 'PriceRange'>
   readonly description: Prisma.FieldRef<"ServiceProvider", 'String'>

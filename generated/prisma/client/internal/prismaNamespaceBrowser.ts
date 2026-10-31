@@ -151,6 +151,9 @@ export const ServiceRequestScalarFieldEnum = {
   customer_email: 'customer_email',
   customer_phone: 'customer_phone',
   preferred_contact: 'preferred_contact',
+  event_slot_id: 'event_slot_id',
+  decline_reason: 'decline_reason',
+  closed_at: 'closed_at',
   created_at: 'created_at',
   updated_at: 'updated_at'
 } as const
@@ -192,6 +195,10 @@ export const BookingScalarFieldEnum = {
   agreement_accepted_at: 'agreement_accepted_at',
   agreement_ip: 'agreement_ip',
   special_requests: 'special_requests',
+  completed_at: 'completed_at',
+  cancelled_at: 'cancelled_at',
+  cancelled_by_id: 'cancelled_by_id',
+  cancellation_reason: 'cancellation_reason',
   created_at: 'created_at',
   updated_at: 'updated_at'
 } as const
@@ -237,6 +244,7 @@ export const ReviewScalarFieldEnum = {
   id: 'id',
   provider_id: 'provider_id',
   customer_id: 'customer_id',
+  booking_id: 'booking_id',
   rating: 'rating',
   title: 'title',
   comment: 'comment',

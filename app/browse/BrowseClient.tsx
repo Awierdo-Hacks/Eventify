@@ -10,8 +10,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { categories, locations } from '@/lib/mockData';
-import { MapPin, Star, CheckCircle, Search, Loader2 } from 'lucide-react';
+import { locations } from '@/lib/mockData';
+import { CATEGORIES, categoryLabel } from '@/lib/categories';
+import { eventTypeLabel, priceRangeLabel } from '@/lib/labels';
+import type { BrowseEventContext } from '@/lib/page-data';
+import { MapPin, Star, CheckCircle, Search, Loader2, PartyPopper, X } from 'lucide-react';
 
 interface Provider {
   id: string;
@@ -38,6 +41,7 @@ interface BrowseClientProps {
   initialPage: number;
   initialPageSize: number;
   initialHasMore: boolean;
+  eventContext?: BrowseEventContext | null;
 }
 
 export default function BrowseClient({
@@ -47,7 +51,13 @@ export default function BrowseClient({
   initialPage,
   initialPageSize,
   initialHasMore,
+  eventContext = null,
 }: BrowseClientProps) {
+  // While searching for an event slot, results are limited to providers that are
+  // free on the event date and fit the number of guests
+  const [eventFilterActive, setEventFilterActive] = useState(!!eventContext);
+  const eventDay = eventContext?.eventDate ? eventContext.eventDate.split('T')[0] : null;
+  const contextQuery = eventContext && eventFilterActive ? `?eventId=${eventContext.eventId}&slotId=${eventContext.slotId}` : '';
   const router = useRouter();
   const didMount = useRef(false);
   
@@ -84,8 +94,18 @@ export default function BrowseClient({
         if (selectedLocation !== 'all') filterParams.append('location', selectedLocation);
         if (priceRange !== 'all') filterParams.append('priceRange', priceRange);
         if (searchQuery) filterParams.append('search', searchQuery);
+        if (eventContext && eventFilterActive) {
+          filterParams.append('eventId', eventContext.eventId);
+          filterParams.append('slotId', eventContext.slotId);
+        }
 
         const apiParams = new URLSearchParams(filterParams);
+        apiParams.delete('eventId');
+        apiParams.delete('slotId');
+        if (eventContext && eventFilterActive) {
+          if (eventDay) apiParams.append('availableOn', eventDay);
+          if (eventContext.guestCount) apiParams.append('guests', String(eventContext.guestCount));
+        }
         apiParams.append('page', String(nextPage));
         apiParams.append('pageSize', String(initialPageSize));
 
@@ -123,7 +143,7 @@ export default function BrowseClient({
     }
 
     fetchProviders(1, false);
-  }, [selectedCategory, selectedLocation, priceRange, searchQuery]);
+  }, [selectedCategory, selectedLocation, priceRange, searchQuery, eventFilterActive]);
   
   // Map price range to display format
   const getPriceRangeDisplay = (range: string) => {
@@ -149,6 +169,35 @@ export default function BrowseClient({
           </p>
         </div>
 
+        {/* Event context: searching a provider for one part of the customer's event */}
+        {eventContext && eventFilterActive && (
+          <Card className="p-4 sm:p-5 mb-4 border-2 border-purple-200 bg-purple-50 rounded-3xl flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0">
+              <PartyPopper className="w-5 h-5 text-purple-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-purple-900">
+                Je zoekt {categoryLabel(eventContext.slotCategory).toLowerCase()} voor &ldquo;{eventContext.eventName}&rdquo;
+              </p>
+              <p className="text-sm text-purple-700">
+                {eventTypeLabel(eventContext.eventType)}
+                {eventDay && ` · beschikbaar op ${new Date(eventContext.eventDate!).toLocaleDateString('nl-BE', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })}`}
+                {eventContext.guestCount ? ` · geschikt voor ${eventContext.guestCount} gasten` : ''}
+                {eventContext.location ? ` · ${eventContext.location}` : ''}
+              </p>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="rounded-xl text-purple-700 hover:bg-purple-100 self-start sm:self-center"
+              onClick={() => setEventFilterActive(false)}
+            >
+              <X className="w-4 h-4 mr-1" />
+              Gewoon rondkijken
+            </Button>
+          </Card>
+        )}
+
         {/* Filters */}
         <Card className="p-4 sm:p-6 mb-6 sm:mb-8 bg-white border-2 border-gray-100 rounded-3xl shadow-eventiphy-lg">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -170,9 +219,9 @@ export default function BrowseClient({
               className="rounded-xl border-2 border-gray-100 h-12 px-4 focus:border-purple-500 focus:outline-none"
             >
               <option value="all">Alle categorieën</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.icon} {cat.name}
+              {CATEGORIES.map((cat) => (
+                <option key={cat.value} value={cat.value}>
+                  {cat.icon} {cat.label}
                 </option>
               ))}
             </select>
@@ -209,7 +258,7 @@ export default function BrowseClient({
           <div className="flex gap-2 mt-4 flex-wrap">
             {selectedCategory !== 'all' && (
               <Badge variant="secondary" className="bg-purple-100 text-purple-700">
-                {categories.find((c) => c.id === selectedCategory)?.name}
+                {categoryLabel(selectedCategory)}
                 <button
                   onClick={() => setSelectedCategory('all')}
                   className="ml-2 p-1 -mr-1 rounded hover:text-purple-900 active:text-purple-900"
@@ -231,7 +280,7 @@ export default function BrowseClient({
             )}
             {priceRange !== 'all' && (
               <Badge variant="secondary" className="bg-purple-100 text-purple-700">
-                {priceRange}
+                {priceRangeLabel(priceRange)}
                 <button onClick={() => setPriceRange('all')} className="ml-2 p-1 -mr-1 rounded hover:text-purple-900 active:text-purple-900">
                   ×
                 </button>
@@ -290,7 +339,7 @@ export default function BrowseClient({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {providers.map((provider, index) => (
               <div key={provider.id}>
-                <Link href={`/providers/${provider.id}`}>
+                <Link href={`/providers/${provider.id}${contextQuery}`}>
                   <Card className="overflow-hidden hover:shadow-eventiphy-xl transition-all hover:-translate-y-1 cursor-pointer border-2 border-gray-100 rounded-3xl h-full">
                     {/* Image */}
                     <div className="relative h-48 overflow-hidden bg-gray-200">

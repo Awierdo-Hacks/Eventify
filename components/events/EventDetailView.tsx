@@ -137,6 +137,7 @@ export function EventDetailView({
   
   // Accept quote state
   const [acceptingQuoteId, setAcceptingQuoteId] = useState<string | null>(null);
+  const [acceptError, setAcceptError] = useState<string | null>(null);
   
   // Event editing state
   const [isEditingMeta, setIsEditingMeta] = useState(false);
@@ -171,10 +172,8 @@ export function EventDetailView({
   };
 
   const handleFindProviders = (slotId: string, category: ProviderCategory) => {
-    // Navigate to browse page with category filter and event context
-    // Use mapEnumToCategory to convert the enum to the database category string
-    const categorySlug = mapEnumToCategory(category);
-    router.push(`/browse?category=${categorySlug}&eventId=${event.id}&slotId=${slotId}`);
+    // Browse is pre-filtered for this slot; the event context travels on to the quote request
+    router.push(`/browse?category=${category}&eventId=${event.id}&slotId=${slotId}`);
   };
 
   const handleViewQuotes = (slotId: string) => {
@@ -267,35 +266,27 @@ export function EventDetailView({
   // Accept a quote (from within the event detail view)
   const handleAcceptQuote = async (quoteId: string, slotId: string) => {
     setAcceptingQuoteId(quoteId);
+    setAcceptError(null);
     try {
-      // First accept the quote via the API
+      // Accept and link to this slot in one step (one transaction on the server)
       const acceptRes = await fetch(`/api/quotes/${quoteId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'accept' }),
+        body: JSON.stringify({ action: 'accept', eventSlotId: slotId }),
       });
 
       if (!acceptRes.ok) {
-        const err = await acceptRes.json();
-        console.error('Error accepting quote:', err);
+        const err = await acceptRes.json().catch(() => ({}));
+        setAcceptError(err.error || 'Er ging iets mis bij het accepteren van de offerte');
         return;
       }
 
-      // Then link the quote to this event slot
-      const linkRes = await fetch(`/api/quotes/${quoteId}/link`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ eventSlotId: slotId }),
-      });
-
-      if (linkRes.ok) {
-        // Refresh event data
-        onRefresh?.();
-        setSelectedSlotForQuotes(null);
-        setSelectedQuoteForDetails(null);
-      }
+      onRefresh?.();
+      setSelectedSlotForQuotes(null);
+      setSelectedQuoteForDetails(null);
     } catch (error) {
       console.error('Error accepting quote:', error);
+      setAcceptError('Er ging iets mis bij het accepteren van de offerte');
     } finally {
       setAcceptingQuoteId(null);
     }
@@ -668,7 +659,10 @@ export function EventDetailView({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-          onClick={() => setSelectedSlotForQuotes(null)}
+          onClick={() => {
+            setSelectedSlotForQuotes(null);
+            setAcceptError(null);
+          }}
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
@@ -700,6 +694,9 @@ export function EventDetailView({
             </div>
 
             <div className="p-6 overflow-y-auto max-h-[60vh]">
+              {acceptError && (
+                <p className="mb-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-3 py-2">{acceptError}</p>
+              )}
               {selectedSlot.quotes.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-gray-500 mb-4">Nog geen offertes ontvangen</p>
