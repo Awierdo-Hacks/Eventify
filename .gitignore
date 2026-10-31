@@ -53,3 +53,6 @@ npm-debug.log*
 
 # Local docker volumes
 postgres_data
+
+# Local test credentials
+test-login.json

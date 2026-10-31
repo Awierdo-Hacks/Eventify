@@ -2,7 +2,9 @@
 
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { headers } from 'next/headers';
 import { setSession } from '@/lib/auth';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 interface LoginResult {
   success: boolean;
@@ -14,13 +16,23 @@ interface LoginResult {
 export async function loginAction(email: string, password: string): Promise<LoginResult> {
   try {
     // Validatie
-    if (!email || !password) {
+    if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
       return { success: false, error: 'Email en wachtwoord zijn verplicht' };
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const headerList = await headers();
+    const ip = headerList.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    const allowed =
+      (await checkRateLimit(`login:ip:${ip}`, 20, 15 * 60_000)) &&
+      (await checkRateLimit(`login:email:${normalizedEmail}`, 8, 15 * 60_000));
+    if (!allowed) {
+      return { success: false, error: 'Te veel inlogpogingen. Probeer het over 15 minuten opnieuw.' };
     }
 
     // Zoek user
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
       include: {
         provider: {
           select: {
@@ -34,7 +46,14 @@ export async function loginAction(email: string, password: string): Promise<Logi
       return { success: false, error: 'Ongeldige inloggegevens' };
     }
 
-    // Check account status
+    // Verify wachtwoord
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+
+    if (!isPasswordValid) {
+      return { success: false, error: 'Ongeldige inloggegevens' };
+    }
+
+    // Check account status (only after a correct password, so blocked accounts can't be probed)
     if (user.status === 'SUSPENDED') {
       return { 
         success: false, 
@@ -49,13 +68,6 @@ export async function loginAction(email: string, password: string): Promise<Logi
         error: 'Account Verbannen',
         message: 'Je account is permanent verbannen van het platform vanwege schending van de gebruiksvoorwaarden. Deze beslissing is definitief.'
       };
-    }
-
-    // Verify wachtwoord
-    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
-
-    if (!isPasswordValid) {
-      return { success: false, error: 'Ongeldige inloggegevens' };
     }
 
     // Maak session

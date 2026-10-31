@@ -2,24 +2,24 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireProvider } from '@/lib/middleware/auth';
 import { prisma } from '@/lib/prisma';
 import { addMonths, startOfMonth, endOfMonth } from 'date-fns';
+import { normalizeExternalUrl } from '@/lib/safeFetch';
 
 // POST - iCal URL koppelen
 export async function POST(request: NextRequest) {
   const { error, session } = await requireProvider();
   if (error) return error;
 
-  const body = await request.json();
-  const { url } = body as { url: string };
+  const body = await request.json().catch(() => ({}));
+  const { url } = body as { url: unknown };
 
   if (!url || typeof url !== 'string') {
     return NextResponse.json({ error: 'Geef een geldige iCal URL op' }, { status: 400 });
   }
 
-  const trimmedUrl = url.trim();
-
-  // Validate URL format
+  // Validate URL format (webcal:// is normalised to https://)
+  let trimmedUrl: string;
   try {
-    new URL(trimmedUrl);
+    trimmedUrl = normalizeExternalUrl(url).toString();
   } catch {
     return NextResponse.json({ error: 'Ongeldige URL formaat' }, { status: 400 });
   }

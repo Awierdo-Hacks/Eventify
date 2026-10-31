@@ -137,7 +137,6 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
         preferredContact: 'email',
       };
       
-      console.log('Sending request:', requestBody);
       
       const response = await fetch('/api/requests', {
         method: 'POST',
@@ -154,7 +153,6 @@ export default function RequestQuotePage({ params }: { params: Promise<{ id: str
       }
 
       const result = await response.json();
-      console.log('Success response:', result);
 
       // Success - redirect to dashboard
       router.push('/dashboard?tab=requests&success=true');

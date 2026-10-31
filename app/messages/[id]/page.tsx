@@ -759,7 +759,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
+              accept="image/jpeg,image/png,image/webp,application/pdf"
               className="hidden"
               onChange={handleFileUpload}
             />

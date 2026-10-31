@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
+import { paymentsEnabled } from '@/lib/payments-mode';
 import type { PageUser } from '@/lib/page-data';
 import { Container } from '@/components/layout';
 import { Card } from '@/components/ui/card';
@@ -835,12 +836,18 @@ export default function DashboardClient({
                           <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
                           <p className="text-sm text-amber-800 font-medium">Betaling nog openstaand</p>
                         </div>
-                        <button
-                          onClick={() => router.push(`/checkout/${booking.id}`)}
-                          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-xl px-4 py-2 text-sm flex-shrink-0 shadow-md transition-all"
-                        >
-                          Betaling afmaken →
-                        </button>
+                        {paymentsEnabled() ? (
+                          <button
+                            onClick={() => router.push(`/checkout/${booking.id}`)}
+                            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-xl px-4 py-2 text-sm flex-shrink-0 shadow-md transition-all"
+                          >
+                            Betaling afmaken →
+                          </button>
+                        ) : (
+                          <p className="text-xs text-amber-700 text-right">
+                            Regel de betaling voorlopig rechtstreeks met de provider
+                          </p>
+                        )}
                       </div>
                     )}
 

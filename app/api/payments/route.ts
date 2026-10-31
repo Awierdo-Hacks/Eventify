@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { getSession } from '@/lib/auth'
 import { getMollieClient } from '@/lib/mollie'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { paymentsEnabled, PAYMENTS_DISABLED_MESSAGE } from '@/lib/payments-mode'
 
 const VALID_METHODS = ['bancontact', 'payconiq', 'creditcard'] as const
 type PaymentMethod = (typeof VALID_METHODS)[number]
@@ -15,13 +16,17 @@ const MOLLIE_METHOD_MAP: Record<PaymentMethod, string> = {
 
 export async function POST(request: Request) {
   try {
+    if (!paymentsEnabled()) {
+      return NextResponse.json({ error: PAYMENTS_DISABLED_MESSAGE }, { status: 503 })
+    }
+
     const session = await getSession()
     if (!session) {
       return NextResponse.json({ error: 'Niet ingelogd' }, { status: 401 })
     }
 
     // Rate limiting: 5 payment initiaties per user per minuut
-    if (!checkRateLimit(`payment:${session.id}`, 5, 60_000)) {
+    if (!(await checkRateLimit(`payment:${session.id}`, 5, 60_000))) {
       return NextResponse.json(
         { error: 'Te veel verzoeken. Probeer het later opnieuw.' },
         { status: 429 }

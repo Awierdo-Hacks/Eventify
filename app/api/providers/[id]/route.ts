@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireProvider } from '@/lib/middleware/auth';
 import { canAccessProviderResource } from '@/lib/middleware/auth';
+import { getSession } from '@/lib/auth';
 import { PriceRange } from '@/generated/prisma/client';
 
 export async function GET(
@@ -18,7 +19,6 @@ export async function GET(
           select: {
             id: true,
             name: true,
-            email: true,
           },
         },
         reviews: {
@@ -59,6 +59,18 @@ export async function GET(
       );
     }
 
+    // Unverified or hidden profiles are only visible to the owner and admins
+    const isPublic = provider.verified && provider.is_active;
+    if (!isPublic) {
+      const session = await getSession();
+      if (!session || !canAccessProviderResource(session, provider.id)) {
+        return NextResponse.json(
+          { error: 'Provider niet gevonden' },
+          { status: 404 }
+        );
+      }
+    }
+
     // Format response – gebruik rating_avg uit DB
     const response = {
       id: provider.id,
@@ -81,7 +93,6 @@ export async function GET(
       user: {
         id: provider.user.id,
         name: provider.user.name,
-        email: provider.user.email,
       },
       reviews: provider.reviews.map((review) => ({
         id: review.id,
@@ -96,7 +107,10 @@ export async function GET(
     };
 
     const res = NextResponse.json(response);
-    res.headers.set('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=600');
+    res.headers.set(
+      'Cache-Control',
+      isPublic ? 'public, s-maxage=120, stale-while-revalidate=600' : 'private, no-store'
+    );
     return res;
   } catch (error) {
     console.error('Provider detail API error:', error);

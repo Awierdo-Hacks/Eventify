@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
+import { checkRateLimit, rateLimitResponse } from '@/lib/rate-limit';
 
 // GET - List conversations for current user
 export async function GET() {
@@ -132,10 +133,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
+    if (!(await checkRateLimit(`conversation:${session.id}`, 20, 60 * 60_000))) {
+      return rateLimitResponse();
+    }
+
+    const body = await request.json().catch(() => ({}));
     const { recipientId } = body;
 
-    if (!recipientId) {
+    if (!recipientId || typeof recipientId !== 'string') {
       return NextResponse.json({ error: 'recipientId is verplicht' }, { status: 400 });
     }
 
@@ -146,10 +151,22 @@ export async function POST(request: Request) {
     // Check if recipient exists
     const recipient = await prisma.user.findUnique({
       where: { id: recipientId },
+      select: { id: true, role: true, status: true },
     });
 
-    if (!recipient) {
+    if (!recipient || recipient.status !== 'ACTIVE') {
       return NextResponse.json({ error: 'Gebruiker niet gevonden' }, { status: 404 });
+    }
+
+    // Conversations are between a customer and a provider (admins may contact anyone)
+    const isCustomerProviderPair =
+      (session.role === 'CUSTOMER' && recipient.role === 'PROVIDER') ||
+      (session.role === 'PROVIDER' && recipient.role === 'CUSTOMER');
+    if (session.role !== 'ADMIN' && !isCustomerProviderPair) {
+      return NextResponse.json(
+        { error: 'Je kunt alleen een gesprek starten tussen klant en dienstverlener' },
+        { status: 403 }
+      );
     }
 
     // Check if conversation already exists between these two users

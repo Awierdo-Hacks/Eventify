@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { UserRole, PriceRange } from '@/generated/prisma/client';
@@ -17,6 +18,10 @@ function mapPriceRange(range: string): PriceRange {
 
 export async function POST(request: Request) {
   try {
+    if (!(await checkRateLimit(`register:ip:${getClientIp(request)}`, 5, 60 * 60_000))) {
+      return rateLimitResponse();
+    }
+
     const body = await request.json();
     const { accountType } = body;
 

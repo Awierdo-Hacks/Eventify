@@ -565,7 +565,7 @@ export default function ProfileEditForm({ initialData, onSave }: ProfileEditForm
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/jpeg,image/png,image/webp,image/svg+xml,image/gif,image/bmp,image/tiff"
+          accept="image/jpeg,image/png,image/webp"
           multiple
           className="hidden"
           onChange={handleImageUpload}

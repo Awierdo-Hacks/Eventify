@@ -11,6 +11,24 @@ import { loginAction } from './actions';
 import { useSession } from '@/components/providers/SessionProvider';
 import { AlertTriangle, Ban, ShieldAlert } from 'lucide-react';
 
+const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+
+// Only same-site relative paths, so ?redirect= can't send users to another site
+function getSafeRedirect(): string | null {
+  if (typeof window === 'undefined') return null;
+  const target = new URLSearchParams(window.location.search).get('redirect');
+  if (!target || !target.startsWith('/') || target.startsWith('//') || target.startsWith('/\\')) {
+    return null;
+  }
+  return target;
+}
+
+function dashboardForRole(role?: string) {
+  if (role === 'PROVIDER') return '/provider-dashboard';
+  if (role === 'ADMIN') return '/admin';
+  return '/dashboard';
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const { update } = useSession();
@@ -35,14 +53,8 @@ export default function LoginPage() {
         setLoading(false);
       } else {
         await update(); // Refresh session
-        // Role-based redirect
-        if (result.role === 'PROVIDER') {
-          router.push('/provider-dashboard');
-        } else if (result.role === 'ADMIN') {
-          router.push('/admin');
-        } else {
-          router.push('/dashboard');
-        }
+        // Back to where the user came from, otherwise their dashboard
+        router.push(getSafeRedirect() ?? dashboardForRole(result.role));
       }
     } catch (err) {
       setError('Er is iets misgegaan. Probeer het opnieuw.');
@@ -63,14 +75,7 @@ export default function LoginPage() {
 
     if (result.success) {
       await update(); // Refresh session
-      // Role-based redirect
-      if (result.role === 'PROVIDER') {
-        router.push('/provider-dashboard');
-      } else if (result.role === 'ADMIN') {
-        router.push('/admin');
-      } else {
-        router.push('/dashboard');
-      }
+      router.push(getSafeRedirect() ?? dashboardForRole(result.role));
     } else {
       setLoading(false);
       setError(result.error || 'Inloggen mislukt');
@@ -169,6 +174,7 @@ export default function LoginPage() {
             </Button>
           </form>
 
+          {DEMO_MODE && (
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -209,6 +215,7 @@ export default function LoginPage() {
               </Button>
             </div>
           </div>
+          )}
 
           <div className="mt-6 text-center text-sm text-gray-600">
             Nog geen account?{' '}

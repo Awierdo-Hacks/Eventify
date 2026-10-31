@@ -132,27 +132,49 @@ export async function PATCH(
     // Build update data
     const updateData: any = {};
     
+    // Slot status is derived from requests, quotes and bookings and can't be set by hand
     if (status !== undefined) {
-      const validStatuses = ['EMPTY', 'SEARCHING', 'QUOTES_REQUESTED', 'QUOTES_RECEIVED', 'BOOKED'];
-      if (!validStatuses.includes(status)) {
+      return NextResponse.json(
+        { error: 'Slot status cannot be changed manually' },
+        { status: 400 }
+      );
+    }
+
+    if (customName !== undefined) {
+      if (customName !== null && typeof customName !== 'string') {
         return NextResponse.json(
-          { error: 'Invalid status' },
+          { error: 'customName must be a string' },
           { status: 400 }
         );
       }
-      updateData.status = status;
-    }
-    
-    if (customName !== undefined) {
-      updateData.custom_name = customName?.trim() || null;
+      updateData.custom_name = customName?.trim().slice(0, 100) || null;
     }
     
     if (isRequired !== undefined) {
+      if (typeof isRequired !== 'boolean') {
+        return NextResponse.json(
+          { error: 'isRequired must be a boolean' },
+          { status: 400 }
+        );
+      }
       updateData.is_required = isRequired;
     }
 
+    // Scope on the event as well, so an event owner cannot touch other events' slots
+    const existingSlot = await prisma.eventSlot.findFirst({
+      where: { id: slotId, event_id: eventId },
+      select: { id: true },
+    });
+
+    if (!existingSlot) {
+      return NextResponse.json(
+        { error: 'Slot not found' },
+        { status: 404 }
+      );
+    }
+
     const updatedSlot = await prisma.eventSlot.update({
-      where: { id: slotId },
+      where: { id: existingSlot.id },
       data: updateData,
     });
 

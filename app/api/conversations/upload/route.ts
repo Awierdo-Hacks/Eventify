@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
-import { existsSync } from 'fs';
 import { getSession } from '@/lib/auth';
+import { detectFileType, storeFile } from '@/lib/storage';
+import { checkRateLimit, rateLimitResponse } from '@/lib/rate-limit';
+
+const MAX_SIZE = 10 * 1024 * 1024;
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,59 +12,41 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const formData = await request.formData();
-    const file = formData.get('file') as File;
+    if (!(await checkRateLimit(`chat-upload:${session.id}`, 20, 10 * 60_000))) {
+      return rateLimitResponse();
+    }
 
-    if (!file) {
+    const formData = await request.formData();
+    const file = formData.get('file');
+
+    if (!(file instanceof File)) {
       return NextResponse.json({ error: 'Geen bestand gevonden' }, { status: 400 });
     }
 
-    // Allow images and common document types
-    const allowedTypes = [
-      'image/jpeg',
-      'image/png',
-      'image/webp',
-      'image/gif',
-      'application/pdf',
-    ];
-
-    if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json(
-        { error: 'Alleen afbeeldingen (JPG, PNG, WebP, GIF) en PDF bestanden zijn toegestaan' },
-        { status: 400 }
-      );
-    }
-
     // Max 10MB for chat uploads
-    if (file.size > 10 * 1024 * 1024) {
+    if (file.size > MAX_SIZE) {
       return NextResponse.json(
         { error: 'Bestand mag maximaal 10MB zijn' },
         { status: 400 }
       );
     }
 
-    // Create uploads directory
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'chat');
-    if (!existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true });
+    // Allow images and PDF, detected from the file contents
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const type = detectFileType(buffer, ['image', 'pdf']);
+    if (!type) {
+      return NextResponse.json(
+        { error: 'Alleen afbeeldingen (JPG, PNG, WebP) en PDF bestanden zijn toegestaan' },
+        { status: 400 }
+      );
     }
 
-    // Generate unique filename
-    const extension = file.name.split('.').pop() || 'jpg';
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${extension}`;
-    const filePath = path.join(uploadsDir, fileName);
-
-    // Write file
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    await writeFile(filePath, buffer);
-
-    const url = `/uploads/chat/${fileName}`;
+    const url = await storeFile('chat', buffer, type);
 
     return NextResponse.json({
       url,
-      fileName: file.name,
-      fileType: file.type,
+      fileName: file.name.slice(0, 200),
+      fileType: type.contentType,
       fileSize: file.size,
     });
   } catch (error) {

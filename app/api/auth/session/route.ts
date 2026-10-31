@@ -1,27 +1,21 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { getSession, clearSession } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
+    // getSession() already verifies the user status in the database
     const session = await getSession();
-    
+
     if (!session) {
+      // Stale, suspended or banned session: remove the cookie
+      const cookieStore = await cookies();
+      if (cookieStore.get('session')) {
+        await clearSession();
+      }
       return NextResponse.json({ user: null });
     }
-    
-    // Verify user status in database
-    const user = await prisma.user.findUnique({
-      where: { id: session.id },
-      select: { status: true },
-    });
-    
-    // If user is suspended or banned, clear session
-    if (!user || user.status !== 'ACTIVE') {
-      await clearSession();
-      return NextResponse.json({ user: null });
-    }
-    
+
     return NextResponse.json({ user: session });
   } catch (error) {
     console.error('Session error:', error);

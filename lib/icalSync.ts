@@ -1,6 +1,7 @@
 import { prisma } from "./prisma";
 import { format, addDays, parseISO, isValid } from "date-fns";
 import ical, { VEvent } from "node-ical";
+import { safeFetch } from "./safeFetch";
 
 export async function syncIcalCalendar(
   integrationId: string,
@@ -21,7 +22,17 @@ export async function syncIcalCalendar(
     headers["If-None-Match"] = integration.ical_last_etag;
   }
 
-  const res = await fetch(integration.ical_url, { headers });
+  let res: Awaited<ReturnType<typeof safeFetch>>;
+  try {
+    res = await safeFetch(integration.ical_url, { headers });
+  } catch (error) {
+    const errMsg = error instanceof Error ? error.message : "iCal URL niet bereikbaar";
+    await prisma.calendarIntegration.update({
+      where: { id: integrationId },
+      data: { sync_error: errMsg },
+    });
+    throw new Error(errMsg);
+  }
 
   if (res.status === 304) {
     // Not modified — update last_synced_at only
@@ -42,11 +53,10 @@ export async function syncIcalCalendar(
   }
 
   const newEtag = res.headers.get("etag");
-  const icsText = await res.text();
 
   let events: ical.CalendarResponse;
   try {
-    events = ical.parseICS(icsText);
+    events = ical.parseICS(await res.text());
   } catch {
     const errMsg = "Ongeldige iCal inhoud";
     await prisma.calendarIntegration.update({
@@ -120,19 +130,22 @@ export async function syncIcalCalendar(
 }
 
 export async function validateIcalUrl(url: string): Promise<void> {
-  let res: Response;
+  let res: Awaited<ReturnType<typeof safeFetch>>;
   try {
-    res = await fetch(url, { method: "HEAD" });
+    res = await safeFetch(url, { method: "HEAD" });
     if (!res.ok) {
       // Try GET if HEAD fails
-      res = await fetch(url);
+      res = await safeFetch(url);
     }
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("niet toegestaan")) {
+      throw error;
+    }
     throw new Error("URL niet bereikbaar. Controleer het adres en probeer opnieuw.");
   }
 
   if (!res.ok) {
-    throw new Error(`URL geeft fout terug (HTTP ${res.status})`);
+    throw new Error("URL geeft een fout terug. Controleer het adres en probeer opnieuw.");
   }
 }
 

@@ -1,4 +1,4 @@
-// Health check endpoint voor Docker en Render
+// Health check endpoint (uptime monitoring)
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
@@ -19,7 +19,6 @@ export async function GET() {
       status: 'unhealthy',
       timestamp: new Date().toISOString(),
       database: 'disconnected',
-      error: error instanceof Error ? error.message : 'Unknown error',
     }, { status: 503 });
   }
 }

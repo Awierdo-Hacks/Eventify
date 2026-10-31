@@ -1,6 +1,8 @@
+import { cache } from 'react';
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { UserRole, UserStatus } from '@/generated/prisma/client';
+import { prisma } from '@/lib/prisma';
 
 let secretKeyCache: Uint8Array | null = null;
 let devSecretWarningShown = false;
@@ -58,14 +60,34 @@ export async function verifyToken(token: string): Promise<SessionUser | null> {
   }
 }
 
-export async function getSession(): Promise<SessionUser | null> {
+/**
+ * Returns the logged-in user, re-checked against the database so that
+ * suspended/banned users and role changes take effect immediately instead of
+ * when the 7-day token expires. Deduplicated per request via React cache().
+ */
+export const getSession = cache(async (): Promise<SessionUser | null> => {
   const cookieStore = await cookies();
   const token = cookieStore.get('session')?.value;
-  
+
   if (!token) return null;
-  
-  return await verifyToken(token);
-}
+
+  const tokenUser = await verifyToken(token);
+  if (!tokenUser) return null;
+
+  const user = await prisma.user.findUnique({
+    where: { id: tokenUser.id },
+    select: { status: true, role: true, provider: { select: { id: true } } },
+  });
+
+  if (!user || user.status !== 'ACTIVE') return null;
+
+  return {
+    ...tokenUser,
+    role: user.role,
+    status: user.status,
+    providerId: user.provider?.id ?? null,
+  };
+});
 
 export async function setSession(user: SessionUser) {
   const token = await createToken(user);

@@ -2,18 +2,24 @@ import { redirect, notFound } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { CheckoutClient } from './CheckoutClient'
+import { paymentsEnabled } from '@/lib/payments-mode'
 
 interface PageProps {
   params: Promise<{ bookingId: string }>
 }
 
 export default async function CheckoutPage({ params }: PageProps) {
+  const { bookingId } = await params
+
   const session = await getSession()
   if (!session) {
-    redirect('/login')
+    redirect(`/login?redirect=/checkout/${bookingId}`)
   }
 
-  const { bookingId } = await params
+  // Online betalen staat uit tot Eventiphy een geverifieerd Mollie-account heeft
+  if (!paymentsEnabled()) {
+    redirect('/dashboard?tab=bookings')
+  }
 
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },

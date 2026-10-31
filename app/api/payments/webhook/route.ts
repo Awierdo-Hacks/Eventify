@@ -1,12 +1,17 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getMollieClient } from '@/lib/mollie'
+import { paymentsEnabled } from '@/lib/payments-mode'
 
 // Mollie roept dit endpoint aan als een betaling van status verandert.
 // Veiligheidsstrategie: we vertrouwen NOOIT de webhook body — we halen de
 // betalingsstatus altijd op bij Mollie zelf om spoofing te voorkomen.
 export async function POST(request: Request) {
   try {
+    if (!paymentsEnabled()) {
+      return NextResponse.json({ error: 'Payments disabled' }, { status: 503 })
+    }
+
     // Mollie stuurt application/x-www-form-urlencoded: id=tr_xxxxx
     const text = await request.text()
     const params = new URLSearchParams(text)

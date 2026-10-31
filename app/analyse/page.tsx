@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Download, LogOut, Users, Briefcase, List } from 'lucide-react';
 
-const ANALYSE_KEY = 'Equarqoune2005';
-
 const CATEGORY_LABELS: Record<string, string> = {
   CATERING: 'Catering',
   MUSIC: 'Muziek / DJ',
@@ -34,62 +32,6 @@ interface WaitlistEntry {
   created_at: string;
 }
 
-function LoginScreen({ onLogin }: { onLogin: () => void }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (username === 'Master' && password === 'Equarqoune2005') {
-      sessionStorage.setItem('analyse_auth', '1');
-      onLogin();
-    } else {
-      setError('Onjuiste gebruikersnaam of wachtwoord.');
-    }
-  }
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-sm bg-white rounded-3xl border-2 border-gray-100 shadow-lg p-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Analyse</h1>
-        <p className="text-sm text-gray-500 mb-6">Toegang vereist</p>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Gebruikersnaam</label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              autoComplete="username"
-              className="w-full h-11 px-4 rounded-xl border-2 border-gray-200 text-gray-900 focus:outline-none focus:border-purple-400 transition-colors"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Wachtwoord</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-              className="w-full h-11 px-4 rounded-xl border-2 border-gray-200 text-gray-900 focus:outline-none focus:border-purple-400 transition-colors"
-            />
-          </div>
-          {error && (
-            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2">{error}</p>
-          )}
-          <button
-            type="submit"
-            className="w-full h-11 rounded-xl bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-colors"
-          >
-            Inloggen
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
-
 function exportCSV(entries: WaitlistEntry[]) {
   const headers = ['Datum', 'Type', 'Naam', 'E-mail', 'Telefoon', 'Diensten', 'Bericht'];
   const rows = entries.map((e) => [
@@ -113,14 +55,17 @@ function exportCSV(entries: WaitlistEntry[]) {
   URL.revokeObjectURL(url);
 }
 
-function Dashboard({ onLogout }: { onLogout: () => void }) {
+function Dashboard() {
   const [entries, setEntries] = useState<WaitlistEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState('');
 
   useEffect(() => {
-    fetch('/api/waitlist', { headers: { 'x-analyse-key': ANALYSE_KEY } })
-      .then((r) => r.json())
+    fetch('/api/waitlist')
+      .then((r) => {
+        if (!r.ok) throw new Error('Unauthorized');
+        return r.json();
+      })
       .then((data) => {
         setEntries(data.entries ?? []);
         setLoading(false);
@@ -156,13 +101,13 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
             <Download className="w-4 h-4" />
             Export CSV
           </button>
-          <button
-            onClick={onLogout}
+          <a
+            href="/admin"
             className="inline-flex items-center gap-2 px-4 h-9 rounded-xl border-2 border-gray-200 text-gray-600 text-sm hover:bg-gray-50 transition-colors"
           >
             <LogOut className="w-4 h-4" />
-            Uitloggen
-          </button>
+            Naar admin
+          </a>
         </div>
       </div>
 
@@ -283,25 +228,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
   );
 }
 
+// Access is enforced server-side in app/analyse/layout.tsx (admins only)
 export default function AnalysePage() {
-  const [authed, setAuthed] = useState(false);
-  const [checked, setChecked] = useState(false);
-
-  useEffect(() => {
-    if (sessionStorage.getItem('analyse_auth') === '1') {
-      setAuthed(true);
-    }
-    setChecked(true);
-  }, []);
-
-  function handleLogout() {
-    sessionStorage.removeItem('analyse_auth');
-    setAuthed(false);
-  }
-
-  if (!checked) return null;
-
-  if (!authed) return <LoginScreen onLogin={() => setAuthed(true)} />;
-
-  return <Dashboard onLogout={handleLogout} />;
+  return <Dashboard />;
 }

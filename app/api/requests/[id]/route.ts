@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 
-export async function PATCH(
+export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -62,7 +62,7 @@ export async function PATCH(
 
     // Check authorization
     const isOwner = serviceRequest.customer_id === session.id;
-    const isProvider = serviceRequest.provider_id === session.providerId;
+    const isProvider = !!session.providerId && serviceRequest.provider_id === session.providerId;
     const isAdmin = session.role === 'ADMIN';
 
     if (!isOwner && !isProvider && !isAdmin) {

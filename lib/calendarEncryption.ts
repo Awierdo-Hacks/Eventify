@@ -6,11 +6,17 @@ const IV_LENGTH = 16;
 function getKey(): Buffer {
   const key = process.env.CALENDAR_ENCRYPTION_KEY;
   if (!key) {
-    // In development without a key, use a deterministic fallback
-    // In production this env var MUST be set
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("CALENDAR_ENCRYPTION_KEY environment variable is not set");
+    }
+    // Deterministic fallback for local development only
     return crypto.scryptSync("eventify-calendar-dev-key", "salt", 32);
   }
-  return Buffer.from(key, "hex");
+  const buffer = Buffer.from(key, "hex");
+  if (buffer.length !== 32) {
+    throw new Error("CALENDAR_ENCRYPTION_KEY must be 64 hex characters (32 bytes)");
+  }
+  return buffer;
 }
 
 export function encryptToken(text: string): string {

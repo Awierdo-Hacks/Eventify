@@ -1,26 +1,34 @@
 import type { NextConfig } from "next";
 
-const enableStandaloneOutput = process.env.NEXT_OUTPUT_STANDALONE === '1';
-
 const nextConfig: NextConfig = {
-  // Enable standalone output only when explicitly requested (e.g. Docker build)
-  ...(enableStandaloneOutput && { output: 'standalone' }),
-  
-  // Optimize images
   images: {
+    // Only our own Blob store and the stock photos used in seed/demo data
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
+      { protocol: 'https', hostname: '*.public.blob.vercel-storage.com' },
+      { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
-    dangerouslyAllowSVG: true,
   },
-  
-  // Disable telemetry in production
-  ...(process.env.NODE_ENV === 'production' && {
-    productionBrowserSourceMaps: false,
-  }),
+
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+        ],
+      },
+      {
+        // Uploaded files are never executed as pages
+        source: '/uploads/:path*',
+        headers: [{ key: 'Content-Security-Policy', value: "default-src 'none'; sandbox" }],
+      },
+    ];
+  },
+
+  productionBrowserSourceMaps: false,
 };
 
 export default nextConfig;

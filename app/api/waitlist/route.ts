@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-
-const ANALYSE_KEY = 'Equarqoune2005';
+import { requireRole } from '@/lib/middleware/auth';
+import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
   try {
+    if (!(await checkRateLimit(`waitlist:${getClientIp(request)}`, 5, 60 * 60_000))) {
+      return rateLimitResponse();
+    }
+
     const body = await request.json();
     const { type, name, email, phone, categories, message } = body;
 
@@ -19,6 +23,15 @@ export async function POST(request: NextRequest) {
     }
     if (type === 'PROVIDER' && (!categories || !Array.isArray(categories) || categories.length === 0)) {
       return NextResponse.json({ error: 'Selecteer minstens één dienst.' }, { status: 400 });
+    }
+    if (
+      name.length > 200 ||
+      email.length > 254 ||
+      (phone !== undefined && phone !== null && (typeof phone !== 'string' || phone.length > 40)) ||
+      (message !== undefined && message !== null && (typeof message !== 'string' || message.length > 2000)) ||
+      (categories !== undefined && (!Array.isArray(categories) || categories.length > 20 || categories.some((c: unknown) => typeof c !== 'string')))
+    ) {
+      return NextResponse.json({ error: 'Ongeldige invoer.' }, { status: 400 });
     }
 
     const entry = await prisma.waitlistEntry.create({
@@ -39,11 +52,10 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
-  const key = request.headers.get('x-analyse-key');
-  if (key !== ANALYSE_KEY) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+// Waitlist contains personal data: admins only
+export async function GET() {
+  const { error } = await requireRole('ADMIN');
+  if (error) return error;
 
   try {
     const entries = await prisma.waitlistEntry.findMany({

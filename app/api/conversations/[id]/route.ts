@@ -1,6 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
+import { z } from 'zod';
+import { checkRateLimit, rateLimitResponse } from '@/lib/rate-limit';
+import { isOwnUploadUrl } from '@/lib/storage';
+
+// Clients may only send text and image messages; QUOTE and SYSTEM messages are
+// created by the server (quote route, workflow events).
+const sendMessageSchema = z.object({
+  content: z.string().max(5000).optional().default(''),
+  messageType: z.enum(['TEXT', 'IMAGE']).optional().default('TEXT'),
+  attachments: z
+    .array(
+      z.object({
+        url: z.string().max(1000).refine(isOwnUploadUrl, 'onbekende bestandslocatie'),
+        fileName: z.string().max(200),
+        fileType: z.enum(['image/jpeg', 'image/png', 'image/webp', 'application/pdf']),
+        fileSize: z.number().int().nonnegative().max(10 * 1024 * 1024),
+      })
+    )
+    .max(10)
+    .optional()
+    .default([]),
+});
 
 // GET - Get messages for a conversation
 export async function GET(
@@ -16,7 +38,8 @@ export async function GET(
     const { id: conversationId } = await params;
     const { searchParams } = new URL(request.url);
     const cursor = searchParams.get('cursor');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const parsedLimit = parseInt(searchParams.get('limit') || '50', 10);
+    const limit = Number.isFinite(parsedLimit) ? Math.min(Math.max(parsedLimit, 1), 100) : 50;
 
     // Verify user is participant
     const participant = await prisma.conversationParticipant.findUnique({
@@ -218,30 +241,18 @@ export async function POST(
       return NextResponse.json({ error: 'Geen toegang tot dit gesprek' }, { status: 403 });
     }
 
-    const body = await request.json();
-    const { content, messageType = 'TEXT', attachments = [], quoteId } = body;
-
-    if (!content && attachments.length === 0) {
-      return NextResponse.json({ error: 'Bericht of bijlage is verplicht' }, { status: 400 });
+    if (!(await checkRateLimit(`message:${session.id}`, 30, 60_000))) {
+      return rateLimitResponse();
     }
 
-    // If quoteId provided, verify it exists and user has access
-    if (quoteId) {
-      const quote = await prisma.quote.findUnique({
-        where: { id: quoteId },
-        include: { provider: true, request: true },
-      });
+    const parsed = sendMessageSchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Ongeldig bericht' }, { status: 400 });
+    }
+    const { content, messageType, attachments } = parsed.data;
 
-      if (!quote) {
-        return NextResponse.json({ error: 'Offerte niet gevonden' }, { status: 404 });
-      }
-
-      // Only the provider who made the quote or the customer can share it
-      const isProvider = quote.provider.user_id === session.id;
-      const isCustomer = quote.request.customer_id === session.id;
-      if (!isProvider && !isCustomer) {
-        return NextResponse.json({ error: 'Geen toegang tot deze offerte' }, { status: 403 });
-      }
+    if (!content.trim() && attachments.length === 0) {
+      return NextResponse.json({ error: 'Bericht of bijlage is verplicht' }, { status: 400 });
     }
 
     // Create message with attachments
@@ -249,11 +260,10 @@ export async function POST(
       data: {
         conversation_id: conversationId,
         sender_id: session.id,
-        content: content || '',
-        message_type: messageType as any,
-        quote_id: quoteId || null,
+        content,
+        message_type: messageType,
         attachments: {
-          create: attachments.map((a: { url: string; fileName: string; fileType: string; fileSize: number }) => ({
+          create: attachments.map((a) => ({
             url: a.url,
             file_name: a.fileName,
             file_type: a.fileType,

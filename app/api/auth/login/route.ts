@@ -2,22 +2,29 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { setSession } from '@/lib/auth';
+import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
-    const { email, password } = await request.json();
+    const { email, password } = await request.json().catch(() => ({}));
 
     // Validatie
-    if (!email || !password) {
+    if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
       return NextResponse.json(
         { error: 'Email en wachtwoord zijn verplicht' },
         { status: 400 }
       );
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+    const allowed =
+      (await checkRateLimit(`login:ip:${getClientIp(request)}`, 20, 15 * 60_000)) &&
+      (await checkRateLimit(`login:email:${normalizedEmail}`, 8, 15 * 60_000));
+    if (!allowed) return rateLimitResponse();
+
     // Zoek user
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
       include: {
         provider: {
           select: {
@@ -34,7 +41,17 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check account status
+    // Verify wachtwoord
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+
+    if (!isPasswordValid) {
+      return NextResponse.json(
+        { error: 'Ongeldige inloggegevens' },
+        { status: 401 }
+      );
+    }
+
+    // Check account status (only after a correct password, so blocked accounts can't be probed)
     if (user.status === 'SUSPENDED') {
       return NextResponse.json(
         { 
@@ -54,16 +71,6 @@ export async function POST(request: Request) {
           status: 'BANNED'
         },
         { status: 403 }
-      );
-    }
-
-    // Verify wachtwoord
-    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
-
-    if (!isPasswordValid) {
-      return NextResponse.json(
-        { error: 'Ongeldige inloggegevens' },
-        { status: 401 }
       );
     }
 

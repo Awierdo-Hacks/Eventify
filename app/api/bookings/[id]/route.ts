@@ -56,15 +56,40 @@ export async function PATCH(
           { status: 403 }
         );
       }
+      if (!['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED'].includes(status)) {
+        return NextResponse.json(
+          { error: 'Ongeldige status' },
+          { status: 400 }
+        );
+      }
       updateData.status = status;
     }
 
+    // Payment status is set by the payment webhook; only admins may correct it by hand
     if (paymentStatus !== undefined) {
+      if (!isAdmin) {
+        return NextResponse.json(
+          { error: 'Alleen admins kunnen de betaalstatus aanpassen' },
+          { status: 403 }
+        );
+      }
+      if (!['UNPAID', 'PENDING', 'PAID', 'FAILED', 'CANCELLED', 'EXPIRED', 'REFUNDED'].includes(paymentStatus)) {
+        return NextResponse.json(
+          { error: 'Ongeldige betaalstatus' },
+          { status: 400 }
+        );
+      }
       updateData.payment_status = paymentStatus;
     }
 
     if (specialRequests !== undefined) {
-      updateData.special_requests = specialRequests;
+      if (specialRequests !== null && typeof specialRequests !== 'string') {
+        return NextResponse.json(
+          { error: 'Ongeldige speciale wensen' },
+          { status: 400 }
+        );
+      }
+      updateData.special_requests = specialRequests?.slice(0, 2000) ?? null;
     }
 
     // Update booking
