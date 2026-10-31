@@ -67,6 +67,16 @@ export type Quote = Prisma.QuoteModel
  */
 export type Booking = Prisma.BookingModel
 /**
+ * Model Payment
+ * 
+ */
+export type Payment = Prisma.PaymentModel
+/**
+ * Model PaymentAuditLog
+ * 
+ */
+export type PaymentAuditLog = Prisma.PaymentAuditLogModel
+/**
  * Model Review
  * 
  */

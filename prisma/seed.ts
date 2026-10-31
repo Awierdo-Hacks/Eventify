@@ -303,7 +303,7 @@ async function main() {
       guest_count: 120,
       final_price: 4500.00,
       status: BookingStatus.CONFIRMED,
-      payment_status: 'Aanbetaling ontvangen',
+      payment_status: 'UNPAID',
       special_requests: 'Extra vegetarische opties graag',
     },
   });
@@ -710,7 +710,7 @@ async function main() {
       guest_count: 50,
       final_price: 2750.00,
       status: BookingStatus.CONFIRMED,
-      payment_status: 'Aanbetaling ontvangen',
+      payment_status: 'UNPAID',
       special_requests: 'Eén gast heeft een notenallergie. Graag een apart bord voor de jarige.',
     },
   });
