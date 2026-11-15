@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { BadgeCheck, MapPin, Star } from 'lucide-react';
-import { categoryIcon } from '@/components/ui/category-icon';
+import { CategoryGlyph } from '@/components/ui/category-icon';
 import { categoryLabel, priceRangeSymbol } from '@/lib/catalog';
 import type { ProviderCardData } from '@/features/providers/queries';
 
@@ -14,7 +14,6 @@ interface ProviderCardProps {
 }
 
 function ProviderCard({ provider, priority, slotId }: ProviderCardProps) {
-  const Icon = categoryIcon(provider.category);
   return (
     <Link
       href={slotId ? `/providers/${provider.id}?slot=${encodeURIComponent(slotId)}` : `/providers/${provider.id}`}
@@ -32,11 +31,11 @@ function ProviderCard({ provider, priority, slotId }: ProviderCardProps) {
           />
         ) : (
           <span className="absolute inset-0 flex items-center justify-center text-brand-300">
-            <Icon className="size-14" strokeWidth={1.25} aria-hidden />
+            <CategoryGlyph category={provider.category} className="size-14" strokeWidth={1.25} />
           </span>
         )}
         <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-surface/95 px-2.5 py-1 text-xs font-semibold text-ink-900 shadow-xs backdrop-blur">
-          <Icon className="size-3.5 text-brand-600" aria-hidden />
+          <CategoryGlyph category={provider.category} className="size-3.5 text-brand-600" />
           {categoryLabel(provider.category)}
         </span>
       </div>

@@ -12,6 +12,11 @@ const config = [
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
     },
   },
+  {
+    // Demo data keeps named handles for readability.
+    files: ['prisma/seed.ts'],
+    rules: { '@typescript-eslint/no-unused-vars': 'off' },
+  },
 ];
 
 export default config;

@@ -1,3 +1,4 @@
+import { createElement } from 'react';
 import {
   BedDouble,
   CakeSlice,
@@ -16,6 +17,7 @@ import {
   UtensilsCrossed,
   Video,
   type LucideIcon,
+  type LucideProps,
 } from 'lucide-react';
 import { findCategory } from '@/lib/catalog';
 import { cn } from '@/lib/utils';
@@ -55,14 +57,18 @@ const tileSizes = {
   lg: 'size-12 rounded-xl [&_svg]:size-6',
 } as const;
 
+/** The bare line icon for a category. */
+function CategoryGlyph({ category, ...props }: { category: string | null | undefined } & LucideProps) {
+  return createElement(categoryIcon(category), { 'aria-hidden': true, ...props });
+}
+
 /** Line icon on a tinted tile — replaces the emoji used in v1. */
 function CategoryIcon({ category, size = 'md', className }: CategoryIconProps) {
-  const Icon = categoryIcon(category);
   return (
     <span className={cn('inline-flex shrink-0 items-center justify-center bg-brand-50 text-brand-700', tileSizes[size], className)}>
-      <Icon aria-hidden />
+      <CategoryGlyph category={category} />
     </span>
   );
 }
 
-export { CategoryIcon };
+export { CategoryIcon, CategoryGlyph };

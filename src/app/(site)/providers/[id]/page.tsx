@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { BadgeCheck, Building2, CalendarDays, ChevronRight, Clock, Flag, Globe, MapPin, Star, Users } from 'lucide-react';
 import { Alert } from '@/components/ui/alert';
-import { CategoryIcon, categoryIcon } from '@/components/ui/category-icon';
+import { CategoryGlyph, CategoryIcon } from '@/components/ui/category-icon';
 import { Stars } from '@/components/ui/stars';
 import { site } from '@/config/site';
 import { ContactActions } from '@/features/providers/components/contact-actions';
@@ -53,7 +53,6 @@ export default async function ProviderPage({ params, searchParams }: { params: P
   if (!provider.isPublic && !isOwnProfile && viewer?.role !== 'ADMIN') notFound();
 
   const category = findCategory(provider.category);
-  const Icon = categoryIcon(provider.category);
   const website = safeWebsite(provider.website);
   const [cover, ...rest] = provider.gallery;
   const totalReviews = provider.ratingDistribution.reduce((sum, entry) => sum + entry.count, 0);
@@ -142,7 +141,7 @@ export default async function ProviderPage({ params, searchParams }: { params: P
         </div>
       ) : (
         <div className="flex h-44 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-100 via-brand-50 to-sun-100 text-brand-300 sm:h-56">
-          <Icon className="size-16" strokeWidth={1.25} aria-hidden />
+          <CategoryGlyph category={provider.category} className="size-16" strokeWidth={1.25} />
         </div>
       )}
 

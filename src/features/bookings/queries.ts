@@ -53,3 +53,8 @@ export function splitByDate<T extends { event_date: Date; status: string }>(book
   const past = bookings.filter((booking) => !upcoming.includes(booking)).reverse();
   return { upcoming, past };
 }
+
+/** True once the event date is in the past. */
+export function hasPassed(date: Date): boolean {
+  return date.getTime() <= Date.now();
+}

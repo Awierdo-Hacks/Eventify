@@ -44,6 +44,13 @@ function mergeMessages(current: MessageView[], incoming: MessageView[]): Message
 
 function Thread({ thread, viewer, linkableEvents }: ThreadProps) {
   const [messages, setMessages] = React.useState(thread.messages);
+  // Server data changes after an action elsewhere on the page (e.g. a quote
+  // was accepted): fold the fresh copies into what is on screen.
+  const [syncedMessages, setSyncedMessages] = React.useState(thread.messages);
+  if (thread.messages !== syncedMessages) {
+    setSyncedMessages(thread.messages);
+    setMessages((current) => mergeMessages(current, thread.messages));
+  }
   const [hasMore, setHasMore] = React.useState(thread.hasMore);
   const [text, setText] = React.useState('');
   const [files, setFiles] = React.useState<UploadedFile[]>([]);
@@ -56,10 +63,6 @@ function Thread({ thread, viewer, linkableEvents }: ThreadProps) {
   const textarea = React.useRef<HTMLTextAreaElement>(null);
   const stickToBottom = React.useRef(true);
   const lastSeen = React.useRef(thread.messages.at(-1)?.createdAt ?? new Date().toISOString());
-
-  // Server data changes after an action elsewhere on the page (e.g. a quote
-  // was accepted): fold the fresh copies into what is on screen.
-  React.useEffect(() => setMessages((current) => mergeMessages(current, thread.messages)), [thread.messages]);
 
   React.useEffect(() => {
     const last = messages.at(-1);
@@ -149,7 +152,6 @@ function Thread({ thread, viewer, linkableEvents }: ThreadProps) {
   const isProvider = viewer.role === 'PROVIDER';
   const canSendQuote = isProvider && canWrite && other?.role === 'CUSTOMER';
 
-  let lastDay = '';
 
   return (
     <section className="flex min-h-0 flex-1 flex-col" aria-label={`Gesprek met ${other?.name ?? 'gebruiker'}`}>
@@ -198,11 +200,11 @@ function Thread({ thread, viewer, linkableEvents }: ThreadProps) {
         {messages.length === 0 && (
           <p className="py-10 text-center text-sm text-ink-500">Nog geen berichten. Stuur het eerste bericht.</p>
         )}
-        {messages.map((message) => {
+        {messages.map((message, index) => {
           const own = message.senderId === viewer.id;
           const day = formatDate(message.createdAt);
-          const showDay = day !== lastDay;
-          lastDay = day;
+          const previous = messages[index - 1];
+          const showDay = !previous || formatDate(previous.createdAt) !== day;
           return (
             <React.Fragment key={message.id}>
               {showDay && (

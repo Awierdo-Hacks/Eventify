@@ -3,7 +3,7 @@ import { CalendarCheck, CalendarDays, Check, Mail, MapPin, Phone, Users } from '
 import { PageHeader } from '@/components/layout/page-header';
 import { StatusBadge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
-import { getProviderBookings, splitByDate, type ProviderBooking } from '@/features/bookings/queries';
+import { getProviderBookings, hasPassed, splitByDate, type ProviderBooking } from '@/features/bookings/queries';
 import { ChatButton } from '@/features/messaging/chat-button';
 import { BookingActions } from '@/features/provider-area/components/booking-actions';
 import { BOOKING_STATUS, eventTypeLabel } from '@/lib/catalog';
@@ -81,7 +81,7 @@ function BookingItem({ booking }: { booking: ProviderBooking }) {
           bookingId={booking.id}
           status={booking.status}
           customerName={booking.customer.name}
-          eventPassed={booking.event_date.getTime() <= Date.now()}
+          eventPassed={hasPassed(booking.event_date)}
         />
         {!deleted && <ChatButton recipientId={booking.customer.id} className="ml-auto" />}
       </div>

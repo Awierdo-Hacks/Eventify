@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { Dialog as DialogPrimitive } from 'radix-ui';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -18,10 +17,7 @@ interface MobileNavProps {
 /** Full-height slide-over menu for small screens. */
 function MobileNav({ links, signedIn, dashboardHref }: MobileNavProps) {
   const [open, setOpen] = React.useState(false);
-  const pathname = usePathname();
-
-  // Close after navigating.
-  React.useEffect(() => setOpen(false), [pathname]);
+  const close = () => setOpen(false);
 
   return (
     <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
@@ -35,7 +31,7 @@ function MobileNav({ links, signedIn, dashboardHref }: MobileNavProps) {
         <DialogPrimitive.Content className="fixed inset-y-0 right-0 z-50 flex w-[min(22rem,100vw)] flex-col bg-surface shadow-lg focus:outline-none data-[state=open]:animate-fade-in">
           <div className="flex h-16 items-center justify-between border-b border-ink-100 px-4">
             <DialogPrimitive.Title asChild>
-              <Link href="/" aria-label="Eventiphy, naar de startpagina">
+              <Link href="/" onClick={close} aria-label="Eventiphy, naar de startpagina">
                 <Logo />
               </Link>
             </DialogPrimitive.Title>
@@ -51,6 +47,7 @@ function MobileNav({ links, signedIn, dashboardHref }: MobileNavProps) {
                 <li key={link.href}>
                   <Link
                     href={link.href}
+                    onClick={close}
                     className="block rounded-lg px-3 py-3 text-base font-semibold text-ink-900 hover:bg-ink-100"
                   >
                     {link.label}
@@ -63,7 +60,7 @@ function MobileNav({ links, signedIn, dashboardHref }: MobileNavProps) {
             {signedIn ? (
               <>
                 <Button asChild size="lg" className="w-full">
-                  <Link href={dashboardHref}>Naar mijn dashboard</Link>
+                  <Link href={dashboardHref} onClick={close}>Naar mijn dashboard</Link>
                 </Button>
                 <Button variant="outline" size="lg" className="w-full" onClick={() => void logoutAction()}>
                   Uitloggen
@@ -72,10 +69,10 @@ function MobileNav({ links, signedIn, dashboardHref }: MobileNavProps) {
             ) : (
               <>
                 <Button asChild size="lg" className="w-full">
-                  <Link href="/register">Gratis account aanmaken</Link>
+                  <Link href="/register" onClick={close}>Gratis account aanmaken</Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="w-full">
-                  <Link href="/login">Inloggen</Link>
+                  <Link href="/login" onClick={close}>Inloggen</Link>
                 </Button>
               </>
             )}

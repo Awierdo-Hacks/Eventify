@@ -18,10 +18,15 @@ const POLL_MS = 15_000;
 function ConversationList({ initial }: { initial: ConversationSummary[] }) {
   const pathname = usePathname();
   const [conversations, setConversations] = React.useState(initial);
+  const [syncedInitial, setSyncedInitial] = React.useState(initial);
+  if (initial !== syncedInitial) {
+    // The server sent a fresh list (after navigation or an action).
+    setSyncedInitial(initial);
+    setConversations(initial);
+  }
   const [query, setQuery] = React.useState('');
   const activeId = pathname.startsWith('/messages/') ? pathname.split('/')[2] : null;
 
-  React.useEffect(() => setConversations(initial), [initial]);
 
   React.useEffect(() => {
     let cancelled = false;

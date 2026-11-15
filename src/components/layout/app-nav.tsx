@@ -142,7 +142,6 @@ export function MobileTabBar({ items, initialUnread }: AppNavProps) {
   const secondary = items.slice(4);
   const moreActive = secondary.some((item) => isActive(pathname, item)) || pathname.startsWith('/account');
 
-  React.useEffect(() => setMoreOpen(false), [pathname]);
 
   const tabClass = (active: boolean) =>
     cn(
@@ -189,6 +188,7 @@ export function MobileTabBar({ items, initialUnread }: AppNavProps) {
                       <li key={item.href}>
                         <Link
                           href={item.href}
+                          onClick={() => setMoreOpen(false)}
                           className="flex items-center gap-3 rounded-lg px-3 py-3 text-base font-semibold text-ink-900 hover:bg-ink-100"
                         >
                           <Icon className="size-5 text-ink-400" aria-hidden />
