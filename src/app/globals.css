@@ -1,0 +1,300 @@
+@import 'tailwindcss';
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Eventiphy design tokens
+   Brand: purple → amber. Neutrals ("ink") carry a hint of aubergine so greys
+   feel related to the brand instead of cold.
+   ─────────────────────────────────────────────────────────────────────────── */
+@theme {
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument), ui-serif, Georgia, serif;
+
+  --color-brand-50: #faf5ff;
+  --color-brand-100: #f3e8ff;
+  --color-brand-200: #e9d5ff;
+  --color-brand-300: #d8b4fe;
+  --color-brand-400: #c084fc;
+  --color-brand-500: #a855f7;
+  --color-brand-600: #9333ea;
+  --color-brand-700: #7e22ce;
+  --color-brand-800: #6b21a8;
+  --color-brand-900: #581c87;
+  --color-brand-950: #3b0764;
+
+  --color-sun-50: #fffbeb;
+  --color-sun-100: #fef3c7;
+  --color-sun-200: #fde68a;
+  --color-sun-300: #fcd34d;
+  --color-sun-400: #fbbf24;
+  --color-sun-500: #f59e0b;
+  --color-sun-600: #d97706;
+  --color-sun-700: #b45309;
+  --color-sun-800: #92400e;
+
+  --color-ink-50: #f9f8fb;
+  --color-ink-100: #f2f0f5;
+  --color-ink-200: #e6e2eb;
+  --color-ink-300: #cfc9d6;
+  --color-ink-400: #a49cae;
+  --color-ink-500: #7c7488;
+  --color-ink-600: #5f576b;
+  --color-ink-700: #473f53;
+  --color-ink-800: #33293f;
+  --color-ink-900: #221a2d;
+  --color-ink-950: #17111f;
+
+  --color-canvas: #fcfbfd;
+  --color-surface: #ffffff;
+
+  --color-success-50: #ecfdf5;
+  --color-success-100: #d1fae5;
+  --color-success-600: #059669;
+  --color-success-700: #047857;
+  --color-success-800: #065f46;
+
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #fee2e2;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+  --color-danger-800: #991b1b;
+
+  --color-info-50: #eff6ff;
+  --color-info-100: #dbeafe;
+  --color-info-700: #1d4ed8;
+  --color-info-800: #1e40af;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.125rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+
+  --shadow-xs: 0 1px 2px rgb(23 17 31 / 0.05);
+  --shadow-sm: 0 1px 2px rgb(23 17 31 / 0.04), 0 2px 6px rgb(23 17 31 / 0.04);
+  --shadow-md: 0 2px 4px rgb(23 17 31 / 0.04), 0 8px 20px rgb(23 17 31 / 0.06);
+  --shadow-lg: 0 4px 8px rgb(23 17 31 / 0.04), 0 18px 40px rgb(23 17 31 / 0.1);
+  --shadow-glow: 0 8px 28px rgb(147 51 234 / 0.28);
+
+  --animate-fade-in: fade-in 0.2s ease-out both;
+  --animate-rise: rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-overlay-in: fade-in 0.18s ease-out both;
+  --animate-overlay-out: fade-out 0.14s ease-in both;
+  --animate-dialog-in: dialog-in 0.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-dialog-out: dialog-out 0.14s ease-in both;
+  --animate-sheet-in: sheet-in 0.26s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-sheet-out: sheet-out 0.18s ease-in both;
+  --animate-pop-in: pop-in 0.14s ease-out both;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes dialog-in {
+    from { opacity: 0; transform: translate(-50%, calc(-50% + 10px)) scale(0.98); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+  @keyframes dialog-out {
+    from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    to { opacity: 0; transform: translate(-50%, calc(-50% + 6px)) scale(0.98); }
+  }
+  @keyframes sheet-in {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  @keyframes sheet-out {
+    from { transform: translateY(0); }
+    to { transform: translateY(100%); }
+  }
+  @keyframes pop-in {
+    from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes shimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink-900);
+    font-family: var(--font-sans);
+    font-feature-settings: 'ss01', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: var(--color-brand-200);
+    color: var(--color-ink-950);
+  }
+
+  /* One consistent, visible keyboard focus style everywhere. */
+  :focus-visible {
+    outline: 2px solid var(--color-brand-600);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* iOS zooms the page when a focused field is smaller than 16px. */
+  @media (max-width: 640px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
+
+  button:not(:disabled),
+  [role='button']:not(:disabled),
+  summary {
+    cursor: pointer;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@utility container-page {
+  width: 100%;
+  max-width: 76rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+  @media (min-width: 640px) {
+    padding-inline: 1.5rem;
+  }
+  @media (min-width: 1024px) {
+    padding-inline: 2rem;
+  }
+}
+
+@utility bg-brand-gradient {
+  background-image: linear-gradient(100deg, #9333ea 0%, #a855f7 42%, #f59e0b 100%);
+}
+
+@utility text-brand-gradient {
+  background-image: linear-gradient(100deg, #9333ea 0%, #b14fe8 45%, #e88a0c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Soft brand wash used behind hero sections. */
+@utility bg-hero-wash {
+  background-image:
+    radial-gradient(60rem 30rem at 12% -10%, rgb(168 85 247 / 0.16), transparent 60%),
+    radial-gradient(48rem 26rem at 95% 0%, rgb(251 191 36 / 0.18), transparent 60%);
+}
+
+@utility skeleton {
+  border-radius: var(--radius-md);
+  background-image: linear-gradient(90deg, var(--color-ink-100) 25%, var(--color-ink-50) 37%, var(--color-ink-100) 63%);
+  background-size: 400% 100%;
+  animation: var(--animate-shimmer);
+}
+
+/* Long-form legal and editorial text. */
+@utility prose-legal {
+  color: var(--color-ink-700);
+  line-height: 1.75;
+  & h2 {
+    margin-top: 2.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: var(--color-ink-950);
+    scroll-margin-top: 6rem;
+  }
+  & h3 {
+    margin-top: 1.75rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--color-ink-900);
+  }
+  & p {
+    margin-block: 0.75rem;
+  }
+  & ul,
+  & ol {
+    margin-block: 0.75rem;
+    padding-left: 1.25rem;
+  }
+  & ul {
+    list-style: disc;
+  }
+  & ol {
+    list-style: decimal;
+  }
+  & li {
+    margin-block: 0.375rem;
+    padding-left: 0.25rem;
+  }
+  & a {
+    color: var(--color-brand-700);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  & strong {
+    color: var(--color-ink-900);
+    font-weight: 700;
+  }
+  & table {
+    width: 100%;
+    margin-block: 1.25rem;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+  }
+  & th {
+    padding: 0.625rem 0.75rem;
+    text-align: left;
+    font-weight: 700;
+    color: var(--color-ink-900);
+    background-color: var(--color-ink-50);
+    border-bottom: 1px solid var(--color-ink-200);
+  }
+  & td {
+    padding: 0.625rem 0.75rem;
+    vertical-align: top;
+    border-bottom: 1px solid var(--color-ink-100);
+  }
+}

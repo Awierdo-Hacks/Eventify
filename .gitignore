@@ -1,55 +1,34 @@
 # Dependencies
 node_modules
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
 
 # Build output
 .next
 out
 dist
 build
-/lib/generated/prisma
+*.tsbuildinfo
+next-env.d.ts
 
-# Environment files
+# Generated Prisma client
+/src/generated
+
+# Environment files — never commit real secrets
 .env
-.env*.local
-.env.local
-.env.development.local
-.env.test.local
-.env.production
-.env.production.local
-
-# Keep example files
+.env.*
 !.env.example
-!.env.production.example
 
-# Testing
-coverage
-.nyc_output
+# Uploads created at runtime (files already tracked stay tracked)
+/public/uploads/*
+
+# Logs / OS / IDE
 *.log
-
-# IDEs
+.DS_Store
+Thumbs.db
 .vscode
 .idea
-*.swp
-*.swo
-*~
-.DS_Store
 
-# OS
-Thumbs.db
-*.log
-
-# Vercel
+# Hosting
 .vercel
-
-# TypeScript
-*.tsbuildinfo
-
-# Debug
-npm-debug.log*
 
 # Local docker volumes
 postgres_data

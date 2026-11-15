@@ -3,7 +3,7 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma/client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -98,15 +98,21 @@ model User {
   phone         String?
   created_at    DateTime   @default(now())
   updated_at    DateTime   @updatedAt
+  // Set when the account was erased on the user's request (v2). The row is kept
+  // in anonymised form so the other party's records stay intact.
+  deleted_at    DateTime?
 
   // Relations
-  provider         ServiceProvider?
-  service_requests ServiceRequest[]
-  bookings         Booking[]
-  reviews          Review[]
-  conversations    ConversationParticipant[]
-  messages_sent    Message[]        @relation("SentMessages")
-  events           Event[]
+  provider          ServiceProvider?
+  service_requests  ServiceRequest[]
+  bookings          Booking[]
+  reviews           Review[]
+  conversations     ConversationParticipant[]
+  messages_sent     Message[]         @relation("SentMessages")
+  events            Event[]
+  legal_acceptances LegalAcceptance[]
+  consent_records   ConsentRecord[]
+  content_reports   ContentReport[]
 
   @@map("users")
 }
@@ -146,6 +152,7 @@ model ServiceProvider {
   blocked_dates         BlockedDate[]
   calendar_integrations CalendarIntegration[]
 
+  @@index([verified, is_active, category])
   @@map("service_providers")
 }
 
@@ -205,6 +212,7 @@ model Quote {
 
   @@index([request_id])
   @@index([provider_id])
+  @@index([event_slot_id])
   @@map("quotes")
 }
 
@@ -322,6 +330,7 @@ model MessageAttachment {
   // Relations
   message Message @relation(fields: [message_id], references: [id], onDelete: Cascade)
 
+  @@index([message_id])
   @@map("message_attachments")
 }
 
@@ -343,6 +352,7 @@ model Event {
   customer        User         @relation(fields: [customer_id], references: [id], onDelete: Cascade)
   slots           EventSlot[]
 
+  @@index([customer_id])
   @@map("events")
 }
 
@@ -363,6 +373,7 @@ model EventSlot {
   quotes           Quote[]          @relation("SlotQuotes")
   booked_quote     Quote?           @relation("BookedQuote", fields: [booked_quote_id], references: [id])
 
+  @@index([event_id])
   @@map("event_slots")
 }
 
@@ -378,6 +389,7 @@ model ProviderService {
   // Relations
   provider ServiceProvider @relation(fields: [provider_id], references: [id], onDelete: Cascade)
 
+  @@index([provider_id])
   @@map("provider_services")
 }
 
@@ -463,4 +475,57 @@ model WaitlistEntry {
   created_at DateTime @default(now())
 
   @@map("waitlist_entries")
+}
+
+// ─── Added in v2 (additive only) ───────────────────────────────────────────
+
+// Proof that a user accepted a specific version of a legal document.
+model LegalAcceptance {
+  id          String   @id @default(cuid())
+  user_id     String
+  document    String // "terms-customer" | "terms-provider" | "privacy"
+  version     String
+  accepted_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, document])
+  @@map("legal_acceptances")
+}
+
+// Proof of a cookie-consent choice (GDPR art. 7(1)). No IP address is stored.
+model ConsentRecord {
+  id             String   @id @default(cuid())
+  visitor_id     String
+  user_id        String?
+  policy_version String
+  analytics      Boolean  @default(false)
+  marketing      Boolean  @default(false)
+  created_at     DateTime @default(now())
+
+  user User? @relation(fields: [user_id], references: [id], onDelete: SetNull)
+
+  @@index([visitor_id])
+  @@index([user_id])
+  @@map("consent_records")
+}
+
+// Notice-and-action queue (EU Digital Services Act art. 16).
+model ContentReport {
+  id             String    @id @default(cuid())
+  reporter_id    String?
+  reporter_email String?
+  target_type    String // "PROVIDER" | "REVIEW" | "MESSAGE"
+  target_id      String
+  reason         String
+  details        String?
+  status         String    @default("OPEN") // "OPEN" | "ACTION_TAKEN" | "DISMISSED"
+  resolution     String?
+  created_at     DateTime  @default(now())
+  resolved_at    DateTime?
+
+  reporter User? @relation(fields: [reporter_id], references: [id], onDelete: SetNull)
+
+  @@index([status, created_at])
+  @@map("content_reports")
 }
