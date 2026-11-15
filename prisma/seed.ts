@@ -1,11 +1,26 @@
-import { PrismaClient, UserRole, PriceRange, ServiceRequestStatus, BookingStatus, EventType, EventStatus, SlotStatus, ProviderCategory } from '@/generated/prisma/client';
+import { PrismaClient, UserRole, PriceRange, ServiceRequestStatus, BookingStatus, EventType, EventStatus, SlotStatus, ProviderCategory } from '../src/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import bcrypt from 'bcryptjs';
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
 
+/**
+ * Demo data for LOCAL development only. This script wipes every table before
+ * inserting, so it refuses to run against anything that is not a local database.
+ */
+function assertLocalDatabase() {
+  const url = process.env.DATABASE_URL ?? '';
+  const isLocal = /@(localhost|127\.0\.0\.1|postgres)[:/]/.test(url);
+  if (!isLocal) {
+    throw new Error(
+      'Refusing to seed: DATABASE_URL does not point to a local database. The seed deletes all existing data.',
+    );
+  }
+}
+
 async function main() {
+  assertLocalDatabase();
   console.log('🌱 Start seeding...');
 
   // Verwijder bestaande data
