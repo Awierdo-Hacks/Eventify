@@ -9,13 +9,15 @@ interface ProviderCardProps {
   provider: ProviderCardData;
   /** Load eagerly for cards above the fold. */
   priority?: boolean;
+  /** Event slot the customer is searching for (carried to the quote request). */
+  slotId?: string;
 }
 
-function ProviderCard({ provider, priority }: ProviderCardProps) {
+function ProviderCard({ provider, priority, slotId }: ProviderCardProps) {
   const Icon = categoryIcon(provider.category);
   return (
     <Link
-      href={`/providers/${provider.id}`}
+      href={slotId ? `/providers/${provider.id}?slot=${encodeURIComponent(slotId)}` : `/providers/${provider.id}`}
       className="group flex h-full flex-col overflow-hidden rounded-2xl border border-ink-200 bg-surface shadow-xs transition-[box-shadow,transform,border-color] duration-200 hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-md"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-brand-100 via-brand-50 to-sun-100">

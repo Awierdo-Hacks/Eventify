@@ -12,11 +12,12 @@ interface ContactActionsProps {
   /** Role of the viewer, or null when signed out. */
   viewerRole: string | null;
   isOwnProfile: boolean;
+  slotId?: string;
 }
 
-function ContactActions({ providerId, providerUserId, viewerRole, isOwnProfile }: ContactActionsProps) {
+function ContactActions({ providerId, providerUserId, viewerRole, isOwnProfile, slotId }: ContactActionsProps) {
   const { run, pending } = useAction(openConversationAction);
-  const quoteHref = `/request-quote/${providerId}`;
+  const quoteHref = slotId ? `/request-quote/${providerId}?slot=${encodeURIComponent(slotId)}` : `/request-quote/${providerId}`;
 
   if (isOwnProfile) {
     return (

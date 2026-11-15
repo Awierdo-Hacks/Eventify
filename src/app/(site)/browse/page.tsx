@@ -43,12 +43,14 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
 }
 
 export default async function BrowsePage({ searchParams }: { searchParams: SearchParams }) {
-  const { items, total, totalPages, filters } = await searchProviders(readFilters(await searchParams));
+  const rawParams = await searchParams;
+  const slotId = first(rawParams.slot)?.slice(0, 40);
+  const { items, total, totalPages, filters } = await searchProviders(readFilters(rawParams));
   const category = findCategory(filters.category);
 
   const hrefWith = (changes: Record<string, string | number | undefined>) => {
     const params = new URLSearchParams();
-    const merged = { ...filters, page: undefined as number | undefined, ...changes };
+    const merged = { ...filters, page: undefined as number | undefined, slot: slotId, ...changes };
     for (const [key, value] of Object.entries(merged)) {
       if (value === undefined || value === '' || (key === 'sort' && value === 'recommended') || (key === 'page' && value === 1)) continue;
       params.set(key, String(value));
@@ -79,7 +81,7 @@ export default async function BrowsePage({ searchParams }: { searchParams: Searc
       </header>
 
       <div className="mt-6">
-        <BrowseFilters key={JSON.stringify(filters)} values={filters} />
+        <BrowseFilters key={JSON.stringify(filters)} values={filters} slotId={slotId} />
       </div>
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
@@ -125,7 +127,7 @@ export default async function BrowsePage({ searchParams }: { searchParams: Searc
         <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((provider, index) => (
             <li key={provider.id}>
-              <ProviderCard provider={provider} priority={index < 3} />
+              <ProviderCard provider={provider} priority={index < 3} slotId={slotId} />
             </li>
           ))}
         </ul>

@@ -43,8 +43,8 @@ function safeWebsite(url: string | null): string | null {
   }
 }
 
-export default async function ProviderPage({ params }: { params: Params }) {
-  const { id } = await params;
+export default async function ProviderPage({ params, searchParams }: { params: Params; searchParams: Promise<{ slot?: string }> }) {
+  const [{ id }, { slot: slotId }] = await Promise.all([params, searchParams]);
   const [provider, viewer] = await Promise.all([getProviderProfile(id), getCurrentUser()]);
   if (!provider) notFound();
 
@@ -288,6 +288,7 @@ export default async function ProviderPage({ params }: { params: Params }) {
                 providerUserId={provider.userId}
                 viewerRole={viewer?.role ?? null}
                 isOwnProfile={isOwnProfile}
+                slotId={slotId?.slice(0, 40)}
               />
             </div>
           </div>

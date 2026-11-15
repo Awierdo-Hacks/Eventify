@@ -8,13 +8,15 @@ import { CATEGORIES, PRICE_RANGES, PRICE_RANGE_LABELS } from '@/lib/catalog';
 
 interface BrowseFiltersProps {
   values: { q?: string; category?: string; location?: string; price?: string; sort: string };
+  /** Event slot being filled; kept across searches. */
+  slotId?: string;
 }
 
 /**
  * A plain GET form: works without JavaScript, is shareable as a URL, and is
  * enhanced to submit as soon as a dropdown changes.
  */
-function BrowseFilters({ values }: BrowseFiltersProps) {
+function BrowseFilters({ values, slotId }: BrowseFiltersProps) {
   const submitOnChange = (event: React.ChangeEvent<HTMLSelectElement>) => event.currentTarget.form?.requestSubmit();
 
   return (
@@ -24,6 +26,7 @@ function BrowseFilters({ values }: BrowseFiltersProps) {
       aria-label="Dienstverleners filteren"
       className="grid gap-3 rounded-2xl border border-ink-200 bg-surface p-3 shadow-xs sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_0.9fr_0.9fr_auto]"
     >
+      {slotId && <input type="hidden" name="slot" value={slotId} />}
       <div className="relative sm:col-span-2 lg:col-span-1">
         <label htmlFor="q" className="sr-only">
           Zoek op naam of trefwoord
