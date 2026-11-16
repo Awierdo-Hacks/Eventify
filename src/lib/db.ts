@@ -23,7 +23,20 @@ function createClient(): PrismaClient {
   return new PrismaClient({ adapter });
 }
 
-/** One Prisma client per server instance (and per dev-server lifetime). */
-export const db: PrismaClient = globalForPrisma.prisma ?? createClient();
+function getClient(): PrismaClient {
+  if (!globalForPrisma.prisma) globalForPrisma.prisma = createClient();
+  return globalForPrisma.prisma;
+}
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;
+/**
+ * One Prisma client per server instance, created on first use. Creating it
+ * lazily means importing this module never needs DATABASE_URL — so the
+ * production build works on a machine that has no database access.
+ */
+export const db: PrismaClient = new Proxy({} as PrismaClient, {
+  get(_target, property) {
+    const client = getClient();
+    const value = Reflect.get(client, property, client);
+    return typeof value === 'function' ? value.bind(client) : value;
+  },
+});

@@ -3,6 +3,9 @@ import { site } from '@/config/site';
 import { getPublicProviderIds } from '@/features/providers/queries';
 import { CATEGORIES } from '@/lib/catalog';
 
+/** Rebuilt hourly, so new provider profiles appear without a deploy. */
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const page = (

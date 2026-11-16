@@ -16,7 +16,7 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build"
+    "vercel-build": "node scripts/check-deploy-env.mjs && prisma generate && prisma migrate deploy && next build"
   },
   "dependencies": {
     "@prisma/adapter-pg": "7.10.1",
@@ -53,6 +53,6 @@
     "typescript": "^5.9.3"
   },
   "engines": {
-    "node": ">=20.19"
+    "node": "22.x"
   }
 }

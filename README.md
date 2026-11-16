@@ -248,8 +248,20 @@ volume there), but **not for serverless hosts**, where the disk is temporary.
 There, set `BLOB_READ_WRITE_TOKEN` and uploads go to Vercel Blob automatically.
 Files already uploaded by v1 (`/uploads/...`) must exist on the new host too.
 
-**Vercel:** the `vercel-build` script generates the Prisma client, applies
-migrations and builds. Set a Blob token for uploads.
+**Vercel:**
+
+1. Set the environment variables under _Project → Settings → Environment
+   Variables_, for **Production and Preview** (v1 read them from a committed
+   `.env`; v2 does not): `DATABASE_URL`, `NEXTAUTH_SECRET`,
+   `NEXT_PUBLIC_APP_URL`, and `BLOB_READ_WRITE_TOKEN` for uploads.
+2. Deploy. The `vercel-build` script checks those variables (and stops with a
+   clear message if one is missing), generates the Prisma client, **applies
+   pending migrations to the database in `DATABASE_URL`**, and builds. That
+   includes preview deployments, so back up the database before the first v2
+   deploy.
+3. Functions run in Frankfurt (`vercel.json` → `fra1`), next to the database.
+   If the database moves, change the region to match: every query from a
+   far-away region costs a round trip across the distance.
 
 **Docker:** `docker build -t eventiphy .` produces a standalone server on port
 3000 with a health check at `/api/health`. Run migrations from the same image
