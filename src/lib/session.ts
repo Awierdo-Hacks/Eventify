@@ -63,7 +63,13 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
 export async function requireUser(returnTo?: string): Promise<CurrentUser> {
   const user = await getCurrentUser();
   if (!user) {
-    redirect(returnTo ? `/login?redirect=${encodeURIComponent(returnTo)}` : '/login');
+    const query = returnTo ? `?redirect=${encodeURIComponent(returnTo)}` : '';
+    // A cookie that still verifies but belongs to a suspended, blocked or
+    // deleted account must be cleared first; otherwise the proxy (which only
+    // sees the cookie) and this check would bounce the visitor back and forth.
+    const cookieStore = await cookies();
+    const stale = await verifySessionToken(cookieStore.get(SESSION_COOKIE)?.value);
+    redirect(stale ? `/api/auth/expired${query}` : `/login${query}`);
   }
   return user;
 }
