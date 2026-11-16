@@ -26,10 +26,20 @@ function LoginForm({ redirectTo }: { redirectTo?: string }) {
     <form onSubmit={onSubmit} className="space-y-5" noValidate>
       {error && !Object.keys(fieldErrors).length && <Alert tone="danger">{error}</Alert>}
       <Field label="E-mailadres" htmlFor="email" error={fieldErrors.email}>
-        <Input {...fieldProps('email', fieldErrors.email)} type="email" autoComplete="email" autoFocus required />
+        <Input
+          {...fieldProps('email', fieldErrors.email)}
+          type="email"
+          autoComplete="email"
+          autoFocus
+          required
+        />
       </Field>
       <Field label="Wachtwoord" htmlFor="password" error={fieldErrors.password}>
-        <PasswordInput {...fieldProps('password', fieldErrors.password)} autoComplete="current-password" required />
+        <PasswordInput
+          {...fieldProps('password', fieldErrors.password)}
+          autoComplete="current-password"
+          required
+        />
       </Field>
       <Button type="submit" size="lg" className="w-full" loading={pending}>
         Inloggen

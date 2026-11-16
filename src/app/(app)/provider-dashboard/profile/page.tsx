@@ -12,7 +12,11 @@ import { requireProvider } from '@/lib/session';
 
 export const metadata: Metadata = { title: 'Profiel' };
 
-export default async function ProviderProfilePage({ searchParams }: { searchParams: Promise<{ welkom?: string }> }) {
+export default async function ProviderProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ welkom?: string }>;
+}) {
   const user = await requireProvider('/provider-dashboard/profile');
   const [{ welkom }, provider] = await Promise.all([
     searchParams,
@@ -59,8 +63,8 @@ export default async function ProviderProfilePage({ searchParams }: { searchPara
 
       {welkom && (
         <Alert tone="success" title="Welkom bij Eventiphy!" className="mb-6">
-          Je account is aangemaakt. Voeg foto’s en diensten toe: een volledig profiel wordt sneller goedgekeurd en
-          krijgt meer aanvragen.
+          Je account is aangemaakt. Voeg foto’s en diensten toe: een volledig profiel wordt sneller
+          goedgekeurd en krijgt meer aanvragen.
         </Alert>
       )}
       {!provider.verified && !welkom && (

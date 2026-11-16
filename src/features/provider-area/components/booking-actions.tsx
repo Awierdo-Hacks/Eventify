@@ -17,7 +17,9 @@ interface BookingActionsProps {
 
 function BookingActions({ bookingId, status, customerName, eventPassed }: BookingActionsProps) {
   const [dialog, setDialog] = React.useState<'COMPLETED' | 'CANCELLED' | null>(null);
-  const { run, pending } = useAction(updateBookingStatusAction, { onSuccess: () => setDialog(null) });
+  const { run, pending } = useAction(updateBookingStatusAction, {
+    onSuccess: () => setDialog(null),
+  });
 
   if (status !== 'CONFIRMED' && status !== 'PENDING') return null;
 

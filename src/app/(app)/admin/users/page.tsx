@@ -18,7 +18,11 @@ export const metadata: Metadata = { title: 'Gebruikers' };
 
 const ROLES = ['CUSTOMER', 'PROVIDER', 'ADMIN'] as const;
 
-export default async function AdminUsersPage({ searchParams }: { searchParams: Promise<{ role?: string; q?: string }> }) {
+export default async function AdminUsersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ role?: string; q?: string }>;
+}) {
   await requireAdmin();
   const params = await searchParams;
   const role = ROLES.find((value) => value === params.role);
@@ -27,7 +31,12 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
   const where: Prisma.UserWhereInput = {
     deleted_at: null,
     ...(role && { role }),
-    ...(q && { OR: [{ name: { contains: q, mode: 'insensitive' } }, { email: { contains: q, mode: 'insensitive' } }] }),
+    ...(q && {
+      OR: [
+        { name: { contains: q, mode: 'insensitive' } },
+        { email: { contains: q, mode: 'insensitive' } },
+      ],
+    }),
   };
 
   const users = await db.user.findMany({
@@ -73,8 +82,18 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
           <label htmlFor="q" className="sr-only">
             Zoek op naam of e-mailadres
           </label>
-          <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-ink-400" aria-hidden />
-          <Input id="q" name="q" type="search" defaultValue={q} placeholder="Naam of e-mailadres" className="pl-10" />
+          <Search
+            className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-ink-400"
+            aria-hidden
+          />
+          <Input
+            id="q"
+            name="q"
+            type="search"
+            defaultValue={q}
+            placeholder="Naam of e-mailadres"
+            className="pl-10"
+          />
         </div>
         <Button type="submit" variant="outline" className="h-11">
           Zoeken
@@ -82,21 +101,43 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
       </Form>
 
       {users.length === 0 ? (
-        <EmptyState icon={Users} title="Geen gebruikers gevonden" description="Pas je zoekopdracht of filter aan." />
+        <EmptyState
+          icon={Users}
+          title="Geen gebruikers gevonden"
+          description="Pas je zoekopdracht of filter aan."
+        />
       ) : (
         <div className="overflow-hidden rounded-xl border border-ink-200 bg-surface shadow-xs">
           <ul className="divide-y divide-ink-100">
             {users.map((user) => (
-              <li key={user.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3.5 sm:px-5">
+              <li
+                key={user.id}
+                className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3.5 sm:px-5"
+              >
                 <div className="min-w-0 flex-1 basis-56">
                   <p className="truncate font-semibold text-ink-950">
                     {user.name}
-                    {user.provider && <span className="font-normal text-ink-500"> · {user.provider.business_name}</span>}
+                    {user.provider && (
+                      <span className="font-normal text-ink-500">
+                        {' '}
+                        · {user.provider.business_name}
+                      </span>
+                    )}
                   </p>
                   <p className="truncate text-sm text-ink-600">{user.email}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge tone={user.role === 'ADMIN' ? 'brand' : user.role === 'PROVIDER' ? 'warning' : 'neutral'}>{ROLE_LABELS[user.role]}</Badge>
+                  <Badge
+                    tone={
+                      user.role === 'ADMIN'
+                        ? 'brand'
+                        : user.role === 'PROVIDER'
+                          ? 'warning'
+                          : 'neutral'
+                    }
+                  >
+                    {ROLE_LABELS[user.role]}
+                  </Badge>
                   <StatusBadge status={user.status} map={USER_STATUS} />
                 </div>
                 <p className="w-full text-xs text-ink-500 sm:w-44">
@@ -105,13 +146,21 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
                     {user._count.service_requests} aanvragen · {user._count.bookings} boekingen
                   </span>
                 </p>
-                {user.role !== 'ADMIN' ? <UserControls userId={user.id} name={user.name} status={user.status} /> : <span className="w-8" />}
+                {user.role !== 'ADMIN' ? (
+                  <UserControls userId={user.id} name={user.name} status={user.status} />
+                ) : (
+                  <span className="w-8" />
+                )}
               </li>
             ))}
           </ul>
         </div>
       )}
-      {users.length === 200 && <p className="mt-3 text-sm text-ink-500">De eerste 200 resultaten worden getoond. Verfijn je zoekopdracht.</p>}
+      {users.length === 200 && (
+        <p className="mt-3 text-sm text-ink-500">
+          De eerste 200 resultaten worden getoond. Verfijn je zoekopdracht.
+        </p>
+      )}
     </>
   );
 }

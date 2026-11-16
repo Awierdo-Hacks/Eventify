@@ -20,12 +20,18 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             Dienstverleners bekijken
           </Link>
         </header>
-        <main id="inhoud" className="flex flex-1 items-start justify-center px-4 py-8 sm:items-center sm:px-6 sm:py-12">
+        <main
+          id="inhoud"
+          className="flex flex-1 items-start justify-center px-4 py-8 sm:items-center sm:px-6 sm:py-12"
+        >
           <div className="w-full max-w-md">{children}</div>
         </main>
       </div>
 
-      <aside className="relative hidden overflow-hidden bg-ink-950 p-12 text-white lg:flex lg:flex-col lg:justify-end" aria-hidden>
+      <aside
+        className="relative hidden overflow-hidden bg-ink-950 p-12 text-white lg:flex lg:flex-col lg:justify-end"
+        aria-hidden
+      >
         <div className="pointer-events-none absolute -right-24 -top-24 size-[28rem] rounded-full bg-brand-600/50 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-32 -left-20 size-96 rounded-full bg-sun-500/30 blur-3xl" />
         <div className="relative">

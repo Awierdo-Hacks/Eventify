@@ -10,14 +10,21 @@ import { headers } from 'next/headers';
 const buckets = new Map<string, number[]>();
 const MAX_KEYS = 10_000;
 
-export function rateLimit(key: string, limit: number, windowMs: number): { allowed: boolean; retryAfterSeconds: number } {
+export function rateLimit(
+  key: string,
+  limit: number,
+  windowMs: number
+): { allowed: boolean; retryAfterSeconds: number } {
   const now = Date.now();
   const recent = (buckets.get(key) ?? []).filter((timestamp) => now - timestamp < windowMs);
 
   if (recent.length >= limit) {
     buckets.set(key, recent);
     const oldest = recent[0] ?? now;
-    return { allowed: false, retryAfterSeconds: Math.max(1, Math.ceil((windowMs - (now - oldest)) / 1000)) };
+    return {
+      allowed: false,
+      retryAfterSeconds: Math.max(1, Math.ceil((windowMs - (now - oldest)) / 1000)),
+    };
   }
 
   recent.push(now);

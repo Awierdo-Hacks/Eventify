@@ -5,7 +5,11 @@ import { CATEGORIES } from '@/lib/catalog';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const page = (path: string, priority: number, changeFrequency: 'daily' | 'weekly' | 'monthly' | 'yearly') => ({
+  const page = (
+    path: string,
+    priority: number,
+    changeFrequency: 'daily' | 'weekly' | 'monthly' | 'yearly'
+  ) => ({
     url: `${site.url}${path}`,
     lastModified: now,
     changeFrequency,
@@ -26,7 +30,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     page('/cookies', 0.2, 'yearly'),
   ];
 
-  const categoryPages = CATEGORIES.map((category) => page(`/browse?category=${category.slug}`, 0.7, 'daily'));
+  const categoryPages = CATEGORIES.map((category) =>
+    page(`/browse?category=${category.slug}`, 0.7, 'daily')
+  );
 
   // Real provider profiles. If the database is unreachable the sitemap still
   // serves the static pages instead of failing.

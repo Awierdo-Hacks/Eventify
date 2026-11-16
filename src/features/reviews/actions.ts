@@ -41,11 +41,17 @@ export async function createReviewAction(input: ReviewInput): Promise<ActionResu
         request: { select: { event_type: true } },
       },
     });
-    if (!booking || booking.customer_id !== user.id) return fail('Deze boeking bestaat niet (meer).');
-    if (booking.status !== 'COMPLETED') return fail('Je kunt pas een beoordeling plaatsen na een afgeronde boeking.');
+    if (!booking || booking.customer_id !== user.id)
+      return fail('Deze boeking bestaat niet (meer).');
+    if (booking.status !== 'COMPLETED')
+      return fail('Je kunt pas een beoordeling plaatsen na een afgeronde boeking.');
 
     const existing = await db.review.findFirst({
-      where: { customer_id: user.id, provider_id: booking.provider_id, event_date: booking.event_date },
+      where: {
+        customer_id: user.id,
+        provider_id: booking.provider_id,
+        event_date: booking.event_date,
+      },
       select: { id: true },
     });
     if (existing) return fail('Je hebt voor deze boeking al een beoordeling geplaatst.');

@@ -78,7 +78,9 @@ const ORDER: Record<ProviderSort, Prisma.ServiceProviderOrderByWithRelationInput
 
 export function normalizeFilters(filters: ProviderFilters) {
   const sort: ProviderSort = filters.sort && filters.sort in ORDER ? filters.sort : 'recommended';
-  const price = PRICE_RANGES.includes(filters.price as PriceRangeKey) ? (filters.price as PriceRangeKey) : undefined;
+  const price = PRICE_RANGES.includes(filters.price as PriceRangeKey)
+    ? (filters.price as PriceRangeKey)
+    : undefined;
   return {
     q: filters.q?.trim().slice(0, 80) || undefined,
     category: filters.category?.trim().slice(0, 40) || undefined,
@@ -120,7 +122,7 @@ const searchCached = unstable_cache(
     return { items: rows.map(toCard), total };
   },
   ['providers-search'],
-  { tags: [TAGS.providers], revalidate: 300 },
+  { tags: [TAGS.providers], revalidate: 300 }
 );
 
 export async function searchProviders(filters: ProviderFilters) {
@@ -144,7 +146,7 @@ export const getFeaturedProviders = unstable_cache(
     return rows.map(toCard);
   },
   ['providers-featured'],
-  { tags: [TAGS.providers], revalidate: 600 },
+  { tags: [TAGS.providers], revalidate: 600 }
 );
 
 /** Number of public providers per stored category value. */
@@ -158,7 +160,7 @@ export const getCategoryCounts = unstable_cache(
     return Object.fromEntries(groups.map((group) => [group.category, group._count._all]));
   },
   ['providers-category-counts'],
-  { tags: [TAGS.providers], revalidate: 600 },
+  { tags: [TAGS.providers], revalidate: 600 }
 );
 
 export const getPublicProviderIds = unstable_cache(
@@ -170,7 +172,7 @@ export const getPublicProviderIds = unstable_cache(
       take: 5000,
     }),
   ['providers-ids'],
-  { tags: [TAGS.providers], revalidate: 3600 },
+  { tags: [TAGS.providers], revalidate: 3600 }
 );
 
 const profileCached = unstable_cache(
@@ -246,7 +248,10 @@ const profileCached = unstable_cache(
       maxGuests: provider.max_guests,
       responseTime: provider.response_time,
       isPublic:
-        provider.verified && provider.is_active && provider.user.status === 'ACTIVE' && !provider.user.deleted_at,
+        provider.verified &&
+        provider.is_active &&
+        provider.user.status === 'ACTIVE' &&
+        !provider.user.deleted_at,
       verified: provider.verified,
       hasEnterpriseNumber: Boolean(provider.btw_number),
       rating: Math.round(provider.rating_avg * 10) / 10,
@@ -279,7 +284,7 @@ const profileCached = unstable_cache(
     };
   },
   ['provider-profile'],
-  { tags: [TAGS.providers], revalidate: 300 },
+  { tags: [TAGS.providers], revalidate: 300 }
 );
 
 export type ProviderProfile = NonNullable<Awaited<ReturnType<typeof profileCached>>>;
@@ -289,18 +294,29 @@ export async function getProviderProfile(id: string) {
 }
 
 /** Days a provider cannot be booked: blocked, already booked, or busy in a synced calendar. */
-export async function getUnavailableDates(providerId: string, from: Date, to: Date): Promise<string[]> {
+export async function getUnavailableDates(
+  providerId: string,
+  from: Date,
+  to: Date
+): Promise<string[]> {
   const [blocked, bookings, external] = await Promise.all([
     db.blockedDate.findMany({
       where: { provider_id: providerId, date: { gte: from, lte: to } },
       select: { date: true },
     }),
     db.booking.findMany({
-      where: { provider_id: providerId, status: { in: ['PENDING', 'CONFIRMED'] }, event_date: { gte: from, lte: to } },
+      where: {
+        provider_id: providerId,
+        status: { in: ['PENDING', 'CONFIRMED'] },
+        event_date: { gte: from, lte: to },
+      },
       select: { event_date: true },
     }),
     db.externalCalendarEvent.findMany({
-      where: { integration: { provider_id: providerId, is_active: true }, start_date: { gte: from, lte: to } },
+      where: {
+        integration: { provider_id: providerId, is_active: true },
+        start_date: { gte: from, lte: to },
+      },
       select: { start_date: true },
     }),
   ]);

@@ -22,7 +22,10 @@ const choiceSchema = z.object({ analytics: z.boolean(), marketing: z.boolean() }
  * what may load) and as a database record (so the choice can be demonstrated
  * later). No IP address or device fingerprint is kept.
  */
-export async function saveConsentAction(input: { analytics: boolean; marketing: boolean }): Promise<ConsentState | null> {
+export async function saveConsentAction(input: {
+  analytics: boolean;
+  marketing: boolean;
+}): Promise<ConsentState | null> {
   const parsed = choiceSchema.safeParse(input);
   if (!parsed.success) return null;
 

@@ -14,7 +14,9 @@ export const passwordSchema = z
   .min(8, 'Kies een wachtwoord van minstens 8 tekens.')
   .max(128, 'Kies een wachtwoord van maximaal 128 tekens.');
 
-const acceptTerms = z.literal(true, { message: 'Je moet akkoord gaan om een account aan te maken.' });
+const acceptTerms = z.literal(true, {
+  message: 'Je moet akkoord gaan om een account aan te maken.',
+});
 
 export const loginSchema = z.object({
   email,
@@ -67,7 +69,10 @@ export const registerProviderSchema = z.object({
     .string()
     .trim()
     .max(20)
-    .regex(/^(BE)?\s?0?\d{3}[.\s]?\d{3}[.\s]?\d{3}$/i, 'Vul een geldig Belgisch ondernemingsnummer in, bv. BE 0123.456.789.')
+    .regex(
+      /^(BE)?\s?0?\d{3}[.\s]?\d{3}[.\s]?\d{3}$/i,
+      'Vul een geldig Belgisch ondernemingsnummer in, bv. BE 0123.456.789.'
+    )
     .or(z.literal('')),
   acceptTerms,
   /** Providers confirm they act as a professional (trader status). */

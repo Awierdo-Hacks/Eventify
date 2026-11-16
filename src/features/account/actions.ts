@@ -24,7 +24,9 @@ const detailsSchema = z.object({
 });
 
 /** Correct your own details (GDPR art. 16). */
-export async function updateAccountAction(input: z.input<typeof detailsSchema>): Promise<ActionResult> {
+export async function updateAccountAction(
+  input: z.input<typeof detailsSchema>
+): Promise<ActionResult> {
   const user = await getCurrentUser();
   if (!user) return fail(NOT_SIGNED_IN);
   const parsed = detailsSchema.safeParse(input);
@@ -37,7 +39,9 @@ export async function updateAccountAction(input: z.input<typeof detailsSchema>):
       data: {
         name: parsed.data.name,
         phone: parsed.data.phone || null,
-        ...(user.role === 'CUSTOMER' ? { first_name: parts[0] ?? null, last_name: parts.slice(1).join(' ') || null } : {}),
+        ...(user.role === 'CUSTOMER'
+          ? { first_name: parts[0] ?? null, last_name: parts.slice(1).join(' ') || null }
+          : {}),
       },
       select: { id: true, email: true, name: true, role: true, status: true },
     });
@@ -56,7 +60,9 @@ const passwordChangeSchema = z.object({
   newPassword: passwordSchema,
 });
 
-export async function changePasswordAction(input: z.input<typeof passwordChangeSchema>): Promise<ActionResult> {
+export async function changePasswordAction(
+  input: z.input<typeof passwordChangeSchema>
+): Promise<ActionResult> {
   const user = await getCurrentUser();
   if (!user) return fail(NOT_SIGNED_IN);
   const parsed = passwordChangeSchema.safeParse(input);
@@ -64,12 +70,18 @@ export async function changePasswordAction(input: z.input<typeof passwordChangeS
   if (!rateLimit(`password:${user.id}`, 8, 15 * 60_000).allowed) return fail(TOO_MANY_REQUESTS);
 
   try {
-    const account = await db.user.findUnique({ where: { id: user.id }, select: { password_hash: true } });
+    const account = await db.user.findUnique({
+      where: { id: user.id },
+      select: { password_hash: true },
+    });
     if (!account || !(await bcrypt.compare(parsed.data.currentPassword, account.password_hash))) {
       const message = 'Je huidige wachtwoord klopt niet.';
       return fail(message, { currentPassword: message });
     }
-    await db.user.update({ where: { id: user.id }, data: { password_hash: await bcrypt.hash(parsed.data.newPassword, 12) } });
+    await db.user.update({
+      where: { id: user.id },
+      data: { password_hash: await bcrypt.hash(parsed.data.newPassword, 12) },
+    });
   } catch (error) {
     console.error('[account] password change failed', error);
     return fail(GENERIC_ERROR);
@@ -81,10 +93,14 @@ export async function changePasswordAction(input: z.input<typeof passwordChangeS
 export async function deleteAccountAction(input: { password: string }): Promise<ActionResult> {
   const user = await getCurrentUser();
   if (!user) return fail(NOT_SIGNED_IN);
-  if (!rateLimit(`delete-account:${user.id}`, 5, 15 * 60_000).allowed) return fail(TOO_MANY_REQUESTS);
+  if (!rateLimit(`delete-account:${user.id}`, 5, 15 * 60_000).allowed)
+    return fail(TOO_MANY_REQUESTS);
 
   try {
-    const account = await db.user.findUnique({ where: { id: user.id }, select: { password_hash: true } });
+    const account = await db.user.findUnique({
+      where: { id: user.id },
+      select: { password_hash: true },
+    });
     if (!account || !(await bcrypt.compare(String(input.password ?? ''), account.password_hash))) {
       const message = 'Dit wachtwoord klopt niet.';
       return fail(message, { password: message });

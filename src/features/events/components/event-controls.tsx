@@ -4,13 +4,31 @@ import * as React from 'react';
 import { MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Field, fieldProps } from '@/components/ui/field';
 import { Input, Select } from '@/components/ui/input';
 import { useAction } from '@/hooks/use-action';
 import { CATEGORIES } from '@/lib/catalog';
-import { addSlotAction, cancelEventAction, removeSlotAction, updateEventAction } from '@/features/events/actions';
+import {
+  addSlotAction,
+  cancelEventAction,
+  removeSlotAction,
+  updateEventAction,
+} from '@/features/events/actions';
 
 interface EventValues {
   id: string;
@@ -74,19 +92,47 @@ export function EventMenu({ event }: { event: EventValues }) {
                 <Input {...fieldProps('name', errors.name)} defaultValue={event.name} required />
               </Field>
               <Field label="Datum" htmlFor="eventDate" optional error={errors.eventDate}>
-                <Input {...fieldProps('eventDate', errors.eventDate)} type="date" defaultValue={event.eventDate} />
+                <Input
+                  {...fieldProps('eventDate', errors.eventDate)}
+                  type="date"
+                  defaultValue={event.eventDate}
+                />
               </Field>
               <Field label="Plaats" htmlFor="location" optional error={errors.location}>
                 <Input {...fieldProps('location', errors.location)} defaultValue={event.location} />
               </Field>
-              <Field label="Aantal gasten" htmlFor="guestCount" optional error={errors.guestCount} className="sm:col-span-2">
-                <Input {...fieldProps('guestCount', errors.guestCount)} type="number" min={1} inputMode="numeric" defaultValue={event.guestCount} />
+              <Field
+                label="Aantal gasten"
+                htmlFor="guestCount"
+                optional
+                error={errors.guestCount}
+                className="sm:col-span-2"
+              >
+                <Input
+                  {...fieldProps('guestCount', errors.guestCount)}
+                  type="number"
+                  min={1}
+                  inputMode="numeric"
+                  defaultValue={event.guestCount}
+                />
               </Field>
               <Field label="Budget van (€)" htmlFor="budgetMin" optional error={errors.budgetMin}>
-                <Input {...fieldProps('budgetMin', errors.budgetMin)} type="number" min={0} inputMode="numeric" defaultValue={event.budgetMin} />
+                <Input
+                  {...fieldProps('budgetMin', errors.budgetMin)}
+                  type="number"
+                  min={0}
+                  inputMode="numeric"
+                  defaultValue={event.budgetMin}
+                />
               </Field>
               <Field label="Budget tot (€)" htmlFor="budgetMax" optional error={errors.budgetMax}>
-                <Input {...fieldProps('budgetMax', errors.budgetMax)} type="number" min={0} inputMode="numeric" defaultValue={event.budgetMax} />
+                <Input
+                  {...fieldProps('budgetMax', errors.budgetMax)}
+                  type="number"
+                  min={0}
+                  inputMode="numeric"
+                  defaultValue={event.budgetMax}
+                />
               </Field>
             </DialogBody>
             <DialogFooter>
@@ -107,8 +153,9 @@ export function EventMenu({ event }: { event: EventValues }) {
         title="Dit event annuleren?"
         description={
           <>
-            <strong>{event.name}</strong> verdwijnt uit je overzicht. Offertes en boekingen blijven bestaan, maar zijn
-            niet meer aan dit event gekoppeld. Afspraken met dienstverleners annuleer je met hen zelf.
+            <strong>{event.name}</strong> verdwijnt uit je overzicht. Offertes en boekingen blijven
+            bestaan, maar zijn niet meer aan dit event gekoppeld. Afspraken met dienstverleners
+            annuleer je met hen zelf.
           </>
         }
         confirmLabel="Event annuleren"
@@ -146,7 +193,11 @@ export function AddSlotButton({ eventId }: { eventId: string }) {
           </DialogHeader>
           <DialogBody className="space-y-4">
             <Field label="Categorie" htmlFor="slot-category">
-              <Select id="slot-category" value={category} onChange={(event) => setCategory(event.target.value)}>
+              <Select
+                id="slot-category"
+                value={category}
+                onChange={(event) => setCategory(event.target.value)}
+              >
                 <option value="" disabled>
                   Kies een categorie
                 </option>
@@ -157,8 +208,18 @@ export function AddSlotButton({ eventId }: { eventId: string }) {
                 ))}
               </Select>
             </Field>
-            <Field label="Eigen naam" htmlFor="slot-name" optional hint="bv. “Fotograaf voor de ceremonie”">
-              <Input id="slot-name" value={customName} onChange={(event) => setCustomName(event.target.value)} maxLength={80} />
+            <Field
+              label="Eigen naam"
+              htmlFor="slot-name"
+              optional
+              hint="bv. “Fotograaf voor de ceremonie”"
+            >
+              <Input
+                id="slot-name"
+                value={customName}
+                onChange={(event) => setCustomName(event.target.value)}
+                maxLength={80}
+              />
             </Field>
           </DialogBody>
           <DialogFooter>
@@ -168,7 +229,9 @@ export function AddSlotButton({ eventId }: { eventId: string }) {
             <Button
               disabled={!category}
               loading={add.pending}
-              onClick={() => add.run({ eventId, category: category as never, customName, isRequired: false })}
+              onClick={() =>
+                add.run({ eventId, category: category as never, customName, isRequired: false })
+              }
             >
               Toevoegen
             </Button>
@@ -179,12 +242,25 @@ export function AddSlotButton({ eventId }: { eventId: string }) {
   );
 }
 
-export function RemoveSlotButton({ eventId, slotId, label }: { eventId: string; slotId: string; label: string }) {
+export function RemoveSlotButton({
+  eventId,
+  slotId,
+  label,
+}: {
+  eventId: string;
+  slotId: string;
+  label: string;
+}) {
   const [open, setOpen] = React.useState(false);
   const remove = useAction(removeSlotAction, { onSuccess: () => setOpen(false) });
   return (
     <>
-      <Button variant="ghost" size="icon-sm" onClick={() => setOpen(true)} aria-label={`${label} verwijderen`}>
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        onClick={() => setOpen(true)}
+        aria-label={`${label} verwijderen`}
+      >
         <Trash2 aria-hidden />
       </Button>
       <ConfirmDialog

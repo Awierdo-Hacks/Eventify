@@ -11,13 +11,22 @@ export const metadata: Metadata = {
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
-  const [unread, pendingTerms] = await Promise.all([getUnreadCount(user.id), pendingTermsFor(user.id, user.role)]);
+  const [unread, pendingTerms] = await Promise.all([
+    getUnreadCount(user.id),
+    pendingTermsFor(user.id, user.role),
+  ]);
 
   return (
     <AppShell user={user} unread={unread}>
       {children}
       {pendingTerms && (
-        <TermsGate terms={{ title: pendingTerms.title, href: pendingTerms.href, updatedLabel: pendingTerms.updatedLabel }} />
+        <TermsGate
+          terms={{
+            title: pendingTerms.title,
+            href: pendingTerms.href,
+            updatedLabel: pendingTerms.updatedLabel,
+          }}
+        />
       )}
     </AppShell>
   );

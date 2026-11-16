@@ -1,13 +1,21 @@
 'use client';
 
 import * as React from 'react';
-import Image from 'next/image';
+import { SmartImage as Image } from '@/components/ui/smart-image';
 import Link from 'next/link';
 import { ChevronLeft, FileText, Flag, Loader2, Paperclip, SendHorizontal, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { useAction } from '@/hooks/use-action';
@@ -67,7 +75,8 @@ function Thread({ thread, viewer, linkableEvents }: ThreadProps) {
   React.useEffect(() => {
     const last = messages.at(-1);
     if (last && last.createdAt > lastSeen.current) lastSeen.current = last.createdAt;
-    if (stickToBottom.current && scroller.current) scroller.current.scrollTop = scroller.current.scrollHeight;
+    if (stickToBottom.current && scroller.current)
+      scroller.current.scrollTop = scroller.current.scrollHeight;
   }, [messages]);
 
   // Poll for new messages while the conversation is on screen.
@@ -76,10 +85,14 @@ function Thread({ thread, viewer, linkableEvents }: ThreadProps) {
     const poll = async () => {
       if (document.visibilityState !== 'visible') return;
       try {
-        const response = await fetch(`/api/conversations/${thread.id}/messages?after=${encodeURIComponent(lastSeen.current)}`, { cache: 'no-store' });
+        const response = await fetch(
+          `/api/conversations/${thread.id}/messages?after=${encodeURIComponent(lastSeen.current)}`,
+          { cache: 'no-store' }
+        );
         if (!response.ok) return;
         const data = (await response.json()) as { messages: MessageView[] };
-        if (!cancelled && data.messages.length > 0) setMessages((current) => mergeMessages(current, data.messages));
+        if (!cancelled && data.messages.length > 0)
+          setMessages((current) => mergeMessages(current, data.messages));
       } catch {
         // Offline: the next tick tries again.
       }
@@ -96,7 +109,8 @@ function Thread({ thread, viewer, linkableEvents }: ThreadProps) {
 
   const onScroll = () => {
     const element = scroller.current;
-    if (element) stickToBottom.current = element.scrollHeight - element.scrollTop - element.clientHeight < 120;
+    if (element)
+      stickToBottom.current = element.scrollHeight - element.scrollTop - element.clientHeight < 120;
   };
 
   const earlier = useAction(loadEarlierAction, {
@@ -133,7 +147,11 @@ function Thread({ thread, viewer, linkableEvents }: ThreadProps) {
     const content = text.trim();
     if ((!content && files.length === 0) || sending || uploading) return;
     setSending(true);
-    const result = await sendMessageAction({ conversationId: thread.id, content, attachments: files as SendMessageInput['attachments'] }).catch(() => null);
+    const result = await sendMessageAction({
+      conversationId: thread.id,
+      content,
+      attachments: files as SendMessageInput['attachments'],
+    }).catch(() => null);
     setSending(false);
     if (result?.ok) {
       stickToBottom.current = true;
@@ -152,11 +170,17 @@ function Thread({ thread, viewer, linkableEvents }: ThreadProps) {
   const isProvider = viewer.role === 'PROVIDER';
   const canSendQuote = isProvider && canWrite && other?.role === 'CUSTOMER';
 
-
   return (
-    <section className="flex min-h-0 flex-1 flex-col" aria-label={`Gesprek met ${other?.name ?? 'gebruiker'}`}>
+    <section
+      className="flex min-h-0 flex-1 flex-col"
+      aria-label={`Gesprek met ${other?.name ?? 'gebruiker'}`}
+    >
       <header className="flex items-center gap-3 border-b border-ink-100 px-3 py-3 sm:px-5">
-        <Link href="/messages" className="flex size-9 items-center justify-center rounded-lg text-ink-600 hover:bg-ink-100 lg:hidden" aria-label="Terug naar gesprekken">
+        <Link
+          href="/messages"
+          className="flex size-9 items-center justify-center rounded-lg text-ink-600 hover:bg-ink-100 lg:hidden"
+          aria-label="Terug naar gesprekken"
+        >
           <ChevronLeft className="size-5" aria-hidden />
         </Link>
         <Avatar name={other?.name} src={other?.image} />
@@ -170,7 +194,9 @@ function Thread({ thread, viewer, linkableEvents }: ThreadProps) {
               (other?.name ?? 'Gesprek')
             )}
           </h2>
-          {other?.contactName && <p className="truncate text-xs text-ink-500">{other.contactName}</p>}
+          {other?.contactName && (
+            <p className="truncate text-xs text-ink-500">{other.contactName}</p>
+          )}
         </div>
         {other && (
           <Link
@@ -184,21 +210,32 @@ function Thread({ thread, viewer, linkableEvents }: ThreadProps) {
         )}
       </header>
 
-      <div ref={scroller} onScroll={onScroll} className="flex-1 space-y-1 overflow-y-auto bg-ink-50/50 px-3 py-4 sm:px-5" role="log" aria-live="polite">
+      <div
+        ref={scroller}
+        onScroll={onScroll}
+        className="flex-1 space-y-1 overflow-y-auto bg-ink-50/50 px-3 py-4 sm:px-5"
+        role="log"
+        aria-live="polite"
+      >
         {hasMore && (
           <div className="flex justify-center pb-3">
             <Button
               variant="outline"
               size="sm"
               loading={earlier.pending}
-              onClick={() => messages[0] && earlier.run({ conversationId: thread.id, before: messages[0].createdAt })}
+              onClick={() =>
+                messages[0] &&
+                earlier.run({ conversationId: thread.id, before: messages[0].createdAt })
+              }
             >
               Eerdere berichten laden
             </Button>
           </div>
         )}
         {messages.length === 0 && (
-          <p className="py-10 text-center text-sm text-ink-500">Nog geen berichten. Stuur het eerste bericht.</p>
+          <p className="py-10 text-center text-sm text-ink-500">
+            Nog geen berichten. Stuur het eerste bericht.
+          </p>
         )}
         {messages.map((message, index) => {
           const own = message.senderId === viewer.id;
@@ -209,7 +246,9 @@ function Thread({ thread, viewer, linkableEvents }: ThreadProps) {
             <React.Fragment key={message.id}>
               {showDay && (
                 <div className="flex justify-center py-3">
-                  <span className="rounded-full bg-surface px-3 py-1 text-xs font-semibold text-ink-500 shadow-xs ring-1 ring-ink-200">{day}</span>
+                  <span className="rounded-full bg-surface px-3 py-1 text-xs font-semibold text-ink-500 shadow-xs ring-1 ring-ink-200">
+                    {day}
+                  </span>
                 </div>
               )}
               {message.type === 'SYSTEM' ? (
@@ -223,16 +262,35 @@ function Thread({ thread, viewer, linkableEvents }: ThreadProps) {
                       linkableEvents={linkableEvents}
                       hideChat
                     />
-                    <p className={cn('mt-1 text-[0.6875rem] text-ink-500', own && 'text-right')}>{formatTime(message.createdAt)}</p>
+                    <p className={cn('mt-1 text-[0.6875rem] text-ink-500', own && 'text-right')}>
+                      {formatTime(message.createdAt)}
+                    </p>
                   </div>
                 </div>
               ) : (
                 <div className={cn('flex py-0.5', own ? 'justify-end' : 'justify-start')}>
-                  <div className={cn('flex max-w-[85%] flex-col gap-1 sm:max-w-[70%]', own ? 'items-end' : 'items-start')}>
+                  <div
+                    className={cn(
+                      'flex max-w-[85%] flex-col gap-1 sm:max-w-[70%]',
+                      own ? 'items-end' : 'items-start'
+                    )}
+                  >
                     {message.attachments.map((attachment) =>
                       attachment.fileType.startsWith('image/') ? (
-                        <a key={attachment.id} href={attachment.url} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-2xl ring-1 ring-ink-200">
-                          <Image src={attachment.url} alt={attachment.fileName} width={320} height={240} className="h-auto max-h-72 w-auto max-w-full object-cover" />
+                        <a
+                          key={attachment.id}
+                          href={attachment.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block overflow-hidden rounded-2xl ring-1 ring-ink-200"
+                        >
+                          <Image
+                            src={attachment.url}
+                            alt={attachment.fileName}
+                            width={320}
+                            height={240}
+                            className="h-auto max-h-72 w-auto max-w-full object-cover"
+                          />
                         </a>
                       ) : (
                         <a
@@ -244,23 +302,31 @@ function Thread({ thread, viewer, linkableEvents }: ThreadProps) {
                         >
                           <FileText className="size-5 shrink-0 text-brand-600" aria-hidden />
                           <span className="min-w-0">
-                            <span className="block truncate font-semibold text-ink-950">{attachment.fileName}</span>
-                            <span className="block text-xs text-ink-500">{formatFileSize(attachment.fileSize)}</span>
+                            <span className="block truncate font-semibold text-ink-950">
+                              {attachment.fileName}
+                            </span>
+                            <span className="block text-xs text-ink-500">
+                              {formatFileSize(attachment.fileSize)}
+                            </span>
                           </span>
                         </a>
-                      ),
+                      )
                     )}
                     {message.content && (
                       <p
                         className={cn(
                           'whitespace-pre-wrap break-words rounded-2xl px-4 py-2.5 text-[0.9375rem] leading-relaxed',
-                          own ? 'rounded-br-md bg-brand-600 text-white' : 'rounded-bl-md bg-surface text-ink-900 ring-1 ring-ink-200',
+                          own
+                            ? 'rounded-br-md bg-brand-600 text-white'
+                            : 'rounded-bl-md bg-surface text-ink-900 ring-1 ring-ink-200'
                         )}
                       >
                         {message.content}
                       </p>
                     )}
-                    <span className="px-1 text-[0.6875rem] text-ink-500">{formatTime(message.createdAt)}</span>
+                    <span className="px-1 text-[0.6875rem] text-ink-500">
+                      {formatTime(message.createdAt)}
+                    </span>
                   </div>
                 </div>
               )}
@@ -274,11 +340,18 @@ function Thread({ thread, viewer, linkableEvents }: ThreadProps) {
           {files.length > 0 && (
             <ul className="mb-2 flex flex-wrap gap-2">
               {files.map((file) => (
-                <li key={file.url} className="flex items-center gap-2 rounded-lg bg-ink-100 py-1 pl-3 pr-1 text-sm">
-                  <span className="max-w-40 truncate font-medium text-ink-800">{file.fileName}</span>
+                <li
+                  key={file.url}
+                  className="flex items-center gap-2 rounded-lg bg-ink-100 py-1 pl-3 pr-1 text-sm"
+                >
+                  <span className="max-w-40 truncate font-medium text-ink-800">
+                    {file.fileName}
+                  </span>
                   <button
                     type="button"
-                    onClick={() => setFiles((current) => current.filter((item) => item.url !== file.url))}
+                    onClick={() =>
+                      setFiles((current) => current.filter((item) => item.url !== file.url))
+                    }
                     className="flex size-6 items-center justify-center rounded-md text-ink-500 hover:bg-ink-200"
                     aria-label={`${file.fileName} verwijderen`}
                   >
@@ -305,8 +378,19 @@ function Thread({ thread, viewer, linkableEvents }: ThreadProps) {
               onChange={(event) => void onFiles(event.target.files)}
               aria-label="Bijlage kiezen"
             />
-            <Button variant="ghost" size="icon" className="shrink-0" onClick={() => fileInput.current?.click()} disabled={uploading || files.length >= 5} aria-label="Bijlage toevoegen">
-              {uploading ? <Loader2 className="animate-spin" aria-hidden /> : <Paperclip aria-hidden />}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="shrink-0"
+              onClick={() => fileInput.current?.click()}
+              disabled={uploading || files.length >= 5}
+              aria-label="Bijlage toevoegen"
+            >
+              {uploading ? (
+                <Loader2 className="animate-spin" aria-hidden />
+              ) : (
+                <Paperclip aria-hidden />
+              )}
             </Button>
             {canSendQuote && (
               <Button variant="outline" className="shrink-0" onClick={() => setQuoteOpen(true)}>
@@ -337,7 +421,14 @@ function Thread({ thread, viewer, linkableEvents }: ThreadProps) {
               }}
               className="max-h-40 min-h-10 flex-1 resize-none rounded-xl border border-ink-200 bg-ink-50 px-3.5 py-2 text-[0.9375rem] leading-relaxed placeholder:text-ink-400 focus:border-brand-500 focus:bg-surface focus:outline-none focus:ring-4 focus:ring-brand-500/15"
             />
-            <Button type="submit" size="icon" className="shrink-0" loading={sending} disabled={uploading || (!text.trim() && files.length === 0)} aria-label="Versturen">
+            <Button
+              type="submit"
+              size="icon"
+              className="shrink-0"
+              loading={sending}
+              disabled={uploading || (!text.trim() && files.length === 0)}
+              aria-label="Versturen"
+            >
               {!sending && <SendHorizontal aria-hidden />}
             </Button>
           </form>
@@ -396,17 +487,27 @@ function ChatQuoteDialog({
         <DialogHeader>
           <DialogTitle>Offerte voor {customerName}</DialogTitle>
           <DialogDescription>
-            De offerte verschijnt in het gesprek. De klant kan ze daar accepteren of afwijzen; een geaccepteerde
-            offerte is een bindende afspraak.
+            De offerte verschijnt in het gesprek. De klant kan ze daar accepteren of afwijzen; een
+            geaccepteerde offerte is een bindende afspraak.
           </DialogDescription>
         </DialogHeader>
         <DialogBody className="space-y-5">
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Datum van het event" htmlFor="chat-quote-date" optional>
-              <Input id="chat-quote-date" type="date" value={eventDate} onChange={(event) => setEventDate(event.target.value)} />
+              <Input
+                id="chat-quote-date"
+                type="date"
+                value={eventDate}
+                onChange={(event) => setEventDate(event.target.value)}
+              />
             </Field>
             <Field label="Plaats" htmlFor="chat-quote-location" optional>
-              <Input id="chat-quote-location" value={eventLocation} onChange={(event) => setEventLocation(event.target.value)} maxLength={200} />
+              <Input
+                id="chat-quote-location"
+                value={eventLocation}
+                onChange={(event) => setEventLocation(event.target.value)}
+                maxLength={200}
+              />
             </Field>
           </div>
           <QuoteFormFields draft={draft} onChange={setDraft} errors={fieldErrors} />
@@ -415,7 +516,10 @@ function ChatQuoteDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={pending}>
             Annuleren
           </Button>
-          <Button loading={pending} onClick={() => run({ conversationId, eventDate, eventLocation, ...draft })}>
+          <Button
+            loading={pending}
+            onClick={() => run({ conversationId, eventDate, eventLocation, ...draft })}
+          >
             Offerte versturen
           </Button>
         </DialogFooter>

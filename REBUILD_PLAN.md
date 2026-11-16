@@ -22,17 +22,17 @@ finished; if a session is interrupted, resume at the first unticked item.
 
 ## What v1 taught us (the problems v2 fixes)
 
-| v1 problem | v2 answer |
-|---|---|
-| Every page is a client component: load JS → fetch session → fetch 3–4 APIs → render. That waterfall is the "slow dashboard". | Server Components read the session cookie and query the database directly, in parallel, and stream HTML. No session round-trip, no client waterfall. |
-| 1,000+ line page files, each with its own copies of types, fetch logic and dialogs. | Feature folders (`queries.ts`, `actions.ts`, `schemas.ts`, components). Routes are thin. |
-| One dashboard page with tabs that loads everything up front. | App shell with real routes per section; each loads only its own data. |
-| Chat keeps a server connection open per user and polls the DB inside it. | Small incremental poll that pauses when the tab is hidden. |
-| framer-motion on most pages, emoji as icons, gradients and 2px borders everywhere. | CSS-only motion, one icon set, restrained use of the brand gradient. |
-| No input validation layer, `any` in most API routes. | zod schemas shared by forms and server actions, strict TypeScript. |
-| Security gaps: committed `.env` with live credentials, `/api/debug-login`, hard-coded analysis key, unauthenticated upload that accepts SVG, unsigned OAuth state, banned users keep a valid session for 7 days. | See "Security" below. |
-| No privacy tooling: no consent, no account deletion, no data export, terms not recorded. | See "Legal & privacy" below. |
-| Uploads written to local disk (lost on every deploy on serverless hosts). | Storage driver: local disk for dev/Docker, object storage in production. |
+| v1 problem                                                                                                                                                                                                       | v2 answer                                                                                                                                            |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Every page is a client component: load JS → fetch session → fetch 3–4 APIs → render. That waterfall is the "slow dashboard".                                                                                     | Server Components read the session cookie and query the database directly, in parallel, and stream HTML. No session round-trip, no client waterfall. |
+| 1,000+ line page files, each with its own copies of types, fetch logic and dialogs.                                                                                                                              | Feature folders (`queries.ts`, `actions.ts`, `schemas.ts`, components). Routes are thin.                                                             |
+| One dashboard page with tabs that loads everything up front.                                                                                                                                                     | App shell with real routes per section; each loads only its own data.                                                                                |
+| Chat keeps a server connection open per user and polls the DB inside it.                                                                                                                                         | Small incremental poll that pauses when the tab is hidden.                                                                                           |
+| framer-motion on most pages, emoji as icons, gradients and 2px borders everywhere.                                                                                                                               | CSS-only motion, one icon set, restrained use of the brand gradient.                                                                                 |
+| No input validation layer, `any` in most API routes.                                                                                                                                                             | zod schemas shared by forms and server actions, strict TypeScript.                                                                                   |
+| Security gaps: committed `.env` with live credentials, `/api/debug-login`, hard-coded analysis key, unauthenticated upload that accepts SVG, unsigned OAuth state, banned users keep a valid session for 7 days. | See "Security" below.                                                                                                                                |
+| No privacy tooling: no consent, no account deletion, no data export, terms not recorded.                                                                                                                         | See "Legal & privacy" below.                                                                                                                         |
+| Uploads written to local disk (lost on every deploy on serverless hosts).                                                                                                                                        | Storage driver: local disk for dev/Docker, object storage in production.                                                                             |
 
 ## Architecture
 
@@ -69,99 +69,132 @@ prisma/                schema + migrations (shared with v1)
 ## Checklist
 
 ### Phase 0 — Foundation
-- [ ] Remove v1 app code from this branch (kept on `main`); keep prisma, public assets, legal source doc
-- [ ] Remove tracked `.env`; add `.env.example`; local Postgres for dev
-- [ ] New `package.json` (drop unused deps: next-auth, jsonwebtoken, framer-motion, ts-node, supabase)
-- [ ] TS strict config, ESLint flat config, Prettier
-- [ ] `lib/env` (validated env), `lib/db` (Prisma singleton), `lib/session`, `lib/auth` guards
-- [ ] Storage driver (local + object storage), upload validation by file signature
-- [ ] Rate limiter for auth / waitlist / upload endpoints
-- [ ] Security headers in `next.config.ts`
+
+- [x] Remove v1 app code from this branch (kept on `main`); keep prisma, public assets, legal source doc
+- [x] Remove tracked `.env`; add `.env.example`; local Postgres for dev
+- [x] New `package.json` (drop unused deps: next-auth, jsonwebtoken, framer-motion, ts-node, supabase)
+- [x] TS strict config, ESLint flat config, Prettier
+- [x] `lib/env` (validated env), `lib/db` (Prisma singleton), `lib/session`, `lib/auth` guards
+- [x] Storage driver (local + object storage), upload validation by file signature
+- [x] Rate limiter for auth / waitlist / upload endpoints
+- [x] Security headers in `next.config.ts`
 
 ### Phase 1 — Design system
-- [ ] Tokens in `globals.css` (colour, type, radius, shadow, motion), self-hosted fonts
-- [ ] Primitives: Button, Input, Textarea, Select, Checkbox, Label, Field, Card, Badge,
-      Avatar, Dialog, Sheet, Dropdown, Tabs, Tooltip, Toast, Skeleton, EmptyState,
-      StatusBadge, Stars, Pagination, Calendar
-- [ ] Logo component, category icon map, shared labels/formatters (nl-BE)
+
+- [x] Tokens in `globals.css` (colour, type, radius, shadow, motion), self-hosted fonts
+- [x] Primitives: Button, Input, Textarea, Select, Checkbox, Label, Field, Card, Badge,
+      StatusBadge, Avatar, Alert, Dialog (bottom sheet on phones), ConfirmDialog,
+      Dropdown, Toast, Skeleton, EmptyState, StatCard, Stars, Pagination, MonthCalendar
+- [x] Logo component, category icon map, shared labels/formatters (nl-BE)
 
 ### Phase 2 — Public site
-- [ ] Site header + footer (with legal links and cookie settings)
-- [ ] Home (hero search, categories, how it works, featured providers, for-providers, CTA)
-- [ ] Browse (server-rendered filters via URL, pagination, ranking disclosure)
-- [ ] Provider profile (gallery, services, availability, reviews, contact/quote CTA, report link)
-- [ ] About, Waitlist
-- [ ] 404 / error / loading states
+
+- [x] Site header + footer (with legal links and cookie settings)
+- [x] Home (hero search, categories, how it works, featured providers, for-providers, FAQ, CTA)
+- [x] "Voor dienstverleners" landing page
+- [x] Browse (server-rendered filters via URL, pagination, ranking disclosure)
+- [x] Provider profile (gallery, services, availability, reviews, contact/quote CTA, report link)
+- [x] About, Waitlist
+- [x] 404 / error / loading states
 
 ### Phase 3 — Auth & onboarding
-- [ ] Login (with status messages for suspended/banned)
-- [ ] Register: customer + provider flows, terms acceptance recorded per role
-- [ ] Provider onboarding: photos + services after account creation (authenticated uploads)
-- [ ] Logout, route protection in `proxy.ts`, role-based redirects
+
+- [x] Login (with status messages for suspended/banned)
+- [x] Register: customer + provider flows, terms acceptance recorded per role
+- [x] Provider onboarding: photos + services after account creation (authenticated uploads)
+- [x] Logout, route protection in `proxy.ts`, role-based redirects
+- [x] Stale sessions (suspended / blocked / deleted accounts) are cleared instead of looping
 
 ### Phase 4 — Customer area
-- [ ] App shell (sidebar / mobile tab bar, unread badge)
-- [ ] Overview (next event, open quotes, upcoming bookings)
-- [ ] Events: list, create (templates), detail (slots, linked quotes, costs, edit, cancel)
-- [ ] Requests list, quote request form (`/request-quote/[id]`) with availability
-- [ ] Quotes: accept / reject (with reason), link to event slot
-- [ ] Bookings list, leave a review after a completed booking
+
+- [x] App shell (sidebar / mobile tab bar, unread badge)
+- [x] Overview (next event, open quotes, upcoming bookings)
+- [x] Events: list, create (templates), detail (slots, linked quotes, costs, edit, cancel)
+- [x] Requests list, quote request form (`/request-quote/[id]`) with availability
+- [x] Quotes: accept / reject (with reason), link to event slot
+- [x] Bookings list, leave a review after a completed booking
 
 ### Phase 5 — Provider area
-- [ ] Overview (new requests, pending quotes, next booking, stats)
-- [ ] Requests → create quote
-- [ ] Quotes (status, rejection feedback, withdraw rejected)
-- [ ] Bookings (status updates)
-- [ ] Agenda (block/unblock dates, booked + external days, stats)
-- [ ] Calendar sync: Google OAuth (signed state) + iCal URL (SSRF-safe)
-- [ ] Profile editor (details, services, images)
+
+- [x] Overview (new requests, pending quotes, next booking, stats)
+- [x] Requests → create quote
+- [x] Quotes (status, rejection feedback, withdraw rejected)
+- [x] Bookings (status updates)
+- [x] Agenda (block/unblock dates, booked + external days, stats)
+- [x] Calendar sync: Google OAuth (signed state) + iCal URL (SSRF-safe)
+- [x] Profile editor (details, services, images)
 
 ### Phase 6 — Messaging
-- [ ] Conversation list with unread counts
-- [ ] Thread: text, attachments (image/PDF), quote cards, send quote from chat
-- [ ] Accept / reject / link quote from chat
-- [ ] Incremental polling, visibility-aware; unread badge in shell
+
+- [x] Conversation list with unread counts
+- [x] Thread: text, attachments (image/PDF), quote cards, send quote from chat
+- [x] Accept / reject / link quote from chat
+- [x] Incremental polling, visibility-aware; unread badge in shell
 
 ### Phase 7 — Admin
-- [ ] Overview (stats + recent activity)
-- [ ] Providers: verify, show/hide, delete, detail
-- [ ] Users: suspend, ban, activate, delete
-- [ ] Waitlist: list, breakdown, CSV export (replaces `/analyse`)
-- [ ] Content reports queue
+
+- [x] Overview (stats + recent activity)
+- [x] Providers: verify, show/hide, delete, detail
+- [x] Users: suspend, ban, activate, delete
+- [x] Waitlist: list, breakdown, CSV export (replaces `/analyse`)
+- [x] Content reports queue
 
 ### Phase 8 — Legal & privacy (EU / Belgium)
-- [ ] Cookie consent: accept / reject with equal prominence, per-category choice,
+
+- [x] Cookie consent: accept / reject with equal prominence, per-category choice,
       withdraw any time, nothing non-essential loads before consent, consent proof stored
-- [ ] Cookie policy page (table of cookies actually used)
-- [ ] Privacy policy (controller, purposes + legal bases, processors, transfers,
+- [x] Cookie policy page (table of cookies actually used)
+- [x] Privacy policy (controller, purposes + legal bases, processors, transfers,
       retention, rights, GBA complaint route)
-- [ ] Terms: general terms, customer terms, provider terms (incl. P2B: ranking,
+- [x] Terms: general terms, customer terms, provider terms (incl. P2B: ranking,
       suspension reasons, complaint handling, notice of changes)
-- [ ] Versioned terms; acceptance stored; re-acceptance prompt when a version changes
-- [ ] Account page: edit profile, change password, download my data, delete account
-- [ ] Report content (DSA notice-and-action) + legal contact point
-- [ ] Review transparency note, ranking explanation, trader status on provider profiles
-- [ ] Company details placeholders in `config/site.ts` + "before launch" list in README
+- [x] Versioned terms; acceptance stored; re-acceptance prompt when a version changes
+- [x] Account page: edit profile, change password, download my data, delete account
+- [x] Report content (DSA notice-and-action) + legal contact point
+- [x] Review transparency note, ranking explanation, trader status on provider profiles
+- [x] Company details placeholders in `config/site.ts` + "before launch" list in README
 
 ### Phase 9 — Quality
-- [ ] SEO: metadata, sitemap with real provider pages, robots, JSON-LD, OG image
-- [ ] Accessibility pass (keyboard, focus, contrast, labels, reduced motion)
-- [ ] Performance pass (bundle check, query review, DB indexes, image sizes)
-- [ ] Seed script updated; end-to-end smoke test of the main flows with a local DB
-- [ ] `npm run build`, typecheck and lint clean
-- [ ] README rewritten (setup, architecture, deploy, launch checklist)
 
-## Open decisions (asked of the owner)
+- [x] SEO: metadata, sitemap with real provider pages, robots, JSON-LD, OG image
+- [x] Accessibility pass (keyboard, focus, contrast, labels, reduced motion)
+- [x] Performance pass (bundle check, query review, DB indexes, image sizes)
+- [x] Seed script updated; end-to-end smoke test of the main flows with a local DB
+- [x] `npm run build`, typecheck and lint clean
+- [x] README rewritten (setup, architecture, deploy, launch checklist)
+- [x] Dockerfile and docker-compose updated for the new layout; `/api/health`
 
-1. Additive database migrations — allowed?
-2. Brand spelling — Eventiphy (code, domain) or Eventify?
-3. Languages — Dutch only, or more from the start?
-4. Analytics — none yet, cookieless, or Google Analytics?
+## Verification (last run)
+
+- `npm run typecheck`, `npm run lint`, `npm run build`: clean.
+- `tests/e2e-smoke.cjs` against the production build with a local database:
+  **22 / 22** checks pass (registration with terms, event, request, quote,
+  accept → booking, chat, quote from chat, agenda and availability, data export,
+  deletion guard, access control, waitlist, report, cookie consent, admin).
+- Migration applied cleanly to an empty database and to a simulation of the
+  production drift (existing `waitlist_entries` / `btw_number`), keeping data.
+- Local production timings: pages 30–60 ms, in-app navigation 30–75 ms.
+
+Not verified here (needs real credentials or infrastructure): Google Calendar
+OAuth end to end, Vercel Blob uploads, the Docker image build, and behaviour
+against the real production database.
+
+## Decisions made by the owner
+
+1. Database: additive-only migrations are allowed.
+2. Brand spelling: **Eventiphy**.
+3. Languages: Dutch only.
+4. Analytics: none for now; the consent system is ready for when one is added.
 
 ## Owner actions (cannot be done from code)
 
+See "Before launch" in the README for the full list. The essentials:
+
 - [ ] **Rotate the database password and `NEXTAUTH_SECRET`** — both were committed
       in `.env` on `main` and remain in git history.
-- [ ] Fill in legal entity details (name, KBO/VAT number, registered address, contact e-mail).
+- [ ] Fill in legal entity details in `src/config/site.ts` (name, KBO/VAT number, address).
+- [ ] Create the mailboxes named in the legal texts.
 - [ ] Have the legal texts reviewed by a Belgian lawyer before launch.
 - [ ] Sign data processing agreements with hosting, database and storage providers.
+- [ ] Back up the database, then apply the v2 migration at deploy time.
+- [ ] Decide on transactional e-mail (needed for the notices the terms promise).

@@ -5,7 +5,12 @@ import { PageHeader } from '@/components/layout/page-header';
 import { CategoryIcon } from '@/components/ui/category-icon';
 import { getProviderProfile, getUnavailableDates } from '@/features/providers/queries';
 import { RequestForm } from '@/features/requests/components/request-form';
-import { categoryLabel, eventTypeLabel, priceRangeSymbol, REQUEST_EVENT_TYPES } from '@/lib/catalog';
+import {
+  categoryLabel,
+  eventTypeLabel,
+  priceRangeSymbol,
+  REQUEST_EVENT_TYPES,
+} from '@/lib/catalog';
 import { db } from '@/lib/db';
 import { toDateKey } from '@/lib/format';
 import { requireCustomer } from '@/lib/session';
@@ -30,7 +35,12 @@ export default async function RequestQuotePage({ params, searchParams }: Props) 
     slotId
       ? db.eventSlot.findFirst({
           where: { id: slotId, event: { customer_id: user.id, status: { not: 'CANCELLED' } } },
-          select: { id: true, event: { select: { event_type: true, event_date: true, location: true, guest_count: true } } },
+          select: {
+            id: true,
+            event: {
+              select: { event_type: true, event_date: true, location: true, guest_count: true },
+            },
+          },
         })
       : null,
   ]);
@@ -52,7 +62,8 @@ export default async function RequestQuotePage({ params, searchParams }: Props) 
           unavailableDates={unavailableDates}
           slotId={slot?.id}
           defaults={{
-            eventType: eventLabel && REQUEST_EVENT_TYPES.includes(eventLabel) ? eventLabel : undefined,
+            eventType:
+              eventLabel && REQUEST_EVENT_TYPES.includes(eventLabel) ? eventLabel : undefined,
             eventDate: slot?.event.event_date ? toDateKey(slot.event.event_date) : undefined,
             eventLocation: slot?.event.location ?? undefined,
             guestCount: slot?.event.guest_count?.toString(),
@@ -83,13 +94,22 @@ export default async function RequestQuotePage({ params, searchParams }: Props) 
             </li>
             {provider.reviewCount > 0 && (
               <li className="flex items-center gap-2">
-                <Star className="size-4 text-sun-400" fill="currentColor" strokeWidth={0} aria-hidden />
-                {provider.rating.toLocaleString('nl-BE', { minimumFractionDigits: 1 })} ({provider.reviewCount})
+                <Star
+                  className="size-4 text-sun-400"
+                  fill="currentColor"
+                  strokeWidth={0}
+                  aria-hidden
+                />
+                {provider.rating.toLocaleString('nl-BE', { minimumFractionDigits: 1 })} (
+                {provider.reviewCount})
               </li>
             )}
             {priceRangeSymbol(provider.priceRange) && (
               <li>
-                Prijsklasse <span className="font-semibold text-ink-900">{priceRangeSymbol(provider.priceRange)}</span>
+                Prijsklasse{' '}
+                <span className="font-semibold text-ink-900">
+                  {priceRangeSymbol(provider.priceRange)}
+                </span>
               </li>
             )}
           </ul>

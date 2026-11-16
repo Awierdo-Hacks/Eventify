@@ -18,7 +18,10 @@ const serviceSchema = z
   .object({
     name: z.string().trim().min(2, 'Geef de dienst een naam.').max(120),
     description: z.string().trim().max(500).optional(),
-    priceFrom: z.coerce.number({ message: 'Vul een prijs in.' }).min(0, 'Vul een prijs in.').max(1_000_000),
+    priceFrom: z.coerce
+      .number({ message: 'Vul een prijs in.' })
+      .min(0, 'Vul een prijs in.')
+      .max(1_000_000),
     priceTo: z
       .union([z.literal(''), z.coerce.number().min(0).max(1_000_000)])
       .optional()
@@ -32,7 +35,9 @@ const serviceSchema = z
 const profileSchema = z
   .object({
     businessName: z.string().trim().min(2, 'Vul je bedrijfsnaam in.').max(120),
-    category: z.enum(CATEGORIES.map((category) => category.slug) as [string, ...string[]], { message: 'Kies een categorie.' }),
+    category: z.enum(CATEGORIES.map((category) => category.slug) as [string, ...string[]], {
+      message: 'Kies een categorie.',
+    }),
     location: z.string().trim().min(2, 'Vul je stad of regio in.').max(120),
     priceRange: z.enum(PRICE_RANGES, { message: 'Kies een prijsklasse.' }),
     description: z.string().trim().min(50, 'Beschrijf je aanbod in minstens 50 tekens.').max(2000),
@@ -42,7 +47,10 @@ const profileSchema = z
       .trim()
       .max(200)
       .optional()
-      .refine((value) => !value || /^(https?:\/\/)?[\w.-]+\.[a-z]{2,}(\/\S*)?$/i.test(value), 'Vul een geldige website in.'),
+      .refine(
+        (value) => !value || /^(https?:\/\/)?[\w.-]+\.[a-z]{2,}(\/\S*)?$/i.test(value),
+        'Vul een geldige website in.'
+      ),
     availability: z.string().trim().max(160).optional(),
     responseTime: z.string().trim().max(80).optional(),
     minGuests: optionalInt,
@@ -51,16 +59,21 @@ const profileSchema = z
     images: z.array(z.string().max(500)).max(12, 'Maximaal 12 foto’s.'),
     services: z.array(serviceSchema).max(30),
   })
-  .refine((data) => data.minGuests === null || data.maxGuests === null || data.minGuests <= data.maxGuests, {
-    path: ['maxGuests'],
-    message: 'Het maximum moet hoger zijn dan het minimum.',
-  });
+  .refine(
+    (data) =>
+      data.minGuests === null || data.maxGuests === null || data.minGuests <= data.maxGuests,
+    {
+      path: ['maxGuests'],
+      message: 'Het maximum moet hoger zijn dan het minimum.',
+    }
+  );
 
 export type ProfileInput = z.input<typeof profileSchema>;
 
 export async function updateProfileAction(input: ProfileInput): Promise<ActionResult> {
   const user = await getCurrentUser();
-  if (!user || user.role !== 'PROVIDER' || !user.providerId) return fail('Alleen dienstverleners kunnen hun profiel bewerken.');
+  if (!user || user.role !== 'PROVIDER' || !user.providerId)
+    return fail('Alleen dienstverleners kunnen hun profiel bewerken.');
   const providerId = user.providerId;
 
   const parsed = profileSchema.safeParse(input);

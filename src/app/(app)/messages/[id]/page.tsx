@@ -15,5 +15,12 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
   if (!thread) notFound();
   await markConversationRead(user.id, id);
 
-  return <Thread key={thread.id} thread={thread} viewer={{ id: user.id, role: user.role }} linkableEvents={linkableEvents} />;
+  return (
+    <Thread
+      key={thread.id}
+      thread={thread}
+      viewer={{ id: user.id, role: user.role }}
+      linkableEvents={linkableEvents}
+    />
+  );
 }

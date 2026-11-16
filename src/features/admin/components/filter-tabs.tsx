@@ -17,12 +17,17 @@ function FilterTabs({ tabs, label }: FilterTabsProps) {
           aria-current={tab.active ? 'page' : undefined}
           className={cn(
             'flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors',
-            tab.active ? 'bg-surface text-ink-950 shadow-xs' : 'text-ink-600 hover:text-ink-950',
+            tab.active ? 'bg-surface text-ink-950 shadow-xs' : 'text-ink-600 hover:text-ink-950'
           )}
         >
           {tab.label}
           {tab.count !== undefined && (
-            <span className={cn('rounded-full px-1.5 text-xs tabular-nums', tab.active ? 'bg-brand-100 text-brand-800' : 'bg-ink-200 text-ink-600')}>
+            <span
+              className={cn(
+                'rounded-full px-1.5 text-xs tabular-nums',
+                tab.active ? 'bg-brand-100 text-brand-800' : 'bg-ink-200 text-ink-600'
+              )}
+            >
               {tab.count}
             </span>
           )}

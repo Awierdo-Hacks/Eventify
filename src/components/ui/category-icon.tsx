@@ -58,14 +58,23 @@ const tileSizes = {
 } as const;
 
 /** The bare line icon for a category. */
-function CategoryGlyph({ category, ...props }: { category: string | null | undefined } & LucideProps) {
+function CategoryGlyph({
+  category,
+  ...props
+}: { category: string | null | undefined } & LucideProps) {
   return createElement(categoryIcon(category), { 'aria-hidden': true, ...props });
 }
 
 /** Line icon on a tinted tile — replaces the emoji used in v1. */
 function CategoryIcon({ category, size = 'md', className }: CategoryIconProps) {
   return (
-    <span className={cn('inline-flex shrink-0 items-center justify-center bg-brand-50 text-brand-700', tileSizes[size], className)}>
+    <span
+      className={cn(
+        'inline-flex shrink-0 items-center justify-center bg-brand-50 text-brand-700',
+        tileSizes[size],
+        className
+      )}
+    >
       <CategoryGlyph category={category} />
     </span>
   );

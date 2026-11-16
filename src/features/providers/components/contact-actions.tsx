@@ -15,9 +15,17 @@ interface ContactActionsProps {
   slotId?: string;
 }
 
-function ContactActions({ providerId, providerUserId, viewerRole, isOwnProfile, slotId }: ContactActionsProps) {
+function ContactActions({
+  providerId,
+  providerUserId,
+  viewerRole,
+  isOwnProfile,
+  slotId,
+}: ContactActionsProps) {
   const { run, pending } = useAction(openConversationAction);
-  const quoteHref = slotId ? `/request-quote/${providerId}?slot=${encodeURIComponent(slotId)}` : `/request-quote/${providerId}`;
+  const quoteHref = slotId
+    ? `/request-quote/${providerId}?slot=${encodeURIComponent(slotId)}`
+    : `/request-quote/${providerId}`;
 
   if (isOwnProfile) {
     return (

@@ -17,7 +17,11 @@ function PasswordInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
         aria-label={visible ? 'Wachtwoord verbergen' : 'Wachtwoord tonen'}
         aria-pressed={visible}
       >
-        {visible ? <EyeOff className="size-4" aria-hidden /> : <Eye className="size-4" aria-hidden />}
+        {visible ? (
+          <EyeOff className="size-4" aria-hidden />
+        ) : (
+          <Eye className="size-4" aria-hidden />
+        )}
       </button>
     </div>
   );

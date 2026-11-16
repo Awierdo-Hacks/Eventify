@@ -23,10 +23,21 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 const attachmentSchema = z.object({
   // Only files that went through our own upload action.
-  url: z.string().max(500).refine((url) => url.startsWith('/uploads/chat/') || /^https:\/\/[\w.-]+\.blob\.vercel-storage\.com\//.test(url)),
+  url: z
+    .string()
+    .max(500)
+    .refine(
+      (url) =>
+        url.startsWith('/uploads/chat/') ||
+        /^https:\/\/[\w.-]+\.blob\.vercel-storage\.com\//.test(url)
+    ),
   fileName: z.string().max(200),
   fileType: z.enum(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf']),
-  fileSize: z.number().int().min(1).max(12 * 1024 * 1024),
+  fileSize: z
+    .number()
+    .int()
+    .min(1)
+    .max(12 * 1024 * 1024),
 });
 
 const sendSchema = z
@@ -35,11 +46,15 @@ const sendSchema = z
     content: z.string().trim().max(4000, 'Je bericht is te lang (maximaal 4000 tekens).'),
     attachments: z.array(attachmentSchema).max(5, 'Maximaal 5 bijlagen per bericht.').default([]),
   })
-  .refine((data) => data.content.length > 0 || data.attachments.length > 0, { message: 'Typ een bericht of voeg een bijlage toe.' });
+  .refine((data) => data.content.length > 0 || data.attachments.length > 0, {
+    message: 'Typ een bericht of voeg een bijlage toe.',
+  });
 
 export type SendMessageInput = z.input<typeof sendSchema>;
 
-export async function sendMessageAction(input: SendMessageInput): Promise<ActionResult<MessageView>> {
+export async function sendMessageAction(
+  input: SendMessageInput
+): Promise<ActionResult<MessageView>> {
   const user = await getCurrentUser();
   if (!user) return fail(NOT_SIGNED_IN);
   const parsed = sendSchema.safeParse(input);
@@ -57,7 +72,10 @@ export async function sendMessageAction(input: SendMessageInput): Promise<Action
           conversation_id: data.conversationId,
           sender_id: user.id,
           content: data.content,
-          message_type: !data.content && data.attachments.every((file) => file.fileType.startsWith('image/')) ? 'IMAGE' : 'TEXT',
+          message_type:
+            !data.content && data.attachments.every((file) => file.fileType.startsWith('image/'))
+              ? 'IMAGE'
+              : 'TEXT',
           attachments: {
             create: data.attachments.map((file) => ({
               url: file.url,
@@ -83,10 +101,13 @@ export async function sendMessageAction(input: SendMessageInput): Promise<Action
 }
 
 /** Provider sends a quote inside a conversation: creates the quote and a quote message. */
-export async function sendChatQuoteAction(input: ChatQuoteInput): Promise<ActionResult<MessageView>> {
+export async function sendChatQuoteAction(
+  input: ChatQuoteInput
+): Promise<ActionResult<MessageView>> {
   const user = await getCurrentUser();
   if (!user) return fail(NOT_SIGNED_IN);
-  if (user.role !== 'PROVIDER' || !user.providerId) return fail('Alleen dienstverleners kunnen offertes versturen.');
+  if (user.role !== 'PROVIDER' || !user.providerId)
+    return fail('Alleen dienstverleners kunnen offertes versturen.');
   const providerId = user.providerId;
 
   const parsed = chatQuoteSchema.safeParse(input);
@@ -99,8 +120,24 @@ export async function sendChatQuoteAction(input: ChatQuoteInput): Promise<Action
     const [provider, other] = await Promise.all([
       db.serviceProvider.findUnique({ where: { id: providerId }, select: { category: true } }),
       db.conversationParticipant.findFirst({
-        where: { conversation_id: data.conversationId, user_id: { not: user.id }, conversation: { participants: { some: { user_id: user.id } } } },
-        select: { user: { select: { id: true, name: true, email: true, phone: true, role: true, status: true, deleted_at: true } } },
+        where: {
+          conversation_id: data.conversationId,
+          user_id: { not: user.id },
+          conversation: { participants: { some: { user_id: user.id } } },
+        },
+        select: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phone: true,
+              role: true,
+              status: true,
+              deleted_at: true,
+            },
+          },
+        },
       }),
     ]);
     if (!other || !provider) return fail(NO_ACCESS);
@@ -109,12 +146,19 @@ export async function sendChatQuoteAction(input: ChatQuoteInput): Promise<Action
       return fail('Je kunt alleen offertes sturen naar klanten met een actief account.');
     }
 
-    const eventDate = data.eventDate && !Number.isNaN(new Date(data.eventDate).getTime()) ? new Date(`${data.eventDate}T00:00:00.000Z`) : null;
+    const eventDate =
+      data.eventDate && !Number.isNaN(new Date(data.eventDate).getTime())
+        ? new Date(`${data.eventDate}T00:00:00.000Z`)
+        : null;
 
     const message = await db.$transaction(async (tx) => {
       // Reuse the open request between these two, or open one for this quote.
       let request = await tx.serviceRequest.findFirst({
-        where: { customer_id: customer.id, provider_id: providerId, status: { in: ['PENDING', 'QUOTED'] } },
+        where: {
+          customer_id: customer.id,
+          provider_id: providerId,
+          status: { in: ['PENDING', 'QUOTED'] },
+        },
         orderBy: { created_at: 'desc' },
         select: { id: true },
       });
@@ -172,7 +216,10 @@ export async function sendChatQuoteAction(input: ChatQuoteInput): Promise<Action
         },
         select: messageSelect,
       });
-      await tx.conversation.update({ where: { id: data.conversationId }, data: { updated_at: now } });
+      await tx.conversation.update({
+        where: { id: data.conversationId },
+        data: { updated_at: now },
+      });
       await tx.conversationParticipant.updateMany({
         where: { conversation_id: data.conversationId, user_id: user.id },
         data: { last_read_at: now },
@@ -189,7 +236,10 @@ export async function sendChatQuoteAction(input: ChatQuoteInput): Promise<Action
 }
 
 /** Older messages for "load earlier". */
-export async function loadEarlierAction(input: { conversationId: string; before: string }): Promise<ActionResult<{ messages: MessageView[]; hasMore: boolean }>> {
+export async function loadEarlierAction(input: {
+  conversationId: string;
+  before: string;
+}): Promise<ActionResult<{ messages: MessageView[]; hasMore: boolean }>> {
   const user = await getCurrentUser();
   if (!user) return fail(NOT_SIGNED_IN);
   try {

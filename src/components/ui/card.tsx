@@ -2,7 +2,12 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 
 function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('rounded-xl border border-ink-200 bg-surface shadow-xs', className)} {...props} />;
+  return (
+    <div
+      className={cn('rounded-xl border border-ink-200 bg-surface shadow-xs', className)}
+      {...props}
+    />
+  );
 }
 
 function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
@@ -22,7 +27,12 @@ function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
 }
 
 function CardFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('flex items-center gap-3 border-t border-ink-100 px-5 py-4 sm:px-6', className)} {...props} />;
+  return (
+    <div
+      className={cn('flex items-center gap-3 border-t border-ink-100 px-5 py-4 sm:px-6', className)}
+      {...props}
+    />
+  );
 }
 
 export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter };

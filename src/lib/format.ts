@@ -17,7 +17,11 @@ const dateWeekday = new Intl.DateTimeFormat(LOCALE, {
   timeZone: TIME_ZONE,
 });
 const time = new Intl.DateTimeFormat(LOCALE, { timeStyle: 'short', timeZone: TIME_ZONE });
-const monthYear = new Intl.DateTimeFormat(LOCALE, { month: 'long', year: 'numeric', timeZone: TIME_ZONE });
+const monthYear = new Intl.DateTimeFormat(LOCALE, {
+  month: 'long',
+  year: 'numeric',
+  timeZone: TIME_ZONE,
+});
 const relative = new Intl.RelativeTimeFormat(LOCALE, { numeric: 'auto' });
 const number = new Intl.NumberFormat(LOCALE);
 
@@ -60,7 +64,11 @@ export function formatChatTime(value: DateInput, now: Date = new Date()): string
   if (diffDays < 7) {
     return new Intl.DateTimeFormat(LOCALE, { weekday: 'short', timeZone: TIME_ZONE }).format(date);
   }
-  return new Intl.DateTimeFormat(LOCALE, { day: 'numeric', month: 'short', timeZone: TIME_ZONE }).format(date);
+  return new Intl.DateTimeFormat(LOCALE, {
+    day: 'numeric',
+    month: 'short',
+    timeZone: TIME_ZONE,
+  }).format(date);
 }
 
 /** yyyy-MM-dd for a calendar day, independent of the server time zone. */

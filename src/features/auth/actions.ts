@@ -57,12 +57,12 @@ export async function loginAction(input: LoginInput): Promise<ActionResult> {
 
     if (user.status === 'SUSPENDED') {
       return fail(
-        `Je account is tijdelijk geschorst. Neem contact op via ${site.contact.supportEmail} voor meer informatie of om bezwaar te maken.`,
+        `Je account is tijdelijk geschorst. Neem contact op via ${site.contact.supportEmail} voor meer informatie of om bezwaar te maken.`
       );
     }
     if (user.status === 'BANNED') {
       return fail(
-        `Je account is geblokkeerd wegens een schending van onze voorwaarden. Je kunt bezwaar maken via ${site.contact.supportEmail}.`,
+        `Je account is geblokkeerd wegens een schending van onze voorwaarden. Je kunt bezwaar maken via ${site.contact.supportEmail}.`
       );
     }
 
@@ -88,7 +88,8 @@ export async function logoutAction(): Promise<void> {
   redirect('/');
 }
 
-const EMAIL_TAKEN = 'Er bestaat al een account met dit e-mailadres. Log in of gebruik een ander adres.';
+const EMAIL_TAKEN =
+  'Er bestaat al een account met dit e-mailadres. Log in of gebruik een ander adres.';
 
 export async function registerCustomerAction(input: RegisterCustomerInput): Promise<ActionResult> {
   const parsed = registerCustomerSchema.safeParse(input);
@@ -99,7 +100,10 @@ export async function registerCustomerAction(input: RegisterCustomerInput): Prom
   if (!limit.allowed) return fail(TOO_MANY_REQUESTS);
 
   try {
-    const existing = await db.user.findUnique({ where: { email: data.email }, select: { id: true } });
+    const existing = await db.user.findUnique({
+      where: { email: data.email },
+      select: { id: true },
+    });
     if (existing) return fail(EMAIL_TAKEN, { email: EMAIL_TAKEN });
 
     const passwordHash = await bcrypt.hash(data.password, BCRYPT_ROUNDS);
@@ -143,7 +147,10 @@ export async function registerProviderAction(input: RegisterProviderInput): Prom
   if (!limit.allowed) return fail(TOO_MANY_REQUESTS);
 
   try {
-    const existing = await db.user.findUnique({ where: { email: data.email }, select: { id: true } });
+    const existing = await db.user.findUnique({
+      where: { email: data.email },
+      select: { id: true },
+    });
     if (existing) return fail(EMAIL_TAKEN, { email: EMAIL_TAKEN });
 
     const passwordHash = await bcrypt.hash(data.password, BCRYPT_ROUNDS);
@@ -178,7 +185,14 @@ export async function registerProviderAction(input: RegisterProviderInput): Prom
           ],
         },
       },
-      select: { id: true, email: true, name: true, role: true, status: true, provider: { select: { id: true } } },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        status: true,
+        provider: { select: { id: true } },
+      },
     });
 
     await createSession({

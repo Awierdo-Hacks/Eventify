@@ -12,10 +12,26 @@ export const metadata: Metadata = {
 };
 
 const VALUES = [
-  { icon: Eye, title: 'Transparant', text: 'Duidelijke profielen, eerlijke beoordelingen en offertes die je naast elkaar kunt leggen.' },
-  { icon: ShieldCheck, title: 'Betrouwbaar', text: 'We kijken elke dienstverlener na voordat een profiel zichtbaar wordt.' },
-  { icon: HeartHandshake, title: 'Persoonlijk', text: 'Je overlegt rechtstreeks met de mensen die je event gaan maken.' },
-  { icon: Sparkles, title: 'Eenvoudig', text: 'Van eerste idee tot laatste afspraak op één plek, zonder losse mailtjes.' },
+  {
+    icon: Eye,
+    title: 'Transparant',
+    text: 'Duidelijke profielen, eerlijke beoordelingen en offertes die je naast elkaar kunt leggen.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Betrouwbaar',
+    text: 'We kijken elke dienstverlener na voordat een profiel zichtbaar wordt.',
+  },
+  {
+    icon: HeartHandshake,
+    title: 'Persoonlijk',
+    text: 'Je overlegt rechtstreeks met de mensen die je event gaan maken.',
+  },
+  {
+    icon: Sparkles,
+    title: 'Eenvoudig',
+    text: 'Van eerste idee tot laatste afspraak op één plek, zonder losse mailtjes.',
+  },
 ];
 
 const CONTACT = [
@@ -32,11 +48,14 @@ export default function AboutPage() {
           <p className="text-sm font-bold uppercase tracking-wider text-brand-700">Over ons</p>
           <h1 className="mt-2 max-w-3xl text-4xl font-extrabold text-ink-950 sm:text-6xl">
             Elk feest verdient de{' '}
-            <span className="text-brand-gradient pr-1 font-serif font-normal italic tracking-normal">juiste mensen</span>
+            <span className="text-brand-gradient pr-1 font-serif font-normal italic tracking-normal">
+              juiste mensen
+            </span>
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ink-600 sm:text-xl">
-            Een event organiseren betekent vaak eindeloos zoeken, mailen en vergelijken. Eventiphy maakt dat
-            eenvoudiger: één plek waar je dienstverleners vindt, offertes vergelijkt en alles vastlegt.
+            Een event organiseren betekent vaak eindeloos zoeken, mailen en vergelijken. Eventiphy
+            maakt dat eenvoudiger: één plek waar je dienstverleners vindt, offertes vergelijkt en
+            alles vastlegt.
           </p>
         </div>
       </section>
@@ -49,18 +68,23 @@ export default function AboutPage() {
             </h2>
             <div className="mt-4 space-y-4 text-lg leading-relaxed text-ink-600">
               <p>
-                We merkten zelf hoe versnipperd het organiseren van een feest is. De fotograaf vind je via via, de
-                cateraar via een zoekmachine, en afspraken staan verspreid over mails en berichtjes.
+                We merkten zelf hoe versnipperd het organiseren van een feest is. De fotograaf vind
+                je via via, de cateraar via een zoekmachine, en afspraken staan verspreid over mails
+                en berichtjes.
               </p>
               <p>
-                Tegelijk hebben goede dienstverleners het moeilijk om gevonden te worden door de klanten die bij hen
-                passen. Eventiphy brengt beide kanten samen, vanuit Antwerpen en voor heel België.
+                Tegelijk hebben goede dienstverleners het moeilijk om gevonden te worden door de
+                klanten die bij hen passen. Eventiphy brengt beide kanten samen, vanuit Antwerpen en
+                voor heel België.
               </p>
             </div>
           </div>
           <ul className="grid gap-4 sm:grid-cols-2">
             {VALUES.map((value) => (
-              <li key={value.title} className="rounded-2xl border border-ink-200 bg-surface p-5 shadow-xs">
+              <li
+                key={value.title}
+                className="rounded-2xl border border-ink-200 bg-surface p-5 shadow-xs"
+              >
                 <span className="flex size-10 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
                   <value.icon className="size-5" aria-hidden />
                 </span>
@@ -82,14 +106,20 @@ export default function AboutPage() {
           </p>
           <ul className="mt-8 grid gap-4 sm:grid-cols-3">
             {CONTACT.map((item) => (
-              <li key={item.label} className="flex items-center gap-4 rounded-2xl bg-canvas p-4 ring-1 ring-ink-200">
+              <li
+                key={item.label}
+                className="flex items-center gap-4 rounded-2xl bg-canvas p-4 ring-1 ring-ink-200"
+              >
                 <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-ink-950 text-white">
                   <item.icon className="size-5" aria-hidden />
                 </span>
                 <div className="min-w-0">
                   <p className="text-xs font-medium text-ink-500">{item.label}</p>
                   {item.href ? (
-                    <a href={item.href} className="block truncate font-bold text-ink-950 hover:text-brand-700">
+                    <a
+                      href={item.href}
+                      className="block truncate font-bold text-ink-950 hover:text-brand-700"
+                    >
                       {item.value}
                     </a>
                   ) : (

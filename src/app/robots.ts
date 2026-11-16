@@ -8,7 +8,17 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
         allow: '/',
         // Signed-in areas and endpoints have nothing for search engines.
-        disallow: ['/dashboard', '/provider-dashboard', '/admin', '/messages', '/account', '/request-quote', '/login', '/api/', '/melden'],
+        disallow: [
+          '/dashboard',
+          '/provider-dashboard',
+          '/admin',
+          '/messages',
+          '/account',
+          '/request-quote',
+          '/login',
+          '/api/',
+          '/melden',
+        ],
       },
     ],
     sitemap: `${site.url}/sitemap.xml`,

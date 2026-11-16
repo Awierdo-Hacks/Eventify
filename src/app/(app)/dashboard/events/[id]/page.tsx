@@ -7,7 +7,11 @@ import { StatusBadge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CategoryIcon } from '@/components/ui/category-icon';
 import { ProgressBar } from '@/features/events/components/event-card';
-import { AddSlotButton, EventMenu, RemoveSlotButton } from '@/features/events/components/event-controls';
+import {
+  AddSlotButton,
+  EventMenu,
+  RemoveSlotButton,
+} from '@/features/events/components/event-controls';
 import { eventProgress, getCustomerEvent } from '@/features/events/queries';
 import { QuoteCard } from '@/features/quotes/components/quote-card';
 import { getCustomerQuotes, getLinkableSlots } from '@/features/quotes/queries';
@@ -31,7 +35,9 @@ export default async function EventDetailPage({ params }: { params: Params }) {
   if (!event) notFound();
 
   const progress = eventProgress(event.slots);
-  const unlinked = allQuotes.filter((quote) => !quote.slotId && (quote.status === 'PENDING' || quote.status === 'ACCEPTED'));
+  const unlinked = allQuotes.filter(
+    (quote) => !quote.slotId && (quote.status === 'PENDING' || quote.status === 'ACCEPTED')
+  );
   const bookedTotal = event.slots.reduce((sum, slot) => {
     const booked = slot.quotes.find((quote) => quote.id === slot.bookedQuoteId);
     return sum + (booked?.price ?? 0);
@@ -41,9 +47,17 @@ export default async function EventDetailPage({ params }: { params: Params }) {
   const thisEvent = linkableEvents.filter((item) => item.id === event.id);
 
   const facts = [
-    { icon: CalendarDays, label: 'Datum', value: event.event_date ? formatDate(event.event_date) : 'Nog niet gekozen' },
+    {
+      icon: CalendarDays,
+      label: 'Datum',
+      value: event.event_date ? formatDate(event.event_date) : 'Nog niet gekozen',
+    },
     { icon: MapPin, label: 'Plaats', value: event.location || 'Nog niet gekozen' },
-    { icon: Users, label: 'Gasten', value: event.guest_count ? String(event.guest_count) : 'Nog niet bekend' },
+    {
+      icon: Users,
+      label: 'Gasten',
+      value: event.guest_count ? String(event.guest_count) : 'Nog niet bekend',
+    },
     {
       icon: Wallet,
       label: 'Budget',
@@ -112,7 +126,10 @@ export default async function EventDetailPage({ params }: { params: Params }) {
                 const booked = slot.quotes.find((quote) => quote.id === slot.bookedQuoteId);
                 const open = slot.quotes.filter((quote) => quote.id !== slot.bookedQuoteId);
                 return (
-                  <li key={slot.id} className="rounded-xl border border-ink-200 bg-surface shadow-xs">
+                  <li
+                    key={slot.id}
+                    className="rounded-xl border border-ink-200 bg-surface shadow-xs"
+                  >
                     <div className="flex flex-wrap items-center gap-3 p-4 sm:p-5">
                       <CategoryIcon category={slot.category} />
                       <div className="min-w-0 flex-1">
@@ -163,11 +180,17 @@ export default async function EventDetailPage({ params }: { params: Params }) {
                 Offertes zonder event
               </h2>
               <p className="mb-4 mt-1 text-sm text-ink-600">
-                Deze offertes horen nog nergens bij. Koppel ze aan een onderdeel om ze hier mee te tellen.
+                Deze offertes horen nog nergens bij. Koppel ze aan een onderdeel om ze hier mee te
+                tellen.
               </p>
               <div className="space-y-3">
                 {unlinked.map((quote) => (
-                  <QuoteCard key={quote.id} quote={quote} viewer="customer" linkableEvents={thisEvent} />
+                  <QuoteCard
+                    key={quote.id}
+                    quote={quote}
+                    viewer="customer"
+                    linkableEvents={thisEvent}
+                  />
                 ))}
               </div>
             </section>
@@ -178,11 +201,15 @@ export default async function EventDetailPage({ params }: { params: Params }) {
           <div className="rounded-xl border border-ink-200 bg-surface p-5 shadow-xs">
             <h2 className="font-bold text-ink-950">Voortgang</h2>
             <div className="mt-4">
-              <ProgressBar percent={progress.percent} label={`${progress.booked} van ${progress.total} vastgelegd`} />
+              <ProgressBar
+                percent={progress.percent}
+                label={`${progress.booked} van ${progress.total} vastgelegd`}
+              />
             </div>
             {progress.withQuotes > 0 && (
               <p className="mt-3 text-sm text-ink-600">
-                Voor {progress.withQuotes} {progress.withQuotes === 1 ? 'onderdeel' : 'onderdelen'} liggen offertes klaar.
+                Voor {progress.withQuotes} {progress.withQuotes === 1 ? 'onderdeel' : 'onderdelen'}{' '}
+                liggen offertes klaar.
               </p>
             )}
           </div>
@@ -198,11 +225,17 @@ export default async function EventDetailPage({ params }: { params: Params }) {
                 <>
                   <div className="flex justify-between gap-3">
                     <dt className="text-ink-600">Budget</dt>
-                    <dd className="font-semibold tabular-nums text-ink-900">{formatPrice(budget)}</dd>
+                    <dd className="font-semibold tabular-nums text-ink-900">
+                      {formatPrice(budget)}
+                    </dd>
                   </div>
                   <div className="flex justify-between gap-3 border-t border-ink-100 pt-2">
-                    <dt className="text-ink-600">{bookedTotal > budget ? 'Boven budget' : 'Nog beschikbaar'}</dt>
-                    <dd className={`font-bold tabular-nums ${bookedTotal > budget ? 'text-danger-700' : 'text-success-700'}`}>
+                    <dt className="text-ink-600">
+                      {bookedTotal > budget ? 'Boven budget' : 'Nog beschikbaar'}
+                    </dt>
+                    <dd
+                      className={`font-bold tabular-nums ${bookedTotal > budget ? 'text-danger-700' : 'text-success-700'}`}
+                    >
                       {formatPrice(Math.abs(budget - bookedTotal))}
                     </dd>
                   </div>
@@ -217,7 +250,9 @@ export default async function EventDetailPage({ params }: { params: Params }) {
                 />
               </div>
             ) : (
-              <p className="mt-3 text-xs text-ink-500">Stel een budget in om te zien hoeveel ruimte je nog hebt.</p>
+              <p className="mt-3 text-xs text-ink-500">
+                Stel een budget in om te zien hoeveel ruimte je nog hebt.
+              </p>
             )}
           </div>
         </aside>

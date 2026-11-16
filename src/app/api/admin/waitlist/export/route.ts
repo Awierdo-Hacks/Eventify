@@ -13,11 +13,14 @@ function cell(value: string | null | undefined): string {
 /** Waitlist as CSV that opens directly in Excel (admin only). */
 export async function GET() {
   const user = await getCurrentUser();
-  if (!user || user.role !== 'ADMIN') return NextResponse.json({ error: 'Geen toegang.' }, { status: 403 });
+  if (!user || user.role !== 'ADMIN')
+    return NextResponse.json({ error: 'Geen toegang.' }, { status: 403 });
 
   const entries = await db.waitlistEntry.findMany({ orderBy: { created_at: 'desc' } });
   const rows = [
-    ['Naam', 'Type', 'E-mail', 'Telefoon', 'Diensten', 'Bericht', 'Aangemeld op'].map(cell).join(';'),
+    ['Naam', 'Type', 'E-mail', 'Telefoon', 'Diensten', 'Bericht', 'Aangemeld op']
+      .map(cell)
+      .join(';'),
     ...entries.map((entry) =>
       [
         entry.name,
@@ -29,7 +32,7 @@ export async function GET() {
         entry.created_at.toISOString().slice(0, 10),
       ]
         .map(cell)
-        .join(';'),
+        .join(';')
     ),
   ];
 

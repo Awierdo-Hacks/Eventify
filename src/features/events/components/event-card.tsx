@@ -20,7 +20,10 @@ function ProgressBar({ percent, label }: { percent: number; label: string }) {
         aria-valuemax={100}
         aria-label={label}
       >
-        <div className="bg-brand-gradient h-full rounded-full transition-[width] duration-500" style={{ width: `${percent}%` }} />
+        <div
+          className="bg-brand-gradient h-full rounded-full transition-[width] duration-500"
+          style={{ width: `${percent}%` }}
+        />
       </div>
     </div>
   );
@@ -35,7 +38,9 @@ function EventCard({ event }: { event: CustomerEvent }) {
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-wider text-brand-700">{eventTypeLabel(event.event_type)}</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-brand-700">
+            {eventTypeLabel(event.event_type)}
+          </p>
           <h3 className="mt-1 truncate text-lg font-bold text-ink-950">{event.name}</h3>
         </div>
         <StatusBadge status={event.status} map={EVENT_STATUS} />
@@ -59,10 +64,16 @@ function EventCard({ event }: { event: CustomerEvent }) {
         ) : null}
       </ul>
       <div className="mt-auto space-y-3">
-        <ProgressBar percent={progress.percent} label={`${progress.booked} van ${progress.total} vastgelegd`} />
+        <ProgressBar
+          percent={progress.percent}
+          label={`${progress.booked} van ${progress.total} vastgelegd`}
+        />
         <p className="flex items-center justify-end gap-1 text-sm font-semibold text-brand-700">
           Bekijk event
-          <ChevronRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
+          <ChevronRight
+            className="size-4 transition-transform group-hover:translate-x-0.5"
+            aria-hidden
+          />
         </p>
       </div>
     </Link>

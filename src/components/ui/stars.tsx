@@ -21,9 +21,19 @@ function Stars({ rating, size = 'sm', className }: StarsProps) {
         const fill = Math.max(0, Math.min(1, clamped - index));
         return (
           <span key={index} className={cn('relative inline-block', iconSize)}>
-            <Star className={cn('absolute inset-0 text-ink-200', iconSize)} fill="currentColor" strokeWidth={0} aria-hidden />
+            <Star
+              className={cn('absolute inset-0 text-ink-200', iconSize)}
+              fill="currentColor"
+              strokeWidth={0}
+              aria-hidden
+            />
             <span className="absolute inset-0 overflow-hidden" style={{ width: `${fill * 100}%` }}>
-              <Star className={cn('text-sun-400', iconSize)} fill="currentColor" strokeWidth={0} aria-hidden />
+              <Star
+                className={cn('text-sun-400', iconSize)}
+                fill="currentColor"
+                strokeWidth={0}
+                aria-hidden
+              />
             </span>
           </span>
         );

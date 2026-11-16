@@ -17,7 +17,8 @@ interface BrowseFiltersProps {
  * enhanced to submit as soon as a dropdown changes.
  */
 function BrowseFilters({ values, slotId }: BrowseFiltersProps) {
-  const submitOnChange = (event: React.ChangeEvent<HTMLSelectElement>) => event.currentTarget.form?.requestSubmit();
+  const submitOnChange = (event: React.ChangeEvent<HTMLSelectElement>) =>
+    event.currentTarget.form?.requestSubmit();
 
   return (
     <Form
@@ -31,20 +32,40 @@ function BrowseFilters({ values, slotId }: BrowseFiltersProps) {
         <label htmlFor="q" className="sr-only">
           Zoek op naam of trefwoord
         </label>
-        <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-ink-400" aria-hidden />
-        <Input id="q" name="q" type="search" defaultValue={values.q} placeholder="Naam of trefwoord" className="pl-10" />
+        <Search
+          className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-ink-400"
+          aria-hidden
+        />
+        <Input
+          id="q"
+          name="q"
+          type="search"
+          defaultValue={values.q}
+          placeholder="Naam of trefwoord"
+          className="pl-10"
+        />
       </div>
       <div>
         <label htmlFor="location" className="sr-only">
           Plaats of regio
         </label>
-        <Input id="location" name="location" defaultValue={values.location} placeholder="Plaats of regio" />
+        <Input
+          id="location"
+          name="location"
+          defaultValue={values.location}
+          placeholder="Plaats of regio"
+        />
       </div>
       <div>
         <label htmlFor="category" className="sr-only">
           Categorie
         </label>
-        <Select id="category" name="category" defaultValue={values.category ?? ''} onChange={submitOnChange}>
+        <Select
+          id="category"
+          name="category"
+          defaultValue={values.category ?? ''}
+          onChange={submitOnChange}
+        >
           <option value="">Alle categorieën</option>
           {CATEGORIES.map((category) => (
             <option key={category.slug} value={category.slug}>

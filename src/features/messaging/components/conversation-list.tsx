@@ -27,7 +27,6 @@ function ConversationList({ initial }: { initial: ConversationSummary[] }) {
   const [query, setQuery] = React.useState('');
   const activeId = pathname.startsWith('/messages/') ? pathname.split('/')[2] : null;
 
-
   React.useEffect(() => {
     let cancelled = false;
     const refresh = async () => {
@@ -54,19 +53,31 @@ function ConversationList({ initial }: { initial: ConversationSummary[] }) {
   const needle = query.trim().toLowerCase();
   const visible = needle
     ? conversations.filter((conversation) =>
-        [conversation.other?.name, conversation.other?.subtitle, conversation.lastMessage?.preview].some((value) => value?.toLowerCase().includes(needle)),
+        [
+          conversation.other?.name,
+          conversation.other?.subtitle,
+          conversation.lastMessage?.preview,
+        ].some((value) => value?.toLowerCase().includes(needle))
       )
     : conversations;
 
   return (
-    <div className={cn('flex min-h-0 flex-col border-ink-200 lg:w-80 lg:shrink-0 lg:border-r', activeId ? 'hidden lg:flex' : 'flex-1 lg:flex-none')}>
+    <div
+      className={cn(
+        'flex min-h-0 flex-col border-ink-200 lg:w-80 lg:shrink-0 lg:border-r',
+        activeId ? 'hidden lg:flex' : 'flex-1 lg:flex-none'
+      )}
+    >
       <div className="border-b border-ink-100 p-4">
         <h1 className="text-xl font-extrabold text-ink-950">Berichten</h1>
         <div className="relative mt-3">
           <label htmlFor="conversation-search" className="sr-only">
             Zoek in gesprekken
           </label>
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-400" aria-hidden />
+          <Search
+            className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-400"
+            aria-hidden
+          />
           <input
             id="conversation-search"
             type="search"
@@ -83,9 +94,13 @@ function ConversationList({ initial }: { initial: ConversationSummary[] }) {
           <span className="flex size-12 items-center justify-center rounded-full bg-brand-50 text-brand-600">
             <MessageSquare className="size-6" aria-hidden />
           </span>
-          <p className="mt-4 font-bold text-ink-950">{needle ? 'Niets gevonden' : 'Nog geen gesprekken'}</p>
+          <p className="mt-4 font-bold text-ink-950">
+            {needle ? 'Niets gevonden' : 'Nog geen gesprekken'}
+          </p>
           <p className="mt-1 text-sm text-ink-600">
-            {needle ? 'Probeer een andere zoekterm.' : 'Start een gesprek vanaf het profiel van een dienstverlener of vanuit een aanvraag.'}
+            {needle
+              ? 'Probeer een andere zoekterm.'
+              : 'Start een gesprek vanaf het profiel van een dienstverlener of vanuit een aanvraag.'}
           </p>
         </div>
       ) : (
@@ -98,22 +113,45 @@ function ConversationList({ initial }: { initial: ConversationSummary[] }) {
                 <Link
                   href={`/messages/${conversation.id}`}
                   aria-current={active ? 'page' : undefined}
-                  className={cn('flex items-center gap-3 rounded-lg p-3 transition-colors', active ? 'bg-brand-50' : 'hover:bg-ink-50')}
+                  className={cn(
+                    'flex items-center gap-3 rounded-lg p-3 transition-colors',
+                    active ? 'bg-brand-50' : 'hover:bg-ink-50'
+                  )}
                 >
-                  <Avatar name={conversation.other?.name} src={conversation.other?.image} size="md" className="size-11" />
+                  <Avatar
+                    name={conversation.other?.name}
+                    src={conversation.other?.image}
+                    size="md"
+                    className="size-11"
+                  />
                   <span className="min-w-0 flex-1">
                     <span className="flex items-baseline justify-between gap-2">
-                      <span className={cn('truncate text-sm text-ink-950', unread ? 'font-extrabold' : 'font-semibold')}>
+                      <span
+                        className={cn(
+                          'truncate text-sm text-ink-950',
+                          unread ? 'font-extrabold' : 'font-semibold'
+                        )}
+                      >
                         {conversation.other?.name ?? 'Gesprek'}
                       </span>
                       {conversation.lastMessage && (
-                        <span className={cn('shrink-0 text-xs', unread ? 'font-bold text-brand-700' : 'text-ink-500')}>
+                        <span
+                          className={cn(
+                            'shrink-0 text-xs',
+                            unread ? 'font-bold text-brand-700' : 'text-ink-500'
+                          )}
+                        >
                           {formatChatTime(conversation.lastMessage.createdAt)}
                         </span>
                       )}
                     </span>
                     <span className="mt-0.5 flex items-center justify-between gap-2">
-                      <span className={cn('truncate text-sm', unread ? 'font-semibold text-ink-900' : 'text-ink-600')}>
+                      <span
+                        className={cn(
+                          'truncate text-sm',
+                          unread ? 'font-semibold text-ink-900' : 'text-ink-600'
+                        )}
+                      >
                         {conversation.lastMessage
                           ? `${conversation.lastMessage.own ? 'Jij: ' : ''}${conversation.lastMessage.preview}`
                           : 'Nog geen berichten'}

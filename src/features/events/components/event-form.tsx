@@ -1,14 +1,30 @@
 'use client';
 
 import * as React from 'react';
-import { Building2, Cake, ClipboardList, Heart, Music4, Plus, X, type LucideIcon } from 'lucide-react';
+import {
+  Building2,
+  Cake,
+  ClipboardList,
+  Heart,
+  Music4,
+  Plus,
+  X,
+  type LucideIcon,
+} from 'lucide-react';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { CategoryIcon } from '@/components/ui/category-icon';
 import { Field, fieldProps } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { useAction } from '@/hooks/use-action';
-import { CATEGORIES, EVENT_TEMPLATES, EVENT_TYPES, categoryByKey, type CategoryKey, type EventTypeKey } from '@/lib/catalog';
+import {
+  CATEGORIES,
+  EVENT_TEMPLATES,
+  EVENT_TYPES,
+  categoryByKey,
+  type CategoryKey,
+  type EventTypeKey,
+} from '@/lib/catalog';
 import { cn } from '@/lib/utils';
 import { createEventAction } from '@/features/events/actions';
 
@@ -20,7 +36,9 @@ const TYPE_ICONS: Record<EventTypeKey, LucideIcon> = {
   CUSTOM: ClipboardList,
 };
 
-const ALL_KEYS = CATEGORIES.map((category) => category.key).filter((key): key is CategoryKey => key !== null);
+const ALL_KEYS = CATEGORIES.map((category) => category.key).filter(
+  (key): key is CategoryKey => key !== null
+);
 
 /** Create an event: pick a template, adjust what you need, add the details. */
 function EventForm() {
@@ -34,7 +52,9 @@ function EventForm() {
   };
 
   const toggle = (key: CategoryKey) =>
-    setSelected((current) => (current.includes(key) ? current.filter((item) => item !== key) : [...current, key]));
+    setSelected((current) =>
+      current.includes(key) ? current.filter((item) => item !== key) : [...current, key]
+    );
 
   const template = eventType ? EVENT_TEMPLATES[eventType] : null;
   const suggested = template ? template.optionalSlots.filter((key) => !selected.includes(key)) : [];
@@ -70,21 +90,33 @@ function EventForm() {
                 key={type}
                 className={cn(
                   'flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-brand-600',
-                  active ? 'border-brand-600 bg-brand-50 ring-1 ring-brand-600' : 'border-ink-200 bg-surface hover:border-ink-300',
+                  active
+                    ? 'border-brand-600 bg-brand-50 ring-1 ring-brand-600'
+                    : 'border-ink-200 bg-surface hover:border-ink-300'
                 )}
               >
-                <input type="radio" name="eventType" className="sr-only" checked={active} onChange={() => chooseType(type)} />
+                <input
+                  type="radio"
+                  name="eventType"
+                  className="sr-only"
+                  checked={active}
+                  onChange={() => chooseType(type)}
+                />
                 <span
                   className={cn(
                     'flex size-10 shrink-0 items-center justify-center rounded-lg',
-                    active ? 'bg-brand-600 text-white' : 'bg-ink-100 text-ink-600',
+                    active ? 'bg-brand-600 text-white' : 'bg-ink-100 text-ink-600'
                   )}
                 >
                   <Icon className="size-5" aria-hidden />
                 </span>
                 <span>
-                  <span className="block font-bold text-ink-950">{EVENT_TEMPLATES[type].label}</span>
-                  <span className="block text-sm text-ink-600">{EVENT_TEMPLATES[type].description}</span>
+                  <span className="block font-bold text-ink-950">
+                    {EVENT_TEMPLATES[type].label}
+                  </span>
+                  <span className="block text-sm text-ink-600">
+                    {EVENT_TEMPLATES[type].description}
+                  </span>
                 </span>
               </label>
             );
@@ -101,9 +133,14 @@ function EventForm() {
             {selected.length > 0 ? (
               <ul className="mt-4 grid gap-2 sm:grid-cols-2">
                 {selected.map((key) => (
-                  <li key={key} className="flex items-center gap-3 rounded-xl border border-ink-200 bg-surface p-3">
+                  <li
+                    key={key}
+                    className="flex items-center gap-3 rounded-xl border border-ink-200 bg-surface p-3"
+                  >
                     <CategoryIcon category={key} size="sm" />
-                    <span className="flex-1 text-sm font-semibold text-ink-950">{categoryByKey(key).label}</span>
+                    <span className="flex-1 text-sm font-semibold text-ink-950">
+                      {categoryByKey(key).label}
+                    </span>
                     <button
                       type="button"
                       onClick={() => toggle(key)}
@@ -148,32 +185,72 @@ function EventForm() {
                       ))}
                     </div>
                   </div>
-                ),
+                )
             )}
           </fieldset>
 
           <fieldset>
             <legend className="text-lg font-bold text-ink-950">3. De details</legend>
-            <p className="mt-1 text-sm text-ink-600">Alleen de naam is verplicht. De rest vul je aan wanneer je het weet.</p>
+            <p className="mt-1 text-sm text-ink-600">
+              Alleen de naam is verplicht. De rest vul je aan wanneer je het weet.
+            </p>
             <div className="mt-4 grid gap-5 sm:grid-cols-2">
-              <Field label="Naam van je event" htmlFor="name" error={fieldErrors.name} className="sm:col-span-2">
-                <Input {...fieldProps('name', fieldErrors.name)} placeholder="bv. Bruiloft Emma & Lars" required />
+              <Field
+                label="Naam van je event"
+                htmlFor="name"
+                error={fieldErrors.name}
+                className="sm:col-span-2"
+              >
+                <Input
+                  {...fieldProps('name', fieldErrors.name)}
+                  placeholder="bv. Bruiloft Emma & Lars"
+                  required
+                />
               </Field>
               <Field label="Datum" htmlFor="eventDate" optional error={fieldErrors.eventDate}>
                 <Input {...fieldProps('eventDate', fieldErrors.eventDate)} type="date" />
               </Field>
               <Field label="Plaats" htmlFor="location" optional error={fieldErrors.location}>
-                <Input {...fieldProps('location', fieldErrors.location)} placeholder="bv. Antwerpen" />
+                <Input
+                  {...fieldProps('location', fieldErrors.location)}
+                  placeholder="bv. Antwerpen"
+                />
               </Field>
-              <Field label="Aantal gasten" htmlFor="guestCount" optional error={fieldErrors.guestCount}>
-                <Input {...fieldProps('guestCount', fieldErrors.guestCount)} type="number" min={1} inputMode="numeric" placeholder="bv. 100" />
+              <Field
+                label="Aantal gasten"
+                htmlFor="guestCount"
+                optional
+                error={fieldErrors.guestCount}
+              >
+                <Input
+                  {...fieldProps('guestCount', fieldErrors.guestCount)}
+                  type="number"
+                  min={1}
+                  inputMode="numeric"
+                  placeholder="bv. 100"
+                />
               </Field>
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Budget van (€)" htmlFor="budgetMin" optional error={fieldErrors.budgetMin}>
-                  <Input {...fieldProps('budgetMin', fieldErrors.budgetMin)} type="number" min={0} inputMode="numeric" />
+                <Field
+                  label="Budget van (€)"
+                  htmlFor="budgetMin"
+                  optional
+                  error={fieldErrors.budgetMin}
+                >
+                  <Input
+                    {...fieldProps('budgetMin', fieldErrors.budgetMin)}
+                    type="number"
+                    min={0}
+                    inputMode="numeric"
+                  />
                 </Field>
                 <Field label="tot (€)" htmlFor="budgetMax" optional error={fieldErrors.budgetMax}>
-                  <Input {...fieldProps('budgetMax', fieldErrors.budgetMax)} type="number" min={0} inputMode="numeric" />
+                  <Input
+                    {...fieldProps('budgetMax', fieldErrors.budgetMax)}
+                    type="number"
+                    min={0}
+                    inputMode="numeric"
+                  />
                 </Field>
               </div>
             </div>

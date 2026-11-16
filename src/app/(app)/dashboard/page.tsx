@@ -1,6 +1,14 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, CalendarCheck, FileText, MessageSquare, PartyPopper, Plus, Search } from 'lucide-react';
+import {
+  ArrowRight,
+  CalendarCheck,
+  FileText,
+  MessageSquare,
+  PartyPopper,
+  Plus,
+  Search,
+} from 'lucide-react';
 import { PageHeader } from '@/components/layout/page-header';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -16,7 +24,11 @@ import { requireCustomer } from '@/lib/session';
 
 export const metadata: Metadata = { title: 'Overzicht' };
 
-export default async function CustomerOverviewPage({ searchParams }: { searchParams: Promise<{ welkom?: string }> }) {
+export default async function CustomerOverviewPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ welkom?: string }>;
+}) {
   const user = await requireCustomer('/dashboard');
   const now = new Date();
 
@@ -25,7 +37,12 @@ export default async function CustomerOverviewPage({ searchParams }: { searchPar
     searchParams,
     getCustomerEvents(user.id),
     db.quote.findMany({
-      where: { request: { customer_id: user.id }, accepted: false, rejected_at: null, valid_until: { gte: now } },
+      where: {
+        request: { customer_id: user.id },
+        accepted: false,
+        rejected_at: null,
+        valid_until: { gte: now },
+      },
       select: {
         id: true,
         total_price: true,
@@ -37,7 +54,11 @@ export default async function CustomerOverviewPage({ searchParams }: { searchPar
       take: 4,
     }),
     db.booking.findMany({
-      where: { customer_id: user.id, status: { in: ['PENDING', 'CONFIRMED'] }, event_date: { gte: now } },
+      where: {
+        customer_id: user.id,
+        status: { in: ['PENDING', 'CONFIRMED'] },
+        event_date: { gte: now },
+      },
       select: {
         id: true,
         event_date: true,
@@ -51,7 +72,9 @@ export default async function CustomerOverviewPage({ searchParams }: { searchPar
   ]);
 
   const firstName = user.name.split(' ')[0];
-  const activeEvents = events.filter((event) => event.status === 'PLANNING' || event.status === 'ACTIVE');
+  const activeEvents = events.filter(
+    (event) => event.status === 'PLANNING' || event.status === 'ACTIVE'
+  );
 
   return (
     <>
@@ -74,7 +97,12 @@ export default async function CustomerOverviewPage({ searchParams }: { searchPar
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Lopende events" value={activeEvents.length} icon={PartyPopper} href="/dashboard/events" />
+        <StatCard
+          label="Lopende events"
+          value={activeEvents.length}
+          icon={PartyPopper}
+          href="/dashboard/events"
+        />
         <StatCard
           label="Offertes om te bekijken"
           value={openQuotes.length}
@@ -82,8 +110,19 @@ export default async function CustomerOverviewPage({ searchParams }: { searchPar
           href="/dashboard/requests"
           highlight={openQuotes.length > 0}
         />
-        <StatCard label="Komende boekingen" value={upcomingBookings.length} icon={CalendarCheck} href="/dashboard/bookings" />
-        <StatCard label="Ongelezen berichten" value={unread} icon={MessageSquare} href="/messages" highlight={unread > 0} />
+        <StatCard
+          label="Komende boekingen"
+          value={upcomingBookings.length}
+          icon={CalendarCheck}
+          href="/dashboard/bookings"
+        />
+        <StatCard
+          label="Ongelezen berichten"
+          value={unread}
+          icon={MessageSquare}
+          href="/messages"
+          highlight={unread > 0}
+        />
       </div>
 
       <section className="mt-10" aria-labelledby="events-title">
@@ -143,13 +182,22 @@ export default async function CustomerOverviewPage({ searchParams }: { searchPar
             <ul className="divide-y divide-ink-100 rounded-xl border border-ink-200 bg-surface">
               {openQuotes.map((quote) => (
                 <li key={quote.id}>
-                  <Link href="/dashboard/requests" className="flex items-center gap-3 p-4 transition-colors hover:bg-ink-50">
+                  <Link
+                    href="/dashboard/requests"
+                    className="flex items-center gap-3 p-4 transition-colors hover:bg-ink-50"
+                  >
                     <CategoryIcon category={quote.provider.category} />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate font-semibold text-ink-950">{quote.provider.business_name}</span>
-                      <span className="block truncate text-sm text-ink-600">Geldig tot {formatDate(quote.valid_until)}</span>
+                      <span className="block truncate font-semibold text-ink-950">
+                        {quote.provider.business_name}
+                      </span>
+                      <span className="block truncate text-sm text-ink-600">
+                        Geldig tot {formatDate(quote.valid_until)}
+                      </span>
                     </span>
-                    <span className="font-bold tabular-nums text-ink-950">{formatPrice(quote.total_price)}</span>
+                    <span className="font-bold tabular-nums text-ink-950">
+                      {formatPrice(quote.total_price)}
+                    </span>
                   </Link>
                 </li>
               ))}
@@ -169,13 +217,22 @@ export default async function CustomerOverviewPage({ searchParams }: { searchPar
             <ul className="divide-y divide-ink-100 rounded-xl border border-ink-200 bg-surface">
               {upcomingBookings.map((booking) => (
                 <li key={booking.id}>
-                  <Link href="/dashboard/bookings" className="flex items-center gap-3 p-4 transition-colors hover:bg-ink-50">
+                  <Link
+                    href="/dashboard/bookings"
+                    className="flex items-center gap-3 p-4 transition-colors hover:bg-ink-50"
+                  >
                     <CategoryIcon category={booking.provider.category} />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate font-semibold text-ink-950">{booking.provider.business_name}</span>
-                      <span className="block truncate text-sm text-ink-600">{formatDate(booking.event_date)}</span>
+                      <span className="block truncate font-semibold text-ink-950">
+                        {booking.provider.business_name}
+                      </span>
+                      <span className="block truncate text-sm text-ink-600">
+                        {formatDate(booking.event_date)}
+                      </span>
                     </span>
-                    <span className="font-bold tabular-nums text-ink-950">{formatPrice(booking.final_price)}</span>
+                    <span className="font-bold tabular-nums text-ink-950">
+                      {formatPrice(booking.final_price)}
+                    </span>
                   </Link>
                 </li>
               ))}

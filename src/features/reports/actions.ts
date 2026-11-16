@@ -8,11 +8,21 @@ import { getCurrentUser } from '@/lib/session';
 import { REPORT_REASONS, REPORT_TARGETS } from '@/features/reports/config';
 
 const reportSchema = z.object({
-  targetType: z.enum(Object.keys(REPORT_TARGETS) as [string, ...string[]], { message: 'Kies wat je wilt melden.' }),
+  targetType: z.enum(Object.keys(REPORT_TARGETS) as [string, ...string[]], {
+    message: 'Kies wat je wilt melden.',
+  }),
   targetId: z.string().trim().max(200).optional(),
-  reason: z.enum(Object.keys(REPORT_REASONS) as [string, ...string[]], { message: 'Kies een reden.' }),
+  reason: z.enum(Object.keys(REPORT_REASONS) as [string, ...string[]], {
+    message: 'Kies een reden.',
+  }),
   details: z.string().trim().min(20, 'Leg kort uit wat er mis is (minstens 20 tekens).').max(3000),
-  email: z.string().trim().toLowerCase().email('Vul een geldig e-mailadres in.').max(254).or(z.literal('')),
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .email('Vul een geldig e-mailadres in.')
+    .max(254)
+    .or(z.literal('')),
   // The DSA asks for a statement of good faith.
   goodFaith: z.literal(true, { message: 'Bevestig dat je melding naar waarheid is.' }),
 });

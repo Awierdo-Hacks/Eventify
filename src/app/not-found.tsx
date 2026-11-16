@@ -4,7 +4,10 @@ import { Logo } from '@/components/ui/logo';
 
 export default function NotFound() {
   return (
-    <main id="inhoud" className="bg-hero-wash flex min-h-dvh flex-col items-center justify-center px-6 text-center">
+    <main
+      id="inhoud"
+      className="bg-hero-wash flex min-h-dvh flex-col items-center justify-center px-6 text-center"
+    >
       <Link href="/" aria-label="Eventiphy, naar de startpagina">
         <Logo />
       </Link>

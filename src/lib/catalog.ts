@@ -36,26 +36,134 @@ export interface Category {
 }
 
 export const CATEGORIES: Category[] = [
-  { key: 'VENUE', slug: 'venues', aliases: ['venue'], label: 'Locaties & zalen', singular: 'Locatie', description: 'Feestzalen, lofts en buitenlocaties' },
-  { key: 'CATERING', slug: 'catering', label: 'Catering', singular: 'Cateraar', description: 'Van walking dinner tot foodtruck' },
-  { key: 'MUSIC', slug: 'dj', aliases: ['music'], label: 'DJ & muziek', singular: 'DJ of band', description: 'Dj’s, bands en live muzikanten' },
-  { key: 'PHOTOGRAPHY', slug: 'photography', label: 'Fotografie', singular: 'Fotograaf', description: 'Reportages en portretten' },
-  { key: 'VIDEOGRAPHY', slug: 'video', aliases: ['videography'], label: 'Videografie', singular: 'Videograaf', description: 'Aftermovies en trouwfilms' },
-  { key: 'DECORATION', slug: 'decoration', label: 'Decoratie & styling', singular: 'Decorateur', description: 'Aankleding, licht en styling' },
-  { key: 'FLOWERS', slug: 'flowers', label: 'Bloemen', singular: 'Bloemist', description: 'Boeketten en bloemdecoratie' },
-  { key: 'ENTERTAINMENT', slug: 'entertainment', label: 'Entertainment', singular: 'Entertainer', description: 'Acts, goochelaars en animatie' },
-  { key: 'CAKE', slug: 'cake', label: 'Taart & patisserie', singular: 'Patissier', description: 'Bruidstaarten en sweet tables' },
-  { key: 'MC', slug: 'mc', label: 'Ceremoniemeester', singular: 'Ceremoniemeester', description: 'Presentatie en begeleiding' },
-  { key: 'TRANSPORT', slug: 'transport', label: 'Vervoer', singular: 'Vervoerder', description: 'Trouwauto’s en shuttles' },
-  { key: 'ACCOMMODATION', slug: 'accommodation', label: 'Accommodatie', singular: 'Accommodatie', description: 'Overnachting voor gasten' },
-  { key: 'SECURITY', slug: 'security', label: 'Beveiliging', singular: 'Beveiliger', description: 'Bewaking en crowd control' },
-  { key: 'SANITARY', slug: 'sanitary', label: 'Sanitair', singular: 'Sanitairverhuurder', description: 'Toiletwagens en voorzieningen' },
-  { key: null, slug: 'planning', label: 'Eventplanning', singular: 'Eventplanner', description: 'Organisatie van A tot Z' },
-  { key: 'OTHER', slug: 'other', label: 'Overig', singular: 'Dienstverlener', description: 'Al het andere voor je event' },
+  {
+    key: 'VENUE',
+    slug: 'venues',
+    aliases: ['venue'],
+    label: 'Locaties & zalen',
+    singular: 'Locatie',
+    description: 'Feestzalen, lofts en buitenlocaties',
+  },
+  {
+    key: 'CATERING',
+    slug: 'catering',
+    label: 'Catering',
+    singular: 'Cateraar',
+    description: 'Van walking dinner tot foodtruck',
+  },
+  {
+    key: 'MUSIC',
+    slug: 'dj',
+    aliases: ['music'],
+    label: 'DJ & muziek',
+    singular: 'DJ of band',
+    description: 'Dj’s, bands en live muzikanten',
+  },
+  {
+    key: 'PHOTOGRAPHY',
+    slug: 'photography',
+    label: 'Fotografie',
+    singular: 'Fotograaf',
+    description: 'Reportages en portretten',
+  },
+  {
+    key: 'VIDEOGRAPHY',
+    slug: 'video',
+    aliases: ['videography'],
+    label: 'Videografie',
+    singular: 'Videograaf',
+    description: 'Aftermovies en trouwfilms',
+  },
+  {
+    key: 'DECORATION',
+    slug: 'decoration',
+    label: 'Decoratie & styling',
+    singular: 'Decorateur',
+    description: 'Aankleding, licht en styling',
+  },
+  {
+    key: 'FLOWERS',
+    slug: 'flowers',
+    label: 'Bloemen',
+    singular: 'Bloemist',
+    description: 'Boeketten en bloemdecoratie',
+  },
+  {
+    key: 'ENTERTAINMENT',
+    slug: 'entertainment',
+    label: 'Entertainment',
+    singular: 'Entertainer',
+    description: 'Acts, goochelaars en animatie',
+  },
+  {
+    key: 'CAKE',
+    slug: 'cake',
+    label: 'Taart & patisserie',
+    singular: 'Patissier',
+    description: 'Bruidstaarten en sweet tables',
+  },
+  {
+    key: 'MC',
+    slug: 'mc',
+    label: 'Ceremoniemeester',
+    singular: 'Ceremoniemeester',
+    description: 'Presentatie en begeleiding',
+  },
+  {
+    key: 'TRANSPORT',
+    slug: 'transport',
+    label: 'Vervoer',
+    singular: 'Vervoerder',
+    description: 'Trouwauto’s en shuttles',
+  },
+  {
+    key: 'ACCOMMODATION',
+    slug: 'accommodation',
+    label: 'Accommodatie',
+    singular: 'Accommodatie',
+    description: 'Overnachting voor gasten',
+  },
+  {
+    key: 'SECURITY',
+    slug: 'security',
+    label: 'Beveiliging',
+    singular: 'Beveiliger',
+    description: 'Bewaking en crowd control',
+  },
+  {
+    key: 'SANITARY',
+    slug: 'sanitary',
+    label: 'Sanitair',
+    singular: 'Sanitairverhuurder',
+    description: 'Toiletwagens en voorzieningen',
+  },
+  {
+    key: null,
+    slug: 'planning',
+    label: 'Eventplanning',
+    singular: 'Eventplanner',
+    description: 'Organisatie van A tot Z',
+  },
+  {
+    key: 'OTHER',
+    slug: 'other',
+    label: 'Overig',
+    singular: 'Dienstverlener',
+    description: 'Al het andere voor je event',
+  },
 ];
 
 /** Categories shown first on the home page. */
-export const FEATURED_CATEGORY_SLUGS = ['venues', 'catering', 'dj', 'photography', 'decoration', 'entertainment', 'flowers', 'video'];
+export const FEATURED_CATEGORY_SLUGS = [
+  'venues',
+  'catering',
+  'dj',
+  'photography',
+  'decoration',
+  'entertainment',
+  'flowers',
+  'video',
+];
 
 const bySlug = new Map<string, Category>();
 const byKey = new Map<string, Category>();
@@ -148,7 +256,15 @@ export const EVENT_TEMPLATES: Record<EventTypeKey, EventTemplate> = {
 };
 
 /** Event types offered when requesting a quote (stored as free text in v1). */
-export const REQUEST_EVENT_TYPES = ['Bruiloft', 'Verjaardag', 'Zakelijk event', 'Festival', 'Babyshower', 'Jubileum', 'Anders'];
+export const REQUEST_EVENT_TYPES = [
+  'Bruiloft',
+  'Verjaardag',
+  'Zakelijk event',
+  'Festival',
+  'Babyshower',
+  'Jubileum',
+  'Anders',
+];
 
 export function eventTypeLabel(value: string | null | undefined): string {
   if (!value) return 'Evenement';
@@ -220,7 +336,11 @@ export const ROLE_LABELS: Record<string, string> = {
 export type QuoteStatusKey = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED';
 
 /** Quotes have no status column: it is derived from these three fields. */
-export function quoteStatus(quote: { accepted: boolean; rejected_at: Date | null; valid_until: Date }): QuoteStatusKey {
+export function quoteStatus(quote: {
+  accepted: boolean;
+  rejected_at: Date | null;
+  valid_until: Date;
+}): QuoteStatusKey {
   if (quote.accepted) return 'ACCEPTED';
   if (quote.rejected_at) return 'REJECTED';
   if (quote.valid_until.getTime() < Date.now()) return 'EXPIRED';

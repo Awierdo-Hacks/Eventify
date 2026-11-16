@@ -17,7 +17,10 @@ class QuoteError extends Error {}
  * slot — so a half-accepted quote can never exist. `bookings.request_id` is
  * unique, which also makes a double click or two tabs safe.
  */
-export async function acceptQuoteAction(input: { quoteId: string; slotId?: string | null }): Promise<ActionResult> {
+export async function acceptQuoteAction(input: {
+  quoteId: string;
+  slotId?: string | null;
+}): Promise<ActionResult> {
   const user = await getCurrentUser();
   if (!user) return fail(NOT_SIGNED_IN);
   if (user.role !== 'CUSTOMER') return fail('Alleen klanten kunnen een offerte accepteren.');
@@ -28,15 +31,23 @@ export async function acceptQuoteAction(input: { quoteId: string; slotId?: strin
         where: { id: input.quoteId },
         include: { request: true },
       });
-      if (!quote || quote.request.customer_id !== user.id) throw new QuoteError('Deze offerte bestaat niet (meer).');
+      if (!quote || quote.request.customer_id !== user.id)
+        throw new QuoteError('Deze offerte bestaat niet (meer).');
       if (quote.accepted) throw new QuoteError('Je hebt deze offerte al geaccepteerd.');
-      if (quote.rejected_at) throw new QuoteError('Deze offerte is afgewezen en kan niet meer geaccepteerd worden.');
+      if (quote.rejected_at)
+        throw new QuoteError('Deze offerte is afgewezen en kan niet meer geaccepteerd worden.');
       if (quote.valid_until.getTime() < Date.now()) {
-        throw new QuoteError('Deze offerte is verlopen. Vraag de dienstverlener om een nieuwe offerte.');
+        throw new QuoteError(
+          'Deze offerte is verlopen. Vraag de dienstverlener om een nieuwe offerte.'
+        );
       }
 
-      const existingBooking = await tx.booking.findUnique({ where: { request_id: quote.request_id }, select: { id: true } });
-      if (existingBooking) throw new QuoteError('Voor deze aanvraag is al een offerte geaccepteerd.');
+      const existingBooking = await tx.booking.findUnique({
+        where: { request_id: quote.request_id },
+        select: { id: true },
+      });
+      if (existingBooking)
+        throw new QuoteError('Voor deze aanvraag is al een offerte geaccepteerd.');
 
       const slotId = input.slotId ?? quote.event_slot_id;
       if (slotId) {
@@ -69,9 +80,15 @@ export async function acceptQuoteAction(input: { quoteId: string; slotId?: strin
           payment_status: 'UNPAID',
         },
       });
-      await tx.serviceRequest.update({ where: { id: quote.request_id }, data: { status: 'ACCEPTED' } });
+      await tx.serviceRequest.update({
+        where: { id: quote.request_id },
+        data: { status: 'ACCEPTED' },
+      });
       if (slotId) {
-        await tx.eventSlot.update({ where: { id: slotId }, data: { status: 'BOOKED', booked_quote_id: quote.id } });
+        await tx.eventSlot.update({
+          where: { id: slotId },
+          data: { status: 'BOOKED', booked_quote_id: quote.id },
+        });
       }
     });
   } catch (error) {
@@ -84,23 +101,37 @@ export async function acceptQuoteAction(input: { quoteId: string; slotId?: strin
   return ok(undefined, 'Offerte geaccepteerd. De afspraak ligt vast.');
 }
 
-export async function rejectQuoteAction(input: { quoteId: string; reason?: string }): Promise<ActionResult> {
+export async function rejectQuoteAction(input: {
+  quoteId: string;
+  reason?: string;
+}): Promise<ActionResult> {
   const user = await getCurrentUser();
   if (!user) return fail(NOT_SIGNED_IN);
 
   try {
     const quote = await db.quote.findUnique({
       where: { id: input.quoteId },
-      select: { id: true, accepted: true, rejected_at: true, event_slot_id: true, request: { select: { customer_id: true } } },
+      select: {
+        id: true,
+        accepted: true,
+        rejected_at: true,
+        event_slot_id: true,
+        request: { select: { customer_id: true } },
+      },
     });
-    if (!quote || quote.request.customer_id !== user.id) return fail('Deze offerte bestaat niet (meer).');
+    if (!quote || quote.request.customer_id !== user.id)
+      return fail('Deze offerte bestaat niet (meer).');
     if (quote.accepted) return fail('Een geaccepteerde offerte kun je niet meer afwijzen.');
     if (quote.rejected_at) return ok();
 
     await db.$transaction(async (tx) => {
       await tx.quote.update({
         where: { id: quote.id },
-        data: { rejected_at: new Date(), rejection_reason: input.reason?.trim().slice(0, 500) || null, event_slot_id: null },
+        data: {
+          rejected_at: new Date(),
+          rejection_reason: input.reason?.trim().slice(0, 500) || null,
+          event_slot_id: null,
+        },
       });
       if (quote.event_slot_id) await refreshSlotStatus(tx, quote.event_slot_id);
     });
@@ -117,15 +148,23 @@ type Tx = Parameters<Parameters<typeof db.$transaction>[0]>[0];
 
 /** After quotes are added to or removed from a slot, bring its status in line. */
 async function refreshSlotStatus(tx: Tx, slotId: string) {
-  const slot = await tx.eventSlot.findUnique({ where: { id: slotId }, select: { status: true, booked_quote_id: true } });
+  const slot = await tx.eventSlot.findUnique({
+    where: { id: slotId },
+    select: { status: true, booked_quote_id: true },
+  });
   if (!slot || slot.booked_quote_id) return;
   const remaining = await tx.quote.count({ where: { event_slot_id: slotId, rejected_at: null } });
-  const next = remaining > 0 ? 'QUOTES_RECEIVED' : slot.status === 'QUOTES_RECEIVED' ? 'EMPTY' : slot.status;
-  if (next !== slot.status) await tx.eventSlot.update({ where: { id: slotId }, data: { status: next } });
+  const next =
+    remaining > 0 ? 'QUOTES_RECEIVED' : slot.status === 'QUOTES_RECEIVED' ? 'EMPTY' : slot.status;
+  if (next !== slot.status)
+    await tx.eventSlot.update({ where: { id: slotId }, data: { status: next } });
 }
 
 /** Attach one of the customer's quotes to a slot of one of their events. */
-export async function linkQuoteAction(input: { quoteId: string; slotId: string }): Promise<ActionResult> {
+export async function linkQuoteAction(input: {
+  quoteId: string;
+  slotId: string;
+}): Promise<ActionResult> {
   const user = await getCurrentUser();
   if (!user) return fail(NOT_SIGNED_IN);
 
@@ -133,14 +172,25 @@ export async function linkQuoteAction(input: { quoteId: string; slotId: string }
     const [quote, slot] = await Promise.all([
       db.quote.findUnique({
         where: { id: input.quoteId },
-        select: { id: true, accepted: true, rejected_at: true, event_slot_id: true, request: { select: { customer_id: true } } },
+        select: {
+          id: true,
+          accepted: true,
+          rejected_at: true,
+          event_slot_id: true,
+          request: { select: { customer_id: true } },
+        },
       }),
       db.eventSlot.findUnique({
         where: { id: input.slotId },
-        select: { id: true, booked_quote_id: true, event: { select: { customer_id: true, status: true } } },
+        select: {
+          id: true,
+          booked_quote_id: true,
+          event: { select: { customer_id: true, status: true } },
+        },
       }),
     ]);
-    if (!quote || quote.request.customer_id !== user.id) return fail('Deze offerte bestaat niet (meer).');
+    if (!quote || quote.request.customer_id !== user.id)
+      return fail('Deze offerte bestaat niet (meer).');
     if (!slot || slot.event.customer_id !== user.id || slot.event.status === 'CANCELLED') {
       return fail('Dit onderdeel van je event bestaat niet (meer).');
     }
@@ -154,9 +204,15 @@ export async function linkQuoteAction(input: { quoteId: string; slotId: string }
       await tx.quote.update({ where: { id: quote.id }, data: { event_slot_id: slot.id } });
       if (quote.accepted) {
         if (previousSlotId && previousSlotId !== slot.id) {
-          await tx.eventSlot.update({ where: { id: previousSlotId }, data: { booked_quote_id: null, status: 'EMPTY' } });
+          await tx.eventSlot.update({
+            where: { id: previousSlotId },
+            data: { booked_quote_id: null, status: 'EMPTY' },
+          });
         }
-        await tx.eventSlot.update({ where: { id: slot.id }, data: { status: 'BOOKED', booked_quote_id: quote.id } });
+        await tx.eventSlot.update({
+          where: { id: slot.id },
+          data: { status: 'BOOKED', booked_quote_id: quote.id },
+        });
       } else {
         await refreshSlotStatus(tx, slot.id);
       }
@@ -178,16 +234,25 @@ export async function unlinkQuoteAction(input: { quoteId: string }): Promise<Act
   try {
     const quote = await db.quote.findUnique({
       where: { id: input.quoteId },
-      select: { id: true, accepted: true, event_slot_id: true, request: { select: { customer_id: true } } },
+      select: {
+        id: true,
+        accepted: true,
+        event_slot_id: true,
+        request: { select: { customer_id: true } },
+      },
     });
-    if (!quote || quote.request.customer_id !== user.id) return fail('Deze offerte bestaat niet (meer).');
+    if (!quote || quote.request.customer_id !== user.id)
+      return fail('Deze offerte bestaat niet (meer).');
     const slotId = quote.event_slot_id;
     if (!slotId) return ok();
 
     await db.$transaction(async (tx) => {
       await tx.quote.update({ where: { id: quote.id }, data: { event_slot_id: null } });
       if (quote.accepted) {
-        await tx.eventSlot.update({ where: { id: slotId }, data: { booked_quote_id: null, status: 'EMPTY' } });
+        await tx.eventSlot.update({
+          where: { id: slotId },
+          data: { booked_quote_id: null, status: 'EMPTY' },
+        });
       }
       await refreshSlotStatus(tx, slotId);
     });
@@ -204,7 +269,8 @@ export async function unlinkQuoteAction(input: { quoteId: string }): Promise<Act
 export async function createQuoteAction(input: CreateQuoteInput): Promise<ActionResult> {
   const user = await getCurrentUser();
   if (!user) return fail(NOT_SIGNED_IN);
-  if (user.role !== 'PROVIDER' || !user.providerId) return fail('Alleen dienstverleners kunnen offertes versturen.');
+  if (user.role !== 'PROVIDER' || !user.providerId)
+    return fail('Alleen dienstverleners kunnen offertes versturen.');
 
   const parsed = createQuoteSchema.safeParse(input);
   if (!parsed.success) return invalid(parsed.error);
@@ -216,7 +282,8 @@ export async function createQuoteAction(input: CreateQuoteInput): Promise<Action
       where: { id: data.requestId },
       select: { id: true, provider_id: true, status: true },
     });
-    if (!request || request.provider_id !== providerId) return fail('Deze aanvraag bestaat niet (meer).');
+    if (!request || request.provider_id !== providerId)
+      return fail('Deze aanvraag bestaat niet (meer).');
     if (request.status === 'ACCEPTED' || request.status === 'CANCELLED') {
       return fail('Voor deze aanvraag kun je geen offerte meer versturen.');
     }
@@ -226,7 +293,8 @@ export async function createQuoteAction(input: CreateQuoteInput): Promise<Action
         where: { request_id: request.id, provider_id: providerId },
         select: { id: true, rejected_at: true },
       });
-      if (existing && !existing.rejected_at) throw new QuoteError('Je hebt voor deze aanvraag al een offerte verstuurd.');
+      if (existing && !existing.rejected_at)
+        throw new QuoteError('Je hebt voor deze aanvraag al een offerte verstuurd.');
       // A rejected quote makes room for a new one (same behaviour as v1).
       if (existing) await tx.quote.delete({ where: { id: existing.id } });
 
@@ -257,14 +325,16 @@ export async function createQuoteAction(input: CreateQuoteInput): Promise<Action
 export async function withdrawQuoteAction(input: { quoteId: string }): Promise<ActionResult> {
   const user = await getCurrentUser();
   if (!user) return fail(NOT_SIGNED_IN);
-  if (user.role !== 'PROVIDER' || !user.providerId) return fail('Alleen dienstverleners kunnen offertes verwijderen.');
+  if (user.role !== 'PROVIDER' || !user.providerId)
+    return fail('Alleen dienstverleners kunnen offertes verwijderen.');
 
   try {
     const quote = await db.quote.findUnique({
       where: { id: input.quoteId },
       select: { id: true, provider_id: true, rejected_at: true },
     });
-    if (!quote || quote.provider_id !== user.providerId) return fail('Deze offerte bestaat niet (meer).');
+    if (!quote || quote.provider_id !== user.providerId)
+      return fail('Deze offerte bestaat niet (meer).');
     if (!quote.rejected_at) return fail('Alleen afgewezen offertes kun je verwijderen.');
     await db.quote.delete({ where: { id: quote.id } });
   } catch (error) {

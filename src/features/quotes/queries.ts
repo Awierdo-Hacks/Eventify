@@ -15,7 +15,16 @@ const quoteSelect = {
   rejection_reason: true,
   event_slot_id: true,
   created_at: true,
-  provider: { select: { id: true, user_id: true, business_name: true, category: true, location: true, images: true } },
+  provider: {
+    select: {
+      id: true,
+      user_id: true,
+      business_name: true,
+      category: true,
+      location: true,
+      images: true,
+    },
+  },
   request: {
     select: {
       id: true,
@@ -45,7 +54,14 @@ export interface QuoteView {
   createdAt: string;
   slotId: string | null;
   linkedEvent: { id: string; name: string } | null;
-  provider: { id: string; userId: string; name: string; category: string; location: string; image: string | null };
+  provider: {
+    id: string;
+    userId: string;
+    name: string;
+    category: string;
+    location: string;
+    image: string | null;
+  };
   request: {
     id: string;
     eventType: string;
@@ -69,7 +85,9 @@ export function toQuoteView(row: QuoteRow): QuoteView {
     rejectionReason: row.rejection_reason,
     createdAt: row.created_at.toISOString(),
     slotId: row.event_slot_id,
-    linkedEvent: row.event_slot ? { id: row.event_slot.event.id, name: row.event_slot.event.name } : null,
+    linkedEvent: row.event_slot
+      ? { id: row.event_slot.event.id, name: row.event_slot.event.name }
+      : null,
     provider: {
       id: row.provider.id,
       userId: row.provider.user_id,
@@ -133,7 +151,11 @@ export async function getLinkableSlots(customerId: string) {
     .map((event) => ({
       id: event.id,
       name: event.name,
-      slots: event.slots.map((slot) => ({ id: slot.id, category: slot.category as string, customName: slot.custom_name })),
+      slots: event.slots.map((slot) => ({
+        id: slot.id,
+        category: slot.category as string,
+        customName: slot.custom_name,
+      })),
     }));
 }
 

@@ -18,17 +18,26 @@ const badgeVariants = cva(
       },
     },
     defaultVariants: { tone: 'neutral' },
-  },
+  }
 );
 
-interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement>, VariantProps<typeof badgeVariants> {}
+interface BadgeProps
+  extends React.HTMLAttributes<HTMLSpanElement>, VariantProps<typeof badgeVariants> {}
 
 function Badge({ className, tone, ...props }: BadgeProps) {
   return <span className={cn(badgeVariants({ tone }), className)} {...props} />;
 }
 
 /** Badge for a status looked up in one of the catalog status maps. */
-function StatusBadge({ status, map, className }: { status: string; map: Record<string, StatusMeta>; className?: string }) {
+function StatusBadge({
+  status,
+  map,
+  className,
+}: {
+  status: string;
+  map: Record<string, StatusMeta>;
+  className?: string;
+}) {
   const meta = map[status] ?? { label: status, tone: 'neutral' as const };
   return (
     <Badge tone={meta.tone} className={className}>

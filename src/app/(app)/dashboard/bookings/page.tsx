@@ -6,7 +6,11 @@ import { Badge, StatusBadge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CategoryIcon } from '@/components/ui/category-icon';
 import { EmptyState } from '@/components/ui/empty-state';
-import { getCustomerBookings, splitByDate, type CustomerBooking } from '@/features/bookings/queries';
+import {
+  getCustomerBookings,
+  splitByDate,
+  type CustomerBooking,
+} from '@/features/bookings/queries';
 import { ChatButton } from '@/features/messaging/chat-button';
 import { ReviewButton } from '@/features/reviews/components/review-dialog';
 import { BOOKING_STATUS, eventTypeLabel } from '@/lib/catalog';
@@ -35,7 +39,9 @@ function BookingItem({ booking }: { booking: CustomerBooking }) {
           </div>
         </div>
         <div className="text-right">
-          <p className="text-xl font-extrabold tabular-nums text-ink-950">{formatPrice(booking.final_price)}</p>
+          <p className="text-xl font-extrabold tabular-nums text-ink-950">
+            {formatPrice(booking.final_price)}
+          </p>
           <StatusBadge status={booking.status} map={BOOKING_STATUS} className="mt-1" />
         </div>
       </div>
@@ -89,7 +95,10 @@ export default async function CustomerBookingsPage() {
 
   return (
     <>
-      <PageHeader title="Boekingen" description="De afspraken die je met dienstverleners hebt vastgelegd." />
+      <PageHeader
+        title="Boekingen"
+        description="De afspraken die je met dienstverleners hebt vastgelegd."
+      />
 
       {bookings.length === 0 ? (
         <EmptyState
@@ -131,9 +140,9 @@ export default async function CustomerBookingsPage() {
             </section>
           )}
           <p className="text-xs leading-relaxed text-ink-500">
-            “Vastgelegd” betekent dat jij en de dienstverlener een afspraak hebben. Betalen doe je rechtstreeks aan de
-            dienstverlener, volgens wat jullie afspraken. Wil je een afspraak wijzigen of annuleren, neem dan contact
-            op met de dienstverlener.
+            “Vastgelegd” betekent dat jij en de dienstverlener een afspraak hebben. Betalen doe je
+            rechtstreeks aan de dienstverlener, volgens wat jullie afspraken. Wil je een afspraak
+            wijzigen of annuleren, neem dan contact op met de dienstverlener.
           </p>
         </div>
       )}

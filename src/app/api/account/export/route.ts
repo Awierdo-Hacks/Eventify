@@ -8,7 +8,10 @@ export async function GET() {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: 'Niet ingelogd.' }, { status: 401 });
   if (!rateLimit(`export:${user.id}`, 5, 60 * 60_000).allowed) {
-    return NextResponse.json({ error: 'Te veel verzoeken. Probeer het later opnieuw.' }, { status: 429 });
+    return NextResponse.json(
+      { error: 'Te veel verzoeken. Probeer het later opnieuw.' },
+      { status: 429 }
+    );
   }
 
   const data = await exportAccountData(user.id);

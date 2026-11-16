@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Briefcase, PartyPopper } from 'lucide-react';
-import { CustomerRegisterForm, ProviderRegisterForm } from '@/features/auth/components/register-forms';
+import {
+  CustomerRegisterForm,
+  ProviderRegisterForm,
+} from '@/features/auth/components/register-forms';
 import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
@@ -11,11 +14,27 @@ export const metadata: Metadata = {
 };
 
 const TYPES = [
-  { key: 'customer', href: '/register', icon: PartyPopper, label: 'Ik plan een event', hint: 'Klant' },
-  { key: 'provider', href: '/register?type=provider', icon: Briefcase, label: 'Ik bied diensten aan', hint: 'Dienstverlener' },
+  {
+    key: 'customer',
+    href: '/register',
+    icon: PartyPopper,
+    label: 'Ik plan een event',
+    hint: 'Klant',
+  },
+  {
+    key: 'provider',
+    href: '/register?type=provider',
+    icon: Briefcase,
+    label: 'Ik bied diensten aan',
+    hint: 'Dienstverlener',
+  },
 ] as const;
 
-export default async function RegisterPage({ searchParams }: { searchParams: Promise<{ type?: string }> }) {
+export default async function RegisterPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ type?: string }>;
+}) {
   const { type } = await searchParams;
   const active = type === 'provider' ? 'provider' : 'customer';
 
@@ -36,10 +55,13 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
               'flex flex-col gap-2 rounded-xl border p-4 transition-colors',
               active === option.key
                 ? 'border-brand-600 bg-brand-50 ring-1 ring-brand-600'
-                : 'border-ink-200 bg-surface hover:border-ink-300',
+                : 'border-ink-200 bg-surface hover:border-ink-300'
             )}
           >
-            <option.icon className={cn('size-5', active === option.key ? 'text-brand-700' : 'text-ink-500')} aria-hidden />
+            <option.icon
+              className={cn('size-5', active === option.key ? 'text-brand-700' : 'text-ink-500')}
+              aria-hidden
+            />
             <span>
               <span className="block text-xs font-medium text-ink-500">{option.hint}</span>
               <span className="block text-sm font-bold text-ink-950">{option.label}</span>
@@ -48,7 +70,9 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
         ))}
       </nav>
 
-      <div className="mt-8">{active === 'provider' ? <ProviderRegisterForm /> : <CustomerRegisterForm />}</div>
+      <div className="mt-8">
+        {active === 'provider' ? <ProviderRegisterForm /> : <CustomerRegisterForm />}
+      </div>
 
       <p className="mt-8 text-center text-sm text-ink-600">
         Heb je al een account?{' '}

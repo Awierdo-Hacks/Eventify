@@ -11,7 +11,10 @@ const optionalDate = z
   .string()
   .optional()
   .transform((value) => (value ? value : null))
-  .refine((value) => value === null || !Number.isNaN(new Date(value).getTime()), 'Vul een geldige datum in.');
+  .refine(
+    (value) => value === null || !Number.isNaN(new Date(value).getTime()),
+    'Vul een geldige datum in.'
+  );
 
 export const eventDetailsSchema = z
   .object({
@@ -22,10 +25,14 @@ export const eventDetailsSchema = z
     budgetMin: optionalNumber(10_000_000, 'Vul een geldig bedrag in.'),
     budgetMax: optionalNumber(10_000_000, 'Vul een geldig bedrag in.'),
   })
-  .refine((data) => data.budgetMin === null || data.budgetMax === null || data.budgetMin <= data.budgetMax, {
-    path: ['budgetMax'],
-    message: 'Het maximum moet hoger zijn dan het minimum.',
-  });
+  .refine(
+    (data) =>
+      data.budgetMin === null || data.budgetMax === null || data.budgetMin <= data.budgetMax,
+    {
+      path: ['budgetMax'],
+      message: 'Het maximum moet hoger zijn dan het minimum.',
+    }
+  );
 
 const slotSchema = z.object({
   category: z.enum(CATEGORY_KEYS),
@@ -37,7 +44,7 @@ export const createEventSchema = eventDetailsSchema.and(
   z.object({
     eventType: z.enum(EVENT_TYPES, { message: 'Kies een type event.' }),
     slots: z.array(slotSchema).min(1, 'Kies minstens één onderdeel.').max(30),
-  }),
+  })
 );
 
 export const addSlotSchema = slotSchema.extend({ eventId: z.string().min(1) });

@@ -7,5 +7,8 @@ export async function GET() {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ conversations: [] }, { status: 401 });
   const conversations = await listConversations(user.id);
-  return NextResponse.json({ conversations }, { headers: { 'Cache-Control': 'private, no-store' } });
+  return NextResponse.json(
+    { conversations },
+    { headers: { 'Cache-Control': 'private, no-store' } }
+  );
 }

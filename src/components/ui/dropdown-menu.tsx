@@ -7,7 +7,12 @@ import { cn } from '@/lib/utils';
 const DropdownMenu = DropdownMenuPrimitive.Root;
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
 
-function DropdownMenuContent({ className, sideOffset = 8, align = 'end', ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
+function DropdownMenuContent({
+  className,
+  sideOffset = 8,
+  align = 'end',
+  ...props
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
   return (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
@@ -15,7 +20,7 @@ function DropdownMenuContent({ className, sideOffset = 8, align = 'end', ...prop
         align={align}
         className={cn(
           'z-50 min-w-52 origin-[var(--radix-dropdown-menu-content-transform-origin)] rounded-xl border border-ink-200 bg-surface p-1.5 shadow-lg data-[state=open]:animate-pop-in',
-          className,
+          className
         )}
         {...props}
       />
@@ -35,19 +40,42 @@ function DropdownMenuItem({ className, tone = 'default', ...props }: DropdownMen
         tone === 'danger'
           ? 'text-danger-700 data-[highlighted]:bg-danger-50'
           : 'text-ink-800 data-[highlighted]:bg-ink-100 data-[highlighted]:text-ink-950 [&_svg]:text-ink-500',
-        className,
+        className
       )}
       {...props}
     />
   );
 }
 
-function DropdownMenuLabel({ className, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Label>) {
-  return <DropdownMenuPrimitive.Label className={cn('px-2.5 py-2 text-xs text-ink-500', className)} {...props} />;
+function DropdownMenuLabel({
+  className,
+  ...props
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Label>) {
+  return (
+    <DropdownMenuPrimitive.Label
+      className={cn('px-2.5 py-2 text-xs text-ink-500', className)}
+      {...props}
+    />
+  );
 }
 
-function DropdownMenuSeparator({ className, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Separator>) {
-  return <DropdownMenuPrimitive.Separator className={cn('-mx-1.5 my-1.5 h-px bg-ink-100', className)} {...props} />;
+function DropdownMenuSeparator({
+  className,
+  ...props
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Separator>) {
+  return (
+    <DropdownMenuPrimitive.Separator
+      className={cn('-mx-1.5 my-1.5 h-px bg-ink-100', className)}
+      {...props}
+    />
+  );
 }
 
-export { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator };
+export {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+};

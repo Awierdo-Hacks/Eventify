@@ -6,7 +6,12 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { ChatButton } from '@/features/messaging/chat-button';
 import { CreateQuoteButton } from '@/features/provider-area/components/create-quote-button';
 import { getProviderRequests, type ProviderRequest } from '@/features/requests/queries';
-import { PRICE_RANGE_LABELS, eventTypeLabel, type PriceRangeKey, type StatusMeta } from '@/lib/catalog';
+import {
+  PRICE_RANGE_LABELS,
+  eventTypeLabel,
+  type PriceRangeKey,
+  type StatusMeta,
+} from '@/lib/catalog';
 import { formatDateWeekday, formatPrice, formatRelative } from '@/lib/format';
 import { requireProvider } from '@/lib/session';
 
@@ -21,24 +26,37 @@ const PROVIDER_REQUEST_STATUS: Record<string, StatusMeta> = {
   CANCELLED: { label: 'Geannuleerd', tone: 'neutral' },
 };
 
-const CONTACT_LABELS: Record<string, string> = { chat: 'via de chat', email: 'per e-mail', phone: 'telefonisch' };
+const CONTACT_LABELS: Record<string, string> = {
+  chat: 'via de chat',
+  email: 'per e-mail',
+  phone: 'telefonisch',
+};
 
 function RequestItem({ request }: { request: ProviderRequest }) {
   const activeQuote = request.quotes.find((quote) => !quote.rejected_at);
   const rejected = request.quotes.length > 0 && !activeQuote;
   const canQuote = (request.status === 'PENDING' || request.status === 'QUOTED') && !activeQuote;
-  const budget = request.budget_range ? PRICE_RANGE_LABELS[request.budget_range as PriceRangeKey] : null;
+  const budget = request.budget_range
+    ? PRICE_RANGE_LABELS[request.budget_range as PriceRangeKey]
+    : null;
 
   return (
     <li className="rounded-xl border border-ink-200 bg-surface shadow-xs">
       <div className="flex flex-wrap items-start justify-between gap-3 p-5">
         <div className="min-w-0">
           <h2 className="font-bold text-ink-950">{request.customer_name}</h2>
-          <p className="text-sm font-semibold text-brand-700">{eventTypeLabel(request.event_type)}</p>
+          <p className="text-sm font-semibold text-brand-700">
+            {eventTypeLabel(request.event_type)}
+          </p>
         </div>
         <div className="text-right">
-          <StatusBadge status={rejected && request.status !== 'ACCEPTED' ? 'REJECTED' : request.status} map={PROVIDER_REQUEST_STATUS} />
-          <p className="mt-1 text-xs text-ink-500">Ontvangen {formatRelative(request.created_at)}</p>
+          <StatusBadge
+            status={rejected && request.status !== 'ACCEPTED' ? 'REJECTED' : request.status}
+            map={PROVIDER_REQUEST_STATUS}
+          />
+          <p className="mt-1 text-xs text-ink-500">
+            Ontvangen {formatRelative(request.created_at)}
+          </p>
         </div>
       </div>
 
@@ -67,31 +85,48 @@ function RequestItem({ request }: { request: ProviderRequest }) {
         </ul>
 
         {request.description && (
-          <p className="whitespace-pre-line rounded-lg bg-ink-50 px-4 py-3 text-sm leading-relaxed text-ink-700">{request.description}</p>
+          <p className="whitespace-pre-line rounded-lg bg-ink-50 px-4 py-3 text-sm leading-relaxed text-ink-700">
+            {request.description}
+          </p>
         )}
 
         <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm">
-          <a href={`mailto:${request.customer_email}`} className="inline-flex items-center gap-1.5 font-medium text-ink-700 hover:text-brand-700">
+          <a
+            href={`mailto:${request.customer_email}`}
+            className="inline-flex items-center gap-1.5 font-medium text-ink-700 hover:text-brand-700"
+          >
             <Mail className="size-4 text-ink-400" aria-hidden />
             {request.customer_email}
           </a>
           {request.customer_phone && (
-            <a href={`tel:${request.customer_phone.replace(/\s/g, '')}`} className="inline-flex items-center gap-1.5 font-medium text-ink-700 hover:text-brand-700">
+            <a
+              href={`tel:${request.customer_phone.replace(/\s/g, '')}`}
+              className="inline-flex items-center gap-1.5 font-medium text-ink-700 hover:text-brand-700"
+            >
               <Phone className="size-4 text-ink-400" aria-hidden />
               {request.customer_phone}
             </a>
           )}
           {request.preferred_contact && CONTACT_LABELS[request.preferred_contact] && (
-            <span className="text-ink-500">Bij voorkeur {CONTACT_LABELS[request.preferred_contact]}</span>
+            <span className="text-ink-500">
+              Bij voorkeur {CONTACT_LABELS[request.preferred_contact]}
+            </span>
           )}
         </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-2 border-t border-ink-100 px-5 py-3">
-        {canQuote && <CreateQuoteButton requestId={request.id} customerName={request.customer_name} resend={rejected} />}
+        {canQuote && (
+          <CreateQuoteButton
+            requestId={request.id}
+            customerName={request.customer_name}
+            resend={rejected}
+          />
+        )}
         {activeQuote && (
           <p className="text-sm text-ink-600">
-            Je offerte: <span className="font-bold text-ink-950">{formatPrice(activeQuote.total_price)}</span>
+            Je offerte:{' '}
+            <span className="font-bold text-ink-950">{formatPrice(activeQuote.total_price)}</span>
           </p>
         )}
         <ChatButton recipientId={request.customer_id} className="ml-auto" />

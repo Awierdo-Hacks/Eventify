@@ -1,10 +1,15 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { env } from '@/lib/env';
 import { getCurrentUser } from '@/lib/session';
-import { connectGoogleCalendar, googleCalendarConfigured, verifyGoogleState } from '@/features/calendar/google';
+import {
+  connectGoogleCalendar,
+  googleCalendarConfigured,
+  verifyGoogleState,
+} from '@/features/calendar/google';
 import { syncProviderCalendars } from '@/features/calendar/sync';
 
-const agenda = (query: string) => NextResponse.redirect(`${env.appUrl}/provider-dashboard/agenda?${query}`);
+const agenda = (query: string) =>
+  NextResponse.redirect(`${env.appUrl}/provider-dashboard/agenda?${query}`);
 
 /**
  * Google redirects here after the provider grants (or refuses) access. The
@@ -20,7 +25,8 @@ export async function GET(request: NextRequest) {
   if (!user || user.role !== 'PROVIDER' || !user.providerId) {
     return NextResponse.redirect(`${env.appUrl}/login?redirect=/provider-dashboard/agenda`);
   }
-  if (searchParams.get('error') || !code || !state || !googleCalendarConfigured()) return agenda('sync=cancelled');
+  if (searchParams.get('error') || !code || !state || !googleCalendarConfigured())
+    return agenda('sync=cancelled');
 
   const providerId = await verifyGoogleState(state);
   if (!providerId || providerId !== user.providerId) return agenda('sync=error');

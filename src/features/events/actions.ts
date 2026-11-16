@@ -22,7 +22,10 @@ async function customer() {
 }
 
 async function ownEvent(eventId: string, userId: string) {
-  const event = await db.event.findUnique({ where: { id: eventId }, select: { id: true, customer_id: true, status: true } });
+  const event = await db.event.findUnique({
+    where: { id: eventId },
+    select: { id: true, customer_id: true, status: true },
+  });
   return event && event.customer_id === userId && event.status !== 'CANCELLED' ? event : null;
 }
 
@@ -66,7 +69,9 @@ export async function createEventAction(input: CreateEventInput): Promise<Action
   redirect(`/dashboard/events/${eventId}`);
 }
 
-export async function updateEventAction(input: EventDetailsInput & { eventId: string }): Promise<ActionResult> {
+export async function updateEventAction(
+  input: EventDetailsInput & { eventId: string }
+): Promise<ActionResult> {
   const user = await customer();
   if (!user) return fail(NOT_ALLOWED);
   const parsed = eventDetailsSchema.safeParse(input);
@@ -103,8 +108,14 @@ export async function cancelEventAction(input: { eventId: string }): Promise<Act
   try {
     if (!(await ownEvent(input.eventId, user.id))) return fail('Dit event bestaat niet (meer).');
     await db.$transaction([
-      db.eventSlot.updateMany({ where: { event_id: input.eventId }, data: { booked_quote_id: null } }),
-      db.quote.updateMany({ where: { event_slot: { event_id: input.eventId } }, data: { event_slot_id: null } }),
+      db.eventSlot.updateMany({
+        where: { event_id: input.eventId },
+        data: { booked_quote_id: null },
+      }),
+      db.quote.updateMany({
+        where: { event_slot: { event_id: input.eventId } },
+        data: { event_slot_id: null },
+      }),
       db.event.update({ where: { id: input.eventId }, data: { status: 'CANCELLED' } }),
     ]);
   } catch (error) {
@@ -148,7 +159,10 @@ export async function addSlotAction(input: AddSlotInput): Promise<ActionResult> 
   return ok(undefined, 'Onderdeel toegevoegd.');
 }
 
-export async function removeSlotAction(input: { eventId: string; slotId: string }): Promise<ActionResult> {
+export async function removeSlotAction(input: {
+  eventId: string;
+  slotId: string;
+}): Promise<ActionResult> {
   const user = await customer();
   if (!user) return fail(NOT_ALLOWED);
 
@@ -160,7 +174,9 @@ export async function removeSlotAction(input: { eventId: string; slotId: string 
     });
     if (!slot) return fail('Dit onderdeel bestaat niet (meer).');
     if (slot.booked_quote_id) {
-      return fail('Voor dit onderdeel ligt al een dienstverlener vast. Koppel de offerte eerst los.');
+      return fail(
+        'Voor dit onderdeel ligt al een dienstverlener vast. Koppel de offerte eerst los.'
+      );
     }
     await db.$transaction([
       db.quote.updateMany({ where: { event_slot_id: slot.id }, data: { event_slot_id: null } }),

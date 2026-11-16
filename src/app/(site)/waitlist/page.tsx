@@ -10,9 +10,21 @@ export const metadata: Metadata = {
 };
 
 const PERKS = [
-  { icon: Bell, title: 'Als eerste op de hoogte', text: 'Je hoort het meteen wanneer we nieuwe regio’s en functies openen.' },
-  { icon: Gift, title: 'Vroege toegang', text: 'Wachtlijstleden mogen nieuwe mogelijkheden eerder uitproberen.' },
-  { icon: Rocket, title: 'Denk mee', text: 'Laat weten wat jij nodig hebt; we bouwen het platform samen.' },
+  {
+    icon: Bell,
+    title: 'Als eerste op de hoogte',
+    text: 'Je hoort het meteen wanneer we nieuwe regio’s en functies openen.',
+  },
+  {
+    icon: Gift,
+    title: 'Vroege toegang',
+    text: 'Wachtlijstleden mogen nieuwe mogelijkheden eerder uitproberen.',
+  },
+  {
+    icon: Rocket,
+    title: 'Denk mee',
+    text: 'Laat weten wat jij nodig hebt; we bouwen het platform samen.',
+  },
 ];
 
 export default function WaitlistPage() {
@@ -23,7 +35,9 @@ export default function WaitlistPage() {
           <p className="text-sm font-bold uppercase tracking-wider text-brand-700">Wachtlijst</p>
           <h1 className="mt-2 text-4xl font-extrabold text-ink-950 sm:text-5xl">
             Hoor het als{' '}
-            <span className="text-brand-gradient pr-1 font-serif font-normal italic tracking-normal">eerste</span>
+            <span className="text-brand-gradient pr-1 font-serif font-normal italic tracking-normal">
+              eerste
+            </span>
           </h1>
           <p className="mt-4 max-w-lg text-lg leading-relaxed text-ink-600">
             Eventiphy groeit stap voor stap. Laat je gegevens achter en we houden je op de hoogte.

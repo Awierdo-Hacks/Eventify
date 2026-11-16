@@ -49,16 +49,23 @@ function SiteFooter() {
         <div className="space-y-5">
           <Logo inverted />
           <p className="max-w-xs text-sm leading-relaxed text-ink-300">
-            Eén plek om de juiste mensen voor je evenement te vinden, offertes te vergelijken en alles vast te leggen.
+            Eén plek om de juiste mensen voor je evenement te vinden, offertes te vergelijken en
+            alles vast te leggen.
           </p>
           <ul className="space-y-2">
             <li>
-              <a href={`mailto:${site.contact.email}`} className={`${linkClass} inline-flex items-center gap-2`}>
+              <a
+                href={`mailto:${site.contact.email}`}
+                className={`${linkClass} inline-flex items-center gap-2`}
+              >
                 <Mail className="size-4" aria-hidden /> {site.contact.email}
               </a>
             </li>
             <li>
-              <a href={site.contact.phoneHref} className={`${linkClass} inline-flex items-center gap-2`}>
+              <a
+                href={site.contact.phoneHref}
+                className={`${linkClass} inline-flex items-center gap-2`}
+              >
                 <Phone className="size-4" aria-hidden /> {site.contact.phone}
               </a>
             </li>

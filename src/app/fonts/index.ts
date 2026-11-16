@@ -14,7 +14,15 @@ export const fontSans = localFont({
   style: 'normal',
   display: 'swap',
   variable: '--font-jakarta',
-  fallback: ['ui-sans-serif', 'system-ui', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+  fallback: [
+    'ui-sans-serif',
+    'system-ui',
+    'Segoe UI',
+    'Roboto',
+    'Helvetica Neue',
+    'Arial',
+    'sans-serif',
+  ],
 });
 
 export const fontSerif = localFont({

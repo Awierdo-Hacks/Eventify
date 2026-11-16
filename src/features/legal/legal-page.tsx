@@ -29,7 +29,9 @@ function LegalPage({ title, intro, updated, version, sections, children }: Legal
       <div className="mt-10 grid gap-10 lg:grid-cols-[16rem_1fr] lg:gap-16">
         <nav aria-label="Inhoud" className="lg:sticky lg:top-24 lg:self-start">
           <details className="group rounded-xl border border-ink-200 bg-surface p-4 lg:hidden">
-            <summary className="list-none font-bold text-ink-950 [&::-webkit-details-marker]:hidden">Inhoud</summary>
+            <summary className="list-none font-bold text-ink-950 [&::-webkit-details-marker]:hidden">
+              Inhoud
+            </summary>
             <ol className="mt-3 space-y-2 text-sm">
               {sections.map((section) => (
                 <li key={section.id}>
@@ -45,7 +47,10 @@ function LegalPage({ title, intro, updated, version, sections, children }: Legal
             <ol className="mt-3 space-y-2 border-l border-ink-200 text-sm">
               {sections.map((section) => (
                 <li key={section.id}>
-                  <a href={`#${section.id}`} className="-ml-px block border-l border-transparent pl-4 text-ink-600 hover:border-brand-600 hover:text-ink-950">
+                  <a
+                    href={`#${section.id}`}
+                    className="-ml-px block border-l border-transparent pl-4 text-ink-600 hover:border-brand-600 hover:text-ink-950"
+                  >
                     {section.title}
                   </a>
                 </li>
@@ -61,7 +66,15 @@ function LegalPage({ title, intro, updated, version, sections, children }: Legal
 }
 
 /** A numbered section with an anchor. */
-function LegalSection({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
+function LegalSection({
+  id,
+  title,
+  children,
+}: {
+  id: string;
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <section aria-labelledby={id}>
       <h2 id={id}>{title}</h2>

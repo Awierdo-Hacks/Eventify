@@ -1,11 +1,35 @@
 'use client';
 
 import * as React from 'react';
-import { BadgeCheck, Ban, Eye, EyeOff, MoreHorizontal, PauseCircle, PlayCircle, ShieldOff, Trash2 } from 'lucide-react';
+import {
+  BadgeCheck,
+  Ban,
+  Eye,
+  EyeOff,
+  MoreHorizontal,
+  PauseCircle,
+  PlayCircle,
+  ShieldOff,
+  Trash2,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Field } from '@/components/ui/field';
 import { Textarea } from '@/components/ui/input';
 import { useAction } from '@/hooks/use-action';
@@ -20,7 +44,17 @@ import {
 const REASON_NOTE =
   'Laat de gebruiker per e-mail weten wat je beslist en waarom, en dat bezwaar mogelijk is. Dat is wettelijk verplicht.';
 
-export function ProviderControls({ providerId, name, verified, visible }: { providerId: string; name: string; verified: boolean; visible: boolean }) {
+export function ProviderControls({
+  providerId,
+  name,
+  verified,
+  visible,
+}: {
+  providerId: string;
+  name: string;
+  verified: boolean;
+  visible: boolean;
+}) {
   const [confirm, setConfirm] = React.useState<'unverify' | 'hide' | null>(null);
   const verify = useAction(setProviderVerifiedAction, { onSuccess: () => setConfirm(null) });
   const visibility = useAction(setProviderVisibleAction, { onSuccess: () => setConfirm(null) });
@@ -28,7 +62,11 @@ export function ProviderControls({ providerId, name, verified, visible }: { prov
   return (
     <div className="flex flex-wrap items-center gap-2">
       {!verified && (
-        <Button size="sm" loading={verify.pending} onClick={() => verify.run({ providerId, verified: true })}>
+        <Button
+          size="sm"
+          loading={verify.pending}
+          onClick={() => verify.run({ providerId, verified: true })}
+        >
           <BadgeCheck aria-hidden /> Verifiëren
         </Button>
       )}
@@ -85,7 +123,10 @@ export function ProviderControls({ providerId, name, verified, visible }: { prov
 
 type UserAction = 'suspend' | 'ban' | 'activate' | 'erase';
 
-const USER_DIALOGS: Record<UserAction, { title: (name: string) => string; description: string; confirm: string; danger: boolean }> = {
+const USER_DIALOGS: Record<
+  UserAction,
+  { title: (name: string) => string; description: string; confirm: string; danger: boolean }
+> = {
   suspend: {
     title: (name) => `${name} schorsen?`,
     description: `De gebruiker kan niet meer inloggen tot je het account weer activeert. ${REASON_NOTE}`,
@@ -113,7 +154,15 @@ const USER_DIALOGS: Record<UserAction, { title: (name: string) => string; descri
   },
 };
 
-export function UserControls({ userId, name, status }: { userId: string; name: string; status: string }) {
+export function UserControls({
+  userId,
+  name,
+  status,
+}: {
+  userId: string;
+  name: string;
+  status: string;
+}) {
   const [action, setAction] = React.useState<UserAction | null>(null);
   const moderate = useAction(moderateUserAction, { onSuccess: () => setAction(null) });
   const erase = useAction(eraseUserAction, { onSuccess: () => setAction(null) });
@@ -159,7 +208,9 @@ export function UserControls({ userId, name, status }: { userId: string; name: s
           confirmLabel={dialog.confirm}
           tone={dialog.danger ? 'danger' : 'default'}
           pending={moderate.pending || erase.pending}
-          onConfirm={() => (action === 'erase' ? erase.run({ userId }) : moderate.run({ userId, action }))}
+          onConfirm={() =>
+            action === 'erase' ? erase.run({ userId }) : moderate.run({ userId, action })
+          }
         />
       )}
     </>
@@ -181,20 +232,33 @@ export function ReportControls({ reportId }: { reportId: string }) {
           <DialogHeader>
             <DialogTitle>Melding afhandelen</DialogTitle>
             <DialogDescription>
-              Leg vast wat je besliste en waarom. Breng de melder en, als je ingrijpt, de betrokken gebruiker op de
-              hoogte van de beslissing en de reden.
+              Leg vast wat je besliste en waarom. Breng de melder en, als je ingrijpt, de betrokken
+              gebruiker op de hoogte van de beslissing en de reden.
             </DialogDescription>
           </DialogHeader>
           <DialogBody>
             <Field label="Beslissing en motivering" htmlFor="resolution">
-              <Textarea id="resolution" value={resolution} onChange={(event) => setResolution(event.target.value)} rows={4} maxLength={1000} />
+              <Textarea
+                id="resolution"
+                value={resolution}
+                onChange={(event) => setResolution(event.target.value)}
+                rows={4}
+                maxLength={1000}
+              />
             </Field>
           </DialogBody>
           <DialogFooter>
-            <Button variant="outline" loading={pending} onClick={() => run({ reportId, outcome: 'DISMISSED', resolution })}>
+            <Button
+              variant="outline"
+              loading={pending}
+              onClick={() => run({ reportId, outcome: 'DISMISSED', resolution })}
+            >
               Geen actie nodig
             </Button>
-            <Button loading={pending} onClick={() => run({ reportId, outcome: 'ACTION_TAKEN', resolution })}>
+            <Button
+              loading={pending}
+              onClick={() => run({ reportId, outcome: 'ACTION_TAKEN', resolution })}
+            >
               Actie ondernomen
             </Button>
           </DialogFooter>

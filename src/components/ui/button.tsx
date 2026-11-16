@@ -13,7 +13,8 @@ const buttonVariants = cva(
         gradient: 'bg-brand-gradient text-white shadow-sm hover:shadow-glow hover:brightness-105',
         dark: 'bg-ink-950 text-white shadow-sm hover:bg-ink-800',
         secondary: 'bg-brand-50 text-brand-800 hover:bg-brand-100',
-        outline: 'border border-ink-200 bg-surface text-ink-900 shadow-xs hover:border-ink-300 hover:bg-ink-50',
+        outline:
+          'border border-ink-200 bg-surface text-ink-900 shadow-xs hover:border-ink-300 hover:bg-ink-50',
         ghost: 'text-ink-700 hover:bg-ink-100 hover:text-ink-950',
         danger: 'bg-danger-600 text-white shadow-sm hover:bg-danger-700',
         'danger-outline': 'border border-danger-100 bg-surface text-danger-700 hover:bg-danger-50',
@@ -29,19 +30,28 @@ const buttonVariants = cva(
     },
     compoundVariants: [{ variant: 'link', className: 'h-auto px-0' }],
     defaultVariants: { variant: 'primary', size: 'md' },
-  },
+  }
 );
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   /** Render the child element (e.g. a Link) with button styling. */
   asChild?: boolean;
   /** Shows a spinner and disables the button. */
   loading?: boolean;
 }
 
-function Button({ className, variant, size, asChild, loading, disabled, children, type, ...props }: ButtonProps) {
+function Button({
+  className,
+  variant,
+  size,
+  asChild,
+  loading,
+  disabled,
+  children,
+  type,
+  ...props
+}: ButtonProps) {
   if (asChild) {
     return (
       <Slot.Root className={cn(buttonVariants({ variant, size }), className)} {...props}>

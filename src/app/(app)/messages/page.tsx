@@ -8,7 +8,9 @@ export default function MessagesIndexPage() {
         <MessageSquare className="size-7" aria-hidden />
       </span>
       <p className="mt-4 text-lg font-bold text-ink-950">Kies een gesprek</p>
-      <p className="mt-1 max-w-xs text-sm text-ink-600">Selecteer links een gesprek om de berichten te lezen.</p>
+      <p className="mt-1 max-w-xs text-sm text-ink-600">
+        Selecteer links een gesprek om de berichten te lezen.
+      </p>
     </div>
   );
 }

@@ -23,7 +23,13 @@ const dialogSizes = { sm: 'sm:max-w-md', md: 'sm:max-w-lg', lg: 'sm:max-w-2xl' }
  * Centered modal on larger screens, bottom sheet on phones — the pattern
  * people expect on mobile and easier to reach with a thumb.
  */
-function DialogContent({ className, children, size = 'md', hideClose, ...props }: DialogContentProps) {
+function DialogContent({
+  className,
+  children,
+  size = 'md',
+  hideClose,
+  ...props
+}: DialogContentProps) {
   return (
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay className={overlayClass} />
@@ -35,7 +41,7 @@ function DialogContent({ className, children, size = 'md', hideClose, ...props }
           // larger: centered
           'sm:inset-x-auto sm:bottom-auto sm:left-1/2 sm:top-1/2 sm:max-h-[88dvh] sm:rounded-2xl sm:data-[state=open]:animate-dialog-in sm:data-[state=closed]:animate-dialog-out sm:[transform:translate(-50%,-50%)]',
           dialogSizes[size],
-          className,
+          className
         )}
         {...props}
       >
@@ -54,7 +60,12 @@ function DialogContent({ className, children, size = 'md', hideClose, ...props }
 }
 
 function DialogHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('flex flex-col gap-1.5 px-5 pb-2 pr-14 pt-5 sm:px-6 sm:pt-6', className)} {...props} />;
+  return (
+    <div
+      className={cn('flex flex-col gap-1.5 px-5 pb-2 pr-14 pt-5 sm:px-6 sm:pt-6', className)}
+      {...props}
+    />
+  );
 }
 
 function DialogBody({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
@@ -66,7 +77,7 @@ function DialogFooter({ className, ...props }: React.HTMLAttributes<HTMLDivEleme
     <div
       className={cn(
         'flex flex-col-reverse gap-2 border-t border-ink-100 bg-ink-50/60 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:flex-row sm:justify-end sm:px-6',
-        className,
+        className
       )}
       {...props}
     />
@@ -74,11 +85,21 @@ function DialogFooter({ className, ...props }: React.HTMLAttributes<HTMLDivEleme
 }
 
 function DialogTitle({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Title>) {
-  return <DialogPrimitive.Title className={cn('text-lg font-bold text-ink-950', className)} {...props} />;
+  return (
+    <DialogPrimitive.Title className={cn('text-lg font-bold text-ink-950', className)} {...props} />
+  );
 }
 
-function DialogDescription({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Description>) {
-  return <DialogPrimitive.Description className={cn('text-sm leading-relaxed text-ink-600', className)} {...props} />;
+function DialogDescription({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Description>) {
+  return (
+    <DialogPrimitive.Description
+      className={cn('text-sm leading-relaxed text-ink-600', className)}
+      {...props}
+    />
+  );
 }
 
 export {

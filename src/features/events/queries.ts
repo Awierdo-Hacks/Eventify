@@ -56,7 +56,11 @@ export async function getCustomerEvent(customerId: string, eventId: string) {
           is_required: true,
           status: true,
           booked_quote_id: true,
-          quotes: { where: { rejected_at: null }, select: quoteSelect, orderBy: { created_at: 'desc' } },
+          quotes: {
+            where: { rejected_at: null },
+            select: quoteSelect,
+            orderBy: { created_at: 'desc' },
+          },
         },
         orderBy: { display_order: 'asc' },
       },

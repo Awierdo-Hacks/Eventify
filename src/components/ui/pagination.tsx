@@ -12,7 +12,9 @@ interface PaginationProps {
 
 function pageWindow(page: number, total: number): Array<number | 'gap'> {
   if (total <= 7) return Array.from({ length: total }, (_, index) => index + 1);
-  const pages = new Set([1, total, page - 1, page, page + 1].filter((value) => value >= 1 && value <= total));
+  const pages = new Set(
+    [1, total, page - 1, page, page + 1].filter((value) => value >= 1 && value <= total)
+  );
   const sorted = [...pages].sort((a, b) => a - b);
   const result: Array<number | 'gap'> = [];
   sorted.forEach((value, index) => {
@@ -29,9 +31,17 @@ const linkClass =
 function Pagination({ page, totalPages, hrefFor, className }: PaginationProps) {
   if (totalPages <= 1) return null;
   return (
-    <nav aria-label="Paginering" className={cn('flex items-center justify-center gap-1', className)}>
+    <nav
+      aria-label="Paginering"
+      className={cn('flex items-center justify-center gap-1', className)}
+    >
       {page > 1 ? (
-        <Link href={hrefFor(page - 1)} className={cn(linkClass, 'text-ink-700 hover:bg-ink-100')} aria-label="Vorige pagina" rel="prev">
+        <Link
+          href={hrefFor(page - 1)}
+          className={cn(linkClass, 'text-ink-700 hover:bg-ink-100')}
+          aria-label="Vorige pagina"
+          rel="prev"
+        >
           <ChevronLeft className="size-4" aria-hidden />
         </Link>
       ) : (
@@ -49,14 +59,22 @@ function Pagination({ page, totalPages, hrefFor, className }: PaginationProps) {
             key={entry}
             href={hrefFor(entry)}
             aria-current={entry === page ? 'page' : undefined}
-            className={cn(linkClass, entry === page ? 'bg-ink-950 text-white' : 'text-ink-700 hover:bg-ink-100')}
+            className={cn(
+              linkClass,
+              entry === page ? 'bg-ink-950 text-white' : 'text-ink-700 hover:bg-ink-100'
+            )}
           >
             {entry}
           </Link>
-        ),
+        )
       )}
       {page < totalPages ? (
-        <Link href={hrefFor(page + 1)} className={cn(linkClass, 'text-ink-700 hover:bg-ink-100')} aria-label="Volgende pagina" rel="next">
+        <Link
+          href={hrefFor(page + 1)}
+          className={cn(linkClass, 'text-ink-700 hover:bg-ink-100')}
+          aria-label="Volgende pagina"
+          rel="next"
+        >
           <ChevronRight className="size-4" aria-hidden />
         </Link>
       ) : (

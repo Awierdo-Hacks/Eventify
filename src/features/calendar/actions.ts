@@ -10,16 +10,24 @@ import { disconnectGoogleCalendar } from '@/features/calendar/google';
 import { normalizeCalendarUrl, UnsafeUrlError } from '@/features/calendar/safe-fetch';
 import { syncProviderCalendars } from '@/features/calendar/sync';
 
-const dateKeys = z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).min(1, 'Kies minstens één dag.').max(366);
+const dateKeys = z
+  .array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/))
+  .min(1, 'Kies minstens één dag.')
+  .max(366);
 
 async function provider() {
   const user = await getCurrentUser();
-  return user?.role === 'PROVIDER' && user.providerId ? { ...user, providerId: user.providerId } : null;
+  return user?.role === 'PROVIDER' && user.providerId
+    ? { ...user, providerId: user.providerId }
+    : null;
 }
 
 const NOT_ALLOWED = 'Alleen dienstverleners kunnen hun agenda beheren.';
 
-export async function blockDatesAction(input: { dates: string[]; reason?: string }): Promise<ActionResult> {
+export async function blockDatesAction(input: {
+  dates: string[];
+  reason?: string;
+}): Promise<ActionResult> {
   const user = await provider();
   if (!user) return fail(NOT_ALLOWED);
   const parsed = dateKeys.safeParse(input.dates);
@@ -30,14 +38,19 @@ export async function blockDatesAction(input: { dates: string[]; reason?: string
     const dates = parsed.data.map((key) => new Date(`${key}T00:00:00.000Z`));
     await db.$transaction([
       db.blockedDate.deleteMany({ where: { provider_id: user.providerId, date: { in: dates } } }),
-      db.blockedDate.createMany({ data: dates.map((date) => ({ provider_id: user.providerId, date, reason })) }),
+      db.blockedDate.createMany({
+        data: dates.map((date) => ({ provider_id: user.providerId, date, reason })),
+      }),
     ]);
   } catch (error) {
     console.error('[calendar] block failed', error);
     return fail(GENERIC_ERROR);
   }
   revalidateApp();
-  return ok(undefined, parsed.data.length === 1 ? 'Dag geblokkeerd.' : `${parsed.data.length} dagen geblokkeerd.`);
+  return ok(
+    undefined,
+    parsed.data.length === 1 ? 'Dag geblokkeerd.' : `${parsed.data.length} dagen geblokkeerd.`
+  );
 }
 
 export async function unblockDatesAction(input: { dates: string[] }): Promise<ActionResult> {
@@ -48,7 +61,10 @@ export async function unblockDatesAction(input: { dates: string[] }): Promise<Ac
 
   try {
     await db.blockedDate.deleteMany({
-      where: { provider_id: user.providerId, date: { in: parsed.data.map((key) => new Date(`${key}T00:00:00.000Z`)) } },
+      where: {
+        provider_id: user.providerId,
+        date: { in: parsed.data.map((key) => new Date(`${key}T00:00:00.000Z`)) },
+      },
     });
   } catch (error) {
     console.error('[calendar] unblock failed', error);
@@ -73,15 +89,28 @@ export async function connectIcalAction(input: { url: string }): Promise<ActionR
   try {
     await db.calendarIntegration.upsert({
       where: { provider_id_type: { provider_id: user.providerId, type: 'ICAL' } },
-      create: { provider_id: user.providerId, type: 'ICAL', is_active: true, ical_url: url.toString() },
-      update: { is_active: true, ical_url: url.toString(), ical_last_etag: null, sync_error: null, last_synced_at: null },
+      create: {
+        provider_id: user.providerId,
+        type: 'ICAL',
+        is_active: true,
+        ical_url: url.toString(),
+      },
+      update: {
+        is_active: true,
+        ical_url: url.toString(),
+        ical_last_etag: null,
+        sync_error: null,
+        last_synced_at: null,
+      },
     });
     const results = await syncProviderCalendars(user.providerId, { force: true });
     const result = results.find((entry) => entry.type === 'ICAL');
     revalidateApp();
     if (result && !result.ok) {
       // Do not keep a connection that never worked.
-      await db.calendarIntegration.deleteMany({ where: { provider_id: user.providerId, type: 'ICAL' } });
+      await db.calendarIntegration.deleteMany({
+        where: { provider_id: user.providerId, type: 'ICAL' },
+      });
       return fail(result.error ?? 'De kalender kon niet gelezen worden.');
     }
   } catch (error) {
@@ -91,12 +120,17 @@ export async function connectIcalAction(input: { url: string }): Promise<ActionR
   return ok(undefined, 'iCal-kalender gekoppeld.');
 }
 
-export async function disconnectCalendarAction(input: { type: 'GOOGLE' | 'ICAL' }): Promise<ActionResult> {
+export async function disconnectCalendarAction(input: {
+  type: 'GOOGLE' | 'ICAL';
+}): Promise<ActionResult> {
   const user = await provider();
   if (!user) return fail(NOT_ALLOWED);
   try {
     if (input.type === 'GOOGLE') await disconnectGoogleCalendar(user.providerId);
-    else await db.calendarIntegration.deleteMany({ where: { provider_id: user.providerId, type: 'ICAL' } });
+    else
+      await db.calendarIntegration.deleteMany({
+        where: { provider_id: user.providerId, type: 'ICAL' },
+      });
   } catch (error) {
     console.error('[calendar] disconnect failed', error);
     return fail(GENERIC_ERROR);

@@ -2,7 +2,16 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { CalendarDays, Check, Link2, Link2Off, MapPin, MessageSquare, Trash2, Users } from 'lucide-react';
+import {
+  CalendarDays,
+  Check,
+  Link2,
+  Link2Off,
+  MapPin,
+  MessageSquare,
+  Trash2,
+  Users,
+} from 'lucide-react';
 import { StatusBadge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CategoryIcon } from '@/components/ui/category-icon';
@@ -76,8 +85,17 @@ function SlotSelect({
   );
 }
 
-function QuoteCard({ quote, viewer, linkableEvents = [], compact, hideChat, className }: QuoteCardProps) {
-  const [dialog, setDialog] = React.useState<'accept' | 'reject' | 'link' | 'withdraw' | null>(null);
+function QuoteCard({
+  quote,
+  viewer,
+  linkableEvents = [],
+  compact,
+  hideChat,
+  className,
+}: QuoteCardProps) {
+  const [dialog, setDialog] = React.useState<'accept' | 'reject' | 'link' | 'withdraw' | null>(
+    null
+  );
   const [slotId, setSlotId] = React.useState('');
   const [reason, setReason] = React.useState('');
   const close = () => setDialog(null);
@@ -113,7 +131,9 @@ function QuoteCard({ quote, viewer, linkableEvents = [], compact, hideChat, clas
           </div>
         </div>
         <div className="shrink-0 text-right">
-          <p className="text-2xl font-extrabold tabular-nums text-ink-950">{formatPrice(quote.price)}</p>
+          <p className="text-2xl font-extrabold tabular-nums text-ink-950">
+            {formatPrice(quote.price)}
+          </p>
           <StatusBadge status={quote.status} map={QUOTE_STATUS} className="mt-1" />
         </div>
       </div>
@@ -121,7 +141,9 @@ function QuoteCard({ quote, viewer, linkableEvents = [], compact, hideChat, clas
       <div className="space-y-4 border-t border-ink-100 px-5 py-4">
         {!compact && (
           <ul className="flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-ink-600">
-            <li className="font-semibold text-ink-900">{eventTypeLabel(quote.request.eventType)}</li>
+            <li className="font-semibold text-ink-900">
+              {eventTypeLabel(quote.request.eventType)}
+            </li>
             <li className="flex items-center gap-1.5">
               <CalendarDays className="size-4 text-ink-400" aria-hidden />
               {formatDate(quote.request.eventDate)}
@@ -160,11 +182,16 @@ function QuoteCard({ quote, viewer, linkableEvents = [], compact, hideChat, clas
 
         <p className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-500">
           <span>Ontvangen op {formatDateShort(quote.createdAt)}</span>
-          {quote.status === 'PENDING' && <span>Geldig tot {formatDateShort(quote.validUntil)}</span>}
+          {quote.status === 'PENDING' && (
+            <span>Geldig tot {formatDateShort(quote.validUntil)}</span>
+          )}
           {quote.linkedEvent && isCustomer && (
             <span>
               Gekoppeld aan{' '}
-              <Link href={`/dashboard/events/${quote.linkedEvent.id}`} className="font-semibold text-brand-700 hover:underline">
+              <Link
+                href={`/dashboard/events/${quote.linkedEvent.id}`}
+                className="font-semibold text-brand-700 hover:underline"
+              >
                 {quote.linkedEvent.name}
               </Link>
             </span>
@@ -175,7 +202,13 @@ function QuoteCard({ quote, viewer, linkableEvents = [], compact, hideChat, clas
       <div className="flex flex-wrap items-center gap-2 border-t border-ink-100 px-5 py-3">
         {canAct && (
           <>
-            <Button size="sm" onClick={() => { setSlotId(quote.slotId ?? ''); setDialog('accept'); }}>
+            <Button
+              size="sm"
+              onClick={() => {
+                setSlotId(quote.slotId ?? '');
+                setDialog('accept');
+              }}
+            >
               Accepteren
             </Button>
             <Button size="sm" variant="outline" onClick={() => setDialog('reject')}>
@@ -184,12 +217,24 @@ function QuoteCard({ quote, viewer, linkableEvents = [], compact, hideChat, clas
           </>
         )}
         {canLink && !quote.slotId && linkableEvents.length > 0 && (
-          <Button size="sm" variant="ghost" onClick={() => { setSlotId(''); setDialog('link'); }}>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => {
+              setSlotId('');
+              setDialog('link');
+            }}
+          >
             <Link2 aria-hidden /> Koppel aan event
           </Button>
         )}
         {canLink && quote.slotId && (
-          <Button size="sm" variant="ghost" loading={unlink.pending} onClick={() => unlink.run({ quoteId: quote.id })}>
+          <Button
+            size="sm"
+            variant="ghost"
+            loading={unlink.pending}
+            onClick={() => unlink.run({ quoteId: quote.id })}
+          >
             <Link2Off aria-hidden /> Loskoppelen
           </Button>
         )}
@@ -219,8 +264,8 @@ function QuoteCard({ quote, viewer, linkableEvents = [], compact, hideChat, clas
         description={
           <>
             Je legt hiermee een afspraak vast met <strong>{quote.provider.name}</strong> voor{' '}
-            <strong>{formatPrice(quote.price)}</strong>. De overeenkomst komt rechtstreeks tussen jou en de
-            dienstverlener tot stand. Er wordt via Eventiphy niets betaald.
+            <strong>{formatPrice(quote.price)}</strong>. De overeenkomst komt rechtstreeks tussen
+            jou en de dienstverlener tot stand. Er wordt via Eventiphy niets betaald.
           </>
         }
         confirmLabel="Ja, accepteren"
@@ -240,8 +285,8 @@ function QuoteCard({ quote, viewer, linkableEvents = [], compact, hideChat, clas
           <DialogHeader>
             <DialogTitle>Offerte afwijzen</DialogTitle>
             <DialogDescription>
-              {quote.provider.name} krijgt te zien dat je de offerte hebt afgewezen. Een reden helpt hen een beter
-              voorstel te doen.
+              {quote.provider.name} krijgt te zien dat je de offerte hebt afgewezen. Een reden helpt
+              hen een beter voorstel te doen.
             </DialogDescription>
           </DialogHeader>
           <DialogBody>
@@ -260,7 +305,11 @@ function QuoteCard({ quote, viewer, linkableEvents = [], compact, hideChat, clas
             <Button variant="outline" onClick={close} disabled={reject.pending}>
               Annuleren
             </Button>
-            <Button variant="danger" loading={reject.pending} onClick={() => reject.run({ quoteId: quote.id, reason })}>
+            <Button
+              variant="danger"
+              loading={reject.pending}
+              onClick={() => reject.run({ quoteId: quote.id, reason })}
+            >
               Offerte afwijzen
             </Button>
           </DialogFooter>
@@ -272,7 +321,9 @@ function QuoteCard({ quote, viewer, linkableEvents = [], compact, hideChat, clas
         <DialogContent size="sm">
           <DialogHeader>
             <DialogTitle>Koppel aan een event</DialogTitle>
-            <DialogDescription>Kies bij welk onderdeel van je event deze offerte hoort.</DialogDescription>
+            <DialogDescription>
+              Kies bij welk onderdeel van je event deze offerte hoort.
+            </DialogDescription>
           </DialogHeader>
           <DialogBody>
             <Field label="Onderdeel" htmlFor="slot">
@@ -283,7 +334,11 @@ function QuoteCard({ quote, viewer, linkableEvents = [], compact, hideChat, clas
             <Button variant="outline" onClick={close} disabled={link.pending}>
               Annuleren
             </Button>
-            <Button disabled={!slotId} loading={link.pending} onClick={() => link.run({ quoteId: quote.id, slotId })}>
+            <Button
+              disabled={!slotId}
+              loading={link.pending}
+              onClick={() => link.run({ quoteId: quote.id, slotId })}
+            >
               Koppelen
             </Button>
           </DialogFooter>

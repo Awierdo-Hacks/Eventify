@@ -60,19 +60,30 @@ function MobileNav({ links, signedIn, dashboardHref }: MobileNavProps) {
             {signedIn ? (
               <>
                 <Button asChild size="lg" className="w-full">
-                  <Link href={dashboardHref} onClick={close}>Naar mijn dashboard</Link>
+                  <Link href={dashboardHref} onClick={close}>
+                    Naar mijn dashboard
+                  </Link>
                 </Button>
-                <Button variant="outline" size="lg" className="w-full" onClick={() => void logoutAction()}>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full"
+                  onClick={() => void logoutAction()}
+                >
                   Uitloggen
                 </Button>
               </>
             ) : (
               <>
                 <Button asChild size="lg" className="w-full">
-                  <Link href="/register" onClick={close}>Gratis account aanmaken</Link>
+                  <Link href="/register" onClick={close}>
+                    Gratis account aanmaken
+                  </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="w-full">
-                  <Link href="/login" onClick={close}>Inloggen</Link>
+                  <Link href="/login" onClick={close}>
+                    Inloggen
+                  </Link>
                 </Button>
               </>
             )}

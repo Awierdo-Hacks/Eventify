@@ -30,9 +30,13 @@ interface QuoteFormFieldsProps {
 
 /** The fields of a quote, shared by the dashboard dialog and the chat dialog. */
 function QuoteFormFields({ draft, onChange, errors }: QuoteFormFieldsProps) {
-  const set = <K extends keyof QuoteDraft>(key: K, value: QuoteDraft[K]) => onChange({ ...draft, [key]: value });
+  const set = <K extends keyof QuoteDraft>(key: K, value: QuoteDraft[K]) =>
+    onChange({ ...draft, [key]: value });
   const setService = (index: number, value: string) =>
-    set('includedServices', draft.includedServices.map((item, itemIndex) => (itemIndex === index ? value : item)));
+    set(
+      'includedServices',
+      draft.includedServices.map((item, itemIndex) => (itemIndex === index ? value : item))
+    );
 
   return (
     <div className="space-y-5">
@@ -79,7 +83,12 @@ function QuoteFormFields({ draft, onChange, errors }: QuoteFormFieldsProps) {
                   variant="ghost"
                   size="icon"
                   className="size-11 shrink-0"
-                  onClick={() => set('includedServices', draft.includedServices.filter((_, itemIndex) => itemIndex !== index))}
+                  onClick={() =>
+                    set(
+                      'includedServices',
+                      draft.includedServices.filter((_, itemIndex) => itemIndex !== index)
+                    )
+                  }
                   aria-label={`Dienst ${index + 1} verwijderen`}
                 >
                   <X aria-hidden />
@@ -94,13 +103,23 @@ function QuoteFormFields({ draft, onChange, errors }: QuoteFormFieldsProps) {
           </p>
         )}
         {draft.includedServices.length < 25 && (
-          <Button variant="link" size="sm" className="mt-2" onClick={() => set('includedServices', [...draft.includedServices, ''])}>
+          <Button
+            variant="link"
+            size="sm"
+            className="mt-2"
+            onClick={() => set('includedServices', [...draft.includedServices, ''])}
+          >
             <Plus aria-hidden /> Regel toevoegen
           </Button>
         )}
       </fieldset>
 
-      <Field label="Voorwaarden" htmlFor="quote-terms" optional hint="bv. voorschot, annulering, wat niet inbegrepen is.">
+      <Field
+        label="Voorwaarden"
+        htmlFor="quote-terms"
+        optional
+        hint="bv. voorschot, annulering, wat niet inbegrepen is."
+      >
         <Textarea
           id="quote-terms"
           value={draft.terms}
@@ -112,7 +131,12 @@ function QuoteFormFields({ draft, onChange, errors }: QuoteFormFieldsProps) {
       </Field>
 
       <Field label="Geldigheid" htmlFor="quote-valid">
-        <Select id="quote-valid" value={draft.validDays} onChange={(event) => set('validDays', event.target.value)} className="sm:w-48">
+        <Select
+          id="quote-valid"
+          value={draft.validDays}
+          onChange={(event) => set('validDays', event.target.value)}
+          className="sm:w-48"
+        >
           <option value="7">7 dagen</option>
           <option value="14">14 dagen</option>
           <option value="30">30 dagen</option>

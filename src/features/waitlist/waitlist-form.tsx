@@ -41,7 +41,9 @@ function WaitlistForm() {
   }
 
   const toggleCategory = (value: string) =>
-    setCategories((current) => (current.includes(value) ? current.filter((item) => item !== value) : [...current, value]));
+    setCategories((current) =>
+      current.includes(value) ? current.filter((item) => item !== value) : [...current, value]
+    );
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -67,7 +69,9 @@ function WaitlistForm() {
               key={option.value}
               className={cn(
                 'flex cursor-pointer flex-col rounded-xl border p-4 transition-colors',
-                type === option.value ? 'border-brand-600 bg-brand-50 ring-1 ring-brand-600' : 'border-ink-200 hover:border-ink-300',
+                type === option.value
+                  ? 'border-brand-600 bg-brand-50 ring-1 ring-brand-600'
+                  : 'border-ink-200 hover:border-ink-300'
               )}
             >
               <input
@@ -90,16 +94,28 @@ function WaitlistForm() {
           <Input {...fieldProps('name', fieldErrors.name)} autoComplete="name" required />
         </Field>
         <Field label="E-mailadres" htmlFor="email" error={fieldErrors.email}>
-          <Input {...fieldProps('email', fieldErrors.email)} type="email" autoComplete="email" required />
+          <Input
+            {...fieldProps('email', fieldErrors.email)}
+            type="email"
+            autoComplete="email"
+            required
+          />
         </Field>
       </div>
       <Field label="Telefoonnummer" htmlFor="phone" optional error={fieldErrors.phone}>
-        <Input {...fieldProps('phone', fieldErrors.phone)} type="tel" autoComplete="tel" placeholder="+32 …" />
+        <Input
+          {...fieldProps('phone', fieldErrors.phone)}
+          type="tel"
+          autoComplete="tel"
+          placeholder="+32 …"
+        />
       </Field>
 
       {type === 'PROVIDER' && (
         <fieldset>
-          <legend className="text-sm font-semibold text-ink-900">Welke diensten bied je aan?</legend>
+          <legend className="text-sm font-semibold text-ink-900">
+            Welke diensten bied je aan?
+          </legend>
           <div className="mt-2 flex flex-wrap gap-2">
             {CATEGORIES.map((category) => {
               const value = category.key ?? category.slug.toUpperCase();
@@ -109,10 +125,17 @@ function WaitlistForm() {
                   key={value}
                   className={cn(
                     'cursor-pointer rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-brand-600',
-                    selected ? 'border-brand-600 bg-brand-600 text-white' : 'border-ink-200 text-ink-700 hover:border-ink-300',
+                    selected
+                      ? 'border-brand-600 bg-brand-600 text-white'
+                      : 'border-ink-200 text-ink-700 hover:border-ink-300'
                   )}
                 >
-                  <input type="checkbox" className="sr-only" checked={selected} onChange={() => toggleCategory(value)} />
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    checked={selected}
+                    onChange={() => toggleCategory(value)}
+                  />
                   {category.label}
                 </label>
               );
@@ -127,7 +150,11 @@ function WaitlistForm() {
       )}
 
       <Field label="Bericht" htmlFor="message" optional error={fieldErrors.message}>
-        <Textarea {...fieldProps('message', fieldErrors.message)} rows={3} placeholder="Vertel gerust wat je zoekt of aanbiedt." />
+        <Textarea
+          {...fieldProps('message', fieldErrors.message)}
+          rows={3}
+          placeholder="Vertel gerust wat je zoekt of aanbiedt."
+        />
       </Field>
 
       {/* Honeypot — hidden from people and assistive technology. */}

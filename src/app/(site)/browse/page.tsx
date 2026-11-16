@@ -25,7 +25,11 @@ function readFilters(params: Record<string, string | string[] | undefined>) {
   };
 }
 
-export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}): Promise<Metadata> {
   const filters = readFilters(await searchParams);
   const category = findCategory(filters.category);
   const where = filters.location ? ` in ${filters.location}` : '';
@@ -52,7 +56,13 @@ export default async function BrowsePage({ searchParams }: { searchParams: Searc
     const params = new URLSearchParams();
     const merged = { ...filters, page: undefined as number | undefined, slot: slotId, ...changes };
     for (const [key, value] of Object.entries(merged)) {
-      if (value === undefined || value === '' || (key === 'sort' && value === 'recommended') || (key === 'page' && value === 1)) continue;
+      if (
+        value === undefined ||
+        value === '' ||
+        (key === 'sort' && value === 'recommended') ||
+        (key === 'page' && value === 1)
+      )
+        continue;
       params.set(key, String(value));
     }
     const query = params.toString();
@@ -76,7 +86,8 @@ export default async function BrowsePage({ searchParams }: { searchParams: Searc
           {category ? category.label : 'Vind de juiste dienstverleners'}
         </h1>
         <p className="mt-2 text-lg text-ink-600">
-          {category ? `${category.description}. ` : ''}Bekijk profielen en vraag vrijblijvend een offerte aan.
+          {category ? `${category.description}. ` : ''}Bekijk profielen en vraag vrijblijvend een
+          offerte aan.
         </p>
       </header>
 
@@ -133,19 +144,28 @@ export default async function BrowsePage({ searchParams }: { searchParams: Searc
         </ul>
       )}
 
-      <Pagination className="mt-10" page={filters.page} totalPages={totalPages} hrefFor={(page) => hrefWith({ page })} />
+      <Pagination
+        className="mt-10"
+        page={filters.page}
+        totalPages={totalPages}
+        hrefFor={(page) => hrefWith({ page })}
+      />
 
       {/* Ranking transparency (EU consumer rules / P2B regulation). */}
       <details className="mt-10 rounded-xl border border-ink-200 bg-surface px-5 py-4 text-sm text-ink-600">
-        <summary className="font-semibold text-ink-900">Hoe bepalen we de volgorde van de resultaten?</summary>
+        <summary className="font-semibold text-ink-900">
+          Hoe bepalen we de volgorde van de resultaten?
+        </summary>
         <div className="mt-3 space-y-2 leading-relaxed">
           <p>
-            Bij “Aanbevolen” staan dienstverleners met de hoogste gemiddelde beoordeling bovenaan. Bij een gelijke
-            score telt het aantal beoordelingen, daarna hoe recent het profiel is aangemaakt.
+            Bij “Aanbevolen” staan dienstverleners met de hoogste gemiddelde beoordeling bovenaan.
+            Bij een gelijke score telt het aantal beoordelingen, daarna hoe recent het profiel is
+            aangemaakt.
           </p>
           <p>
-            Dienstverleners kunnen niet betalen voor een hogere positie. Alleen profielen die door Eventiphy zijn
-            nagekeken worden getoond. Beoordelingen komen uitsluitend van klanten met een afgeronde boeking.
+            Dienstverleners kunnen niet betalen voor een hogere positie. Alleen profielen die door
+            Eventiphy zijn nagekeken worden getoond. Beoordelingen komen uitsluitend van klanten met
+            een afgeronde boeking.
           </p>
         </div>
       </details>

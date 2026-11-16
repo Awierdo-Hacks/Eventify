@@ -18,7 +18,7 @@ interface Options<T> {
  */
 export function useAction<Input, T>(
   action: (input: Input) => Promise<ActionResult<T>>,
-  options: Options<T> = {},
+  options: Options<T> = {}
 ) {
   const [pending, startTransition] = useTransition();
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -50,8 +50,17 @@ export function useAction<Input, T>(
         }
       });
     },
-    [action, onSuccess, successMessage, toastError],
+    [action, onSuccess, successMessage, toastError]
   );
 
-  return { run, pending, error, fieldErrors, clearErrors: () => { setError(null); setFieldErrors({}); } };
+  return {
+    run,
+    pending,
+    error,
+    fieldErrors,
+    clearErrors: () => {
+      setError(null);
+      setFieldErrors({});
+    },
+  };
 }

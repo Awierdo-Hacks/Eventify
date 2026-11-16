@@ -1,634 +1,268 @@
-# 📖 Eventiphy# 📖 Eventiphy Documentatie
+# Eventiphy 2.0
 
+A marketplace that connects people who are planning an event with the providers
+who make it happen: venues, catering, DJs, photographers and more. Customers plan
+an event, request and compare quotes, and confirm bookings; providers manage
+requests, quotes, bookings and their agenda.
 
+This branch is a ground-up rebuild of v1 (which stays on `main`). It uses the
+**same database** and offers the same functionality, with a new design, a new
+code structure, and the privacy and legal groundwork for running as a company in
+the EU.
 
-**Event Planning Platform** - Verbind organisatoren met dienstverlenersVolledige technische documentatie en product blueprint  
-
-🌐 **Live:** [eventiphy.site](https://eventiphy.site)  
-
-🌐 **Live:** [eventiphy.site](https://eventiphy.site)  🐳 **Docker Ready** | 🚀 **Render Deployment**
-
-🐳 **Docker Ready** | 🚀 **Production Deployment**
+- **Stack:** Next.js 16 (App Router, React 19), TypeScript (strict), Tailwind CSS v4,
+  Prisma 7 on PostgreSQL, zod, Radix primitives.
+- **Language of the product:** Dutch (Belgium).
+- **Progress and checklist:** [`REBUILD_PLAN.md`](./REBUILD_PLAN.md).
 
 ---
 
----
+## Getting started
 
-## 🚀 Quick Start
+Requirements: Node.js 20.19+ and PostgreSQL 16 (or Docker).
 
-## 🚀 Quick Start
-
-### Lokale Development
-
-### Prerequisites
-
-- Node.js 20+ **Optie 1: PostgreSQL via Docker (Aanbevolen)**
-
-- PostgreSQL 16```bash
-
-- npm/pnpmdocker run --name eventiphy-postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres
-
-docker exec -it eventiphy-postgres psql -U postgres -c "CREATE DATABASE eventiphy;"
-
-### Local Development```
-
-
-
-```bash**Optie 2: Lokale PostgreSQL Installatie**
-
-# 1. Install dependencies1. Download PostgreSQL van https://www.postgresql.org/download/
-
-npm install2. Installeer en start de service
-
-3. Maak een database aan: `CREATE DATABASE eventiphy;`
-
-# 2. Setup environment variables4. Update `.env` met jouw credentials
-
+```bash
 cp .env.example .env
-
-# Edit .env with your DATABASE_URL and secrets### Project Setup
+```
 
 ```bash
+docker compose up -d postgres
+```
 
-# 3. Initialize database# Installeer dependencies
+```bash
+npm install
+```
 
-npx prisma migrate devnpm install
+```bash
+npm run db:deploy
+```
 
-npx prisma db seed
+```bash
+npm run db:seed
+```
 
-# Setup database schema
-
-# 4. Start development servernpx prisma migrate dev --name init
-
+```bash
 npm run dev
-
-```# Seed database met demo data
-
-npx prisma db seed
-
-Open [http://localhost:3000](http://localhost:3000)
-
-# Start development server
-
----npm run dev
-
 ```
 
-## 🐳 Docker Development
-
-### Docker Development
-
-```bash```bash
-
-# Start with Docker Compose (includes PostgreSQL)# Met Docker Compose (incl. PostgreSQL)
-
-docker-compose updocker-compose up
-
-
-
-# Or build manually# Of bouw image handmatig
-
-docker build -t eventiphy:latest .docker build -t eventiphy:latest .
-
-docker run -p 3000:3000 eventiphy:latestdocker run -p 3000:3000 eventiphy:latest
-
-``````
-
-
-
-------
-
-
-
-## 📁 Project Structure## 🐳 Production Deployment
-
-
-
-```**Complete Docker setup voor Render + Neon PostgreSQL**
-
-eventiphy/
-
-├── app/                      # Next.js App Router📚 **Zie volledige handleiding:** [DEPLOYMENT.md](./DEPLOYMENT.md)
-
-│   ├── api/                  # API routes
-
-│   ├── (pages)/              # Application pages**Snelle deploy:**
-
-│   └── globals.css           # Global styles1. Maak Neon database aan → [console.neon.tech](https://console.neon.tech)
-
-├── components/               # React components2. Push naar GitHub
-
-│   ├── layout/               # Layout components3. Connect Render → [dashboard.render.com](https://dashboard.render.com)
-
-│   ├── providers/            # Context providers4. Deploy! 🚀
-
-│   └── ui/                   # UI components (shadcn/ui)
-
-├── lib/                      # Utilities & configs**Deployment docs:**
-
-│   ├── auth.ts               # Authentication logic- 📘 [DEPLOYMENT.md](./DEPLOYMENT.md) - Complete step-by-step guide
-
-│   ├── prisma.ts             # Prisma client- 📗 [QUICK_START.md](./QUICK_START.md) - Handige commando's
-
-│   └── utils.ts              # Helper functions- 📙 [DOCKER_SETUP_COMPLETE.md](./DOCKER_SETUP_COMPLETE.md) - Setup overzicht
-
-├── prisma/                   # Database
-
-│   ├── schema.prisma         # Database schema---
-
-│   ├── seed.ts               # Seed data
-
-│   └── migrations/           # Database migrations## �📌 Overzicht
-
-├── scripts/                  # Utility scripts- **Tech Stack**
-
-│   ├── dev/                  # Development & testing scripts- **Architectuur**
-
-│   └── utils/                # Utility scripts- **Features**
-
-├── types/                    # TypeScript definitions- **User Flows**
-
-├── docs/                     # Documentation- **PRD**
-
-│   ├── DEPLOYMENT.md         # Deployment guide
-
-│   ├── QUICK_START.md        # Quick reference---
-
-│   └── DESIGN_GUIDE.md       # Design system
-
-├── public/                   # Static assets## ⚛️ Frontend
-
-├── .env                      # Local environment variables- **React** – UI Framework voor component-based development  
-
-├── .env.production           # Production environment template- **Next.js** – Full-stack React framework met ingebouwde routing, API routes en server-side rendering  
-
-├── docker-compose.yml        # Docker Compose config- **TypeScript** – Type-safe development voor frontend en backend  
-
-├── Dockerfile                # Docker build config- **Tailwind CSS** – Utility-first CSS framework voor styling  
-
-├── next.config.ts            # Next.js configuration- **Framer Motion** – Animatie library voor smooth transitions  
-
-├── tailwind.config.ts        # Tailwind CSS config- **Shadcn/ui** – Herbruikbare UI componenten  
-
-├── tsconfig.json             # TypeScript config- **Lucide React** – Icon library  
-
-└── package.json              # Dependencies & scripts- **React Router** – Client-side routing (alleen indien nodig naast Next.js routing)  
-
-```- **React Query** – Data fetching en caching (voor client-side data management waar gewenst)  
-
-
-
-------
-
-
-
-## ⚛️ Tech Stack## 🔧 Backend
-
-- **Next.js API Routes & Server Actions** – Ingebouwde backendlaag voor business logica en API endpoints  
-
-### Frontend- **TypeScript** – End-to-end type safety  
-
-- **Next.js 16** - React framework met App Router- **PostgreSQL** – Relationele database voor consistente en schaalbare data-opslag  
-
-- **TypeScript** - Type-safe development- **Prisma** – ORM voor type-veilige database interacties en migrations  
-
-- **Tailwind CSS** - Utility-first styling- **Auth.js (NextAuth)** – Authenticatie en sessiebeheer met ondersteuning voor meerdere providers  
-
-- **Shadcn/ui** - Component library- **JWT / Secure Sessions** – Veilige authenticatie en autorisatie  
-
-- **Framer Motion** - Animations- **Bestandsopslag (S3-compatibel, bv. Cloudflare R2 / Supabase Storage)** – Image & document hosting via eigen API-routes  
-
-- **RESTful API** – API architectuur voor interne en externe integraties  
-
-### Backend
-
-- **Next.js API Routes** - Backend endpoints---
-
-- **Prisma** - ORM & database migrations
-
-- **PostgreSQL** - Relational database## 🔗 Integrations
-
-- **NextAuth.js** - Authentication- **Stripe Connect** – Betalingsverwerking (toekomstig)  
-
-- **JWT** - Secure sessions- **Email Service** – Transactionele emails  
-
-- **File Storage** – Image & document hosting  
-
-### DevOps- **LLM Integration** – AI-powered features  
-
-- **Docker** - Containerization
-
-- **GitHub Actions** - CI/CD---
-
-- **Render** - Hosting platform
-
-- **render** - PostgreSQL hosting## 🗂️ Data Model & Entities
-
-
-
----### ServiceProvider
-
-- `business_name`  
-
-## 🗄️ Database Schema- `category`  
-
-- `location`  
-
-### Core Entities- `price_range`  
-
-- **User** - Customers, Providers, Admins- `images`  
-
-- **ServiceProvider** - Business profiles- `verified`  
-
-- **ServiceRequest** - Event booking requests
-
-- **Quote** - Price offers from providers### ServiceRequest
-
-- **Booking** - Confirmed reservations- `customer_email`  
-
-- **Review** - Customer feedback- `provider_id`  
-
-- **Message** - Communication between parties- `event_type`  
-
-- `event_date`  
-
----- `guest_count`  
-
-- `budget`  
-
-## 🔐 Authentication & Authorization
-
-### Quote
-
-### User Roles- `request_id`  
-
-- **Customer** - Browse & book services- `provider_id`  
-
-- **Provider** - Offer services & manage bookings- `amount`  
-
-- **Admin** - Platform management- `description`  
-
-- `valid_until`  
-
-### Features
-
-- Secure password hashing (bcrypt)### Booking
-
-- JWT-based sessions- `quote_id`  
-
-- Role-based access control (RBAC)- `customer_email`  
-
-- Protected API routes- `provider_id`  
-
-- `amount`  
-
----- `payment_status`  
-
-
-
-## 📦 Available Scripts### Review
-
-- `provider_id`  
-
-```bash- `customer_email`  
-
-# Development- `rating`  
-
-npm run dev          # Start dev server (localhost:3000)- `title`  
-
-- `comment`  
-
-# Building
-
-npm run build        # Build for production### Message
-
-npm start            # Start production server- `request_id`  
-
-- `from_email`  
-
-# Database- `to_email`  
-
-npx prisma studio    # Open Prisma Studio (DB GUI)- `message`  
-
-npx prisma migrate dev    # Create & apply migration
-
-npx prisma db seed   # Seed database with demo data### User
-
-- `email`  
-
-# Code Quality- `full_name`  
-
-npm run lint         # Run ESLint- `role`  
-
-- `user_type`  
-
-# Utilities (see scripts/ folder)
-
-.\scripts\utils\generate-secret.ps1    # Generate NEXTAUTH_SECRET---
-
-```
-
-## 👥 User Flows
+Open http://localhost:3000. Demo accounts (password `password123`):
+
+| Role     | E-mail                               |
+| -------- | ------------------------------------ |
+| Admin    | `admin@eventiphy.nl`                 |
+| Customer | `sarah.jansen@example.com`           |
+| Provider | `info@culinairecreatiesamsterdam.nl` |
+
+> **The seed wipes every table.** It refuses to run unless `DATABASE_URL` points
+> at a local database. Never work against the production database from a
+> development machine; use a local one.
+
+### Scripts
+
+| Command                       | What it does                                         |
+| ----------------------------- | ---------------------------------------------------- |
+| `npm run dev`                 | Development server                                   |
+| `npm run build` / `npm start` | Production build and server                          |
+| `npm run typecheck`           | TypeScript, no emit                                  |
+| `npm run lint`                | ESLint                                               |
+| `npm run db:deploy`           | Apply pending migrations                             |
+| `npm run db:migrate`          | Create a migration during development                |
+| `npm run db:seed`             | Load demo data (local databases only)                |
+| `node tests/e2e-smoke.cjs`    | Browser test of the main flows (see the file header) |
 
 ---
 
-### Klant Flow
-
-## 🚀 Deployment1. Browse dienstverleners op categorie/locatie  
-
-2. Bekijk provider profielen en reviews  
-
-### Production Deployment (Render + Neon)3. Vraag offerte aan met event details  
-
-4. Ontvang en vergelijk offertes  
-
-See detailed guide: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)5. Accepteer offerte → Boeking  
-
-6. Event vindt plaats  
-
-**Quick Steps:**7. Schrijf review  
-
-1. Create Neon PostgreSQL database
-
-2. Push code to GitHub### Provider Flow
-
-3. Connect Render to repository1. Registreer als dienstverlener  
-
-4. Configure environment variables2. Maak bedrijfsprofiel aan  
-
-5. Deploy!3. Wacht op admin verificatie  
-
-4. Ontvang aanvragen  
-
-### Environment Variables5. Verstuur gepersonaliseerde offertes  
-
-6. Beheer boekingen  
-
-Required environment variables:7. Ontvang betaling & reviews  
-
-
-
-```env### Admin Flow
-
-# Database1. Monitor platform statistieken  
-
-DATABASE_URL=postgresql://user:password@host:5432/dbname2. Verifieer nieuwe providers  
-
-3. Beheer gebruikers en content  
-
-# Auth4. Modereer reviews  
-
-NEXTAUTH_URL=https://yourdomain.com5. Los geschillen op  
-
-NEXTAUTH_SECRET=your-secret-key-here6. Analyseer platform groei  
-
-
-
-# App---
-
-NODE_ENV=production
-
-```## 🚀 Features
-
-- User authenticatie (customer, provider, admin)  
-
----- Provider zoeken en filteren  
-
-- Gedetailleerde provider profielen  
-
-## 🎯 Features- Offerte aanvraag systeem  
-
-- Quote management  
-
-### For Customers- Booking systeem  
-
-- ✅ Browse service providers by category- Review & rating systeem  
-
-- ✅ View detailed profiles & portfolios- Dashboards voor klanten & providers  
-
-- ✅ Request custom quotes- Admin panel voor moderatie  
-
-- ✅ Compare offers- Realtime chat tussen klant en provider  
-
-- ✅ Book services- Email notificaties  
-
-- ✅ Write reviews- Stripe betalingsintegratie  
-
-- Kalender synchronisatie  
-
-### For Providers- Geavanceerde zoekfilters  
-
-- ✅ Create business profile- Favorieten systeem  
-
-- ✅ Receive booking requests- Portfolio galerij uitbreidingen  
-
-- ✅ Send personalized quotes- AI-powered matching algoritme  
-
-- ✅ Manage bookings- Meertalige ondersteuning (EN/NL)  
-
-- ✅ Build reputation via reviews- Mobile app (React Native)  
-
-- Premium provider subscripties  
-
-### For Admins- Analytics dashboard  
-
-- ✅ User management- Rapportage tools  
-
-- ✅ Provider verification- API voor third-party integraties  
-
-- ✅ Platform statistics
-
-- ✅ Content moderation---
-
-
-
----## 📖 Project Overzicht
-
-
-
-## 📚 Documentation### Wat is Eventiphy?
-
-Eventiphy is een digitaal platform dat het organiseren van evenementen vereenvoudigt door gebruikers te verbinden met dienstverleners zoals cateraars, DJ's, decorateurs, fotografen en locaties. Gebruikers kunnen hun evenement plannen, leveranciers vergelijken, offertes aanvragen, en direct boeken — allemaal binnen één omgeving.
-
-- [Deployment Guide](docs/DEPLOYMENT.md) - Complete deployment walkthrough
-
-- [Quick Start](docs/QUICK_START.md) - Handy commands & troubleshooting### Voor Klanten
-
-- [Design Guide](docs/DESIGN_GUIDE.md) - UI/UX guidelines- Vind binnen 5 minuten de perfecte dienstverleners voor jouw event  
-
-
-
----### Voor Providers
-
-- Bereik nieuwe klanten en beheer boekingen efficiënt  
-
-## 🛠️ Development Guidelines
-
-### Veilig & Betrouwbaar
-
-### Code Style- Geverifieerde professionals en transparante prijzen  
-
-- Use TypeScript for all files
-
-- Follow ESLint & Prettier configurations---
-
-- Use functional components with hooks
-
-- Keep components small and focused## 🛠️ Kernfunctionaliteit
-
-- Geavanceerde zoek- en filteropties  
-
-### Git Workflow- Provider profielen met portfolio's  
-
-- Create feature branches from `main`- Offerte aanvraag systeem  
-
-- Write descriptive commit messages- Quote & booking management  
-
-- Test before pushing- Review & rating systeem  
-
-- Create pull requests for review- Role-based dashboards  
-
-- Admin moderatie tools  
-
-### Testing- Responsive design  
-
-- Test locally before deployment
-
-- Verify Docker build works---
-
-- Check database migrations
-
-- Test on multiple devices## 📊 Project Status
-
-- **MVP Fase 1** – ✓ Voltooid  
-
----  Alle kernfunctionaliteit is geïmplementeerd en klaar voor gebruik  
-
-- **Fase 2 - Optimalisatie** – Gepland  
-
-## 🔧 Troubleshooting- **Fase 3 - Groei Features** – Gepland  
-
-
-
-### Common Issues---
-
-
-
-**Database Connection Issues**## ❓ Waarom Deze Stack?
-
-```bash
-
-# Check DATABASE_URL format### Modern & Schaalbaar
-
-echo $env:DATABASE_URLNext.js met TypeScript en React zorgt voor een snelle, betrouwbare en schaalbare full-stack architectuur. Door frontend en backend in één framework te combineren, blijft de codebase compact en onderhoudbaar. PostgreSQL in combinatie met Prisma biedt een stabiele, futureproof basis voor relationele data zoals boekingen, offertes en reviews.
-
-
-
-# Test connection### Developer Experience
-
-npx prisma db pushTailwind CSS en Shadcn/ui maken het mogelijk om snel mooie, consistente UI's te bouwen. TypeScript end-to-end en Prisma zorgen voor sterke type safety en minder bugs. De integratie met Next.js API Routes en Auth.js geeft een duidelijke structuur voor authenticatie en business logica.
+## How the code is organised
 
 ```
-
-### Performance & SEO
-
-**Build Failures**Server-side rendering en statische generatie via Next.js verbeteren performance en SEO voor de marketplace. Optimalisaties zoals caching, lazy loading en code splitting zijn first-class ondersteund.
-
-```bash
-
-# Clear Next.js cache---
-
-Remove-Item -Recurse -Force .next
-
-## 🏗️ Systeem Architectuur – 3-Tier
-
-# Reinstall dependencies
-
-Remove-Item -Recurse -Force node_modules1. **Presentation Layer (Frontend)**  
-
-npm install   Next.js/React applicatie met Tailwind CSS en Shadcn/ui voor UI. Client communiceert met eigen Next.js API routes en server actions.  
-
+src/
+  app/                    Routes only. Pages are thin: read, render, done.
+    (site)/               Public pages: home, browse, profiles, legal
+    (auth)/               Login and registration
+    (app)/                Signed-in areas: dashboard, provider-dashboard, admin,
+                          messages, account, request-quote
+    api/                  The few HTTP endpoints (polling, exports, OAuth, health)
+  components/ui/          Design-system primitives (Button, Field, Dialog, …)
+  components/layout/      Site header/footer and the signed-in app shell
+  features/<domain>/      One folder per domain:
+                            queries.ts   reading data (server only)
+                            actions.ts   changing data (server actions)
+                            schemas.ts   zod validation shared by form and server
+                            components/  UI specific to the domain
+  lib/                    db, session, env, storage, rate limit, formatting, catalog
+  config/site.ts          Brand and company details — the one place to edit them
+  proxy.ts                Fast route protection from the session cookie
+prisma/                   Schema and migrations (shared with v1)
+tests/                    End-to-end smoke test
 ```
 
-2. **Business Logic Layer (Backend)**  
+Rules of thumb that keep it maintainable:
 
-**Docker Issues**   Next.js API Routes en server actions handelen authenticatie, autorisatie, data validatie en business rules (offertes, boekingen, reviews, provider-verificatie).  
+- **Data is read on the server.** Pages call `queries.ts` functions directly and
+  in parallel; there are no client-side fetch waterfalls. Client components exist
+  only where something is interactive.
+- **Every change goes through a server action** that (1) checks who is asking,
+  (2) validates input with zod, (3) does the work, in a transaction where several
+  rows must agree, and (4) returns the same `ActionResult` shape. Forms use the
+  `useAction` hook for pending state, field errors and toasts.
+- **Authorisation is checked where the data is touched**, never only in the UI.
+  `requireUser()` / `requireRole()` guard pages; actions re-check ownership.
+- **Vocabulary lives in one file** (`lib/catalog.ts`): categories, statuses,
+  labels. v1 stored provider categories in several spellings; `findCategory()`
+  resolves all of them.
 
-```bash
+### Why it is fast
 
-# Rebuild image3. **Data Layer (Database)**  
+| v1                                                                               | v2                                                                                |
+| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Page loads JS, then asks for the session, then fires 3–4 API calls, then renders | The server reads the cookie, runs the queries in parallel and sends finished HTML |
+| One dashboard page loads every tab's data                                        | One route per section; each loads only its own data                               |
+| Chat holds a server connection open per user and polls the database inside it    | A small request every few seconds, only while the tab is visible                  |
+| Animation library on most pages                                                  | CSS only                                                                          |
+| Fonts and images unoptimised                                                     | Self-hosted fonts, responsive images                                              |
 
-docker-compose down   PostgreSQL database voor gestructureerde en consistente opslag van gebruikers, providers, aanvragen, offertes, boekingen en reviews. Prisma verzorgt type-veilige queries en migrations. Bestanden (images/documenten) worden opgeslagen via S3-compatibele storage.  
-
-docker-compose build --no-cache
-
-docker-compose up---
-
-```
-
-## 🔒 Security Features
-
----- JWT-based authenticatie of secure sessions via Auth.js  
-
-- Role-based access control (RBAC)  
-
-## 📞 Support- HTTPS/TLS encryptie  
-
-- Input validatie & sanitization  
-
-- 📧 Email: support@eventiphy.site- CORS policy (indien nodig voor externe integraties)  
-
-- 📖 Docs: [docs/](docs/)- Rate limiting  
-
-- 🐛 Issues: [GitHub Issues](https://github.com/Awierdo-Hacks/Eventiphy/issues)- XSS & CSRF protectie  
-
-- Secure password hashing  
+Public data (search results, profiles, category counts) is cached on the server
+and refreshed the moment a profile changes. Measured locally on a production
+build: pages answer in 30–60 ms and moving between dashboard sections takes
+30–75 ms. Real-world numbers depend mostly on the distance between the app and
+the database — **host them in the same region.**
 
 ---
 
+## Database
+
+The Prisma schema and all v1 migrations are unchanged. v2 adds one migration,
+`v2_privacy_and_indexes`, which is **additive and idempotent**:
+
+- `users.deleted_at` — marks an erased account
+- `legal_acceptances` — who accepted which version of which document, and when
+- `consent_records` — proof of cookie choices (no IP address)
+- `content_reports` — the queue behind "Inhoud melden"
+- a handful of indexes
+
+It also repairs drift: v1 created `waitlist_entries` and
+`service_providers.btw_number` outside the migration history. The migration
+creates them only if they are missing, so it applies cleanly both to the existing
+production database and to an empty one (both cases were tested). v1 keeps
+working against the migrated database.
+
+Apply it at deploy time with `npm run db:deploy`. **Take a backup first.**
+
 ---
 
-## 📄 License
+## Security
 
-## 📑 Product Requirements Document (PRD)
-
-ISC License - See LICENSE file for details
-
-**Versie 1.0 – 27 Oktober 2025**
+- **Sessions:** signed, httpOnly cookie (same format and secret as v1, so existing
+  logins survive). The account is re-read on every request, so suspending or
+  deleting an account takes effect immediately rather than when the cookie expires.
+- **Passwords:** bcrypt; login responses do not reveal whether an address exists.
+- **Rate limits** on login, registration, uploads, messages and public forms.
+  The limiter is in-memory per server instance — good against casual abuse; put
+  a shared store (e.g. Redis) behind `lib/rate-limit.ts` for hard guarantees on a
+  multi-instance deployment.
+- **Uploads** require a session; the file type is determined from the file's
+  content, not its name. SVG is not accepted. Uploaded files are served with a
+  policy that forbids script execution.
+- **Calendar sync:** the Google OAuth state is signed and bound to the signed-in
+  provider; iCal links are fetched through a client that refuses private network
+  addresses; tokens are encrypted at rest; only free/busy information is read.
+- **Headers:** Content-Security-Policy, HSTS, no framing, strict referrer policy.
+- Removed from v1: the `/api/debug-login` endpoint, the hard-coded analysis key,
+  the anonymous upload endpoint, the committed `.env`.
 
 ---
 
-### 1. Productoverzicht
+## Privacy and legal (EU / Belgium)
 
-## 🙏 AcknowledgmentsEventiphy is een digitaal platform (web + mobiel) dat het organiseren van evenementen vereenvoudigt door gebruikers te verbinden met dienstverleners zoals cateraars, DJ's, decorateurs, fotografen en locaties. Gebruikers kunnen hun evenement plannen, leveranciers vergelijken, offertes aanvragen, en direct boeken — allemaal binnen één omgeving.
+What the product does:
 
+- **Cookies.** Only two cookies are set without consent, both strictly necessary
+  (`session`, `ev_consent`). The banner offers refuse and accept with equal
+  prominence on the first layer, per-category choice, and withdrawal at any time
+  from the footer. Choices expire after six months and are logged as proof.
+  Nothing non-essential loads before consent. Fonts are self-hosted, so no
+  visitor data goes to third parties.
+- **Analytics** are off. To add Google Analytics, set
+  `NEXT_PUBLIC_GA_MEASUREMENT_ID`; it then loads only after a visitor allows
+  "Statistieken". For another tool, add it in `features/consent/analytics.tsx`
+  and list its cookies on `/cookies`.
+- **Terms.** Separate terms for customers and for providers, accepted with an
+  unticked checkbox at registration and stored with their version. When a
+  document's version changes (`features/legal/documents.ts`), signed-in users are
+  asked to accept again. Accounts created in v1 are asked on their first v2 login.
+- **Data-subject rights.** Under _Account & privacy_ users can correct their
+  details, download everything held about them (JSON) and delete their account.
+  Deletion erases personal data and keeps bookings, quotes and reviews in
+  anonymous form for the other party; it is refused while bookings are upcoming.
+- **Platform rules.** Search ranking is explained on the browse page and in the
+  terms (ratings, never payment). Reviews can only be left after a completed
+  booking, and the site says so. Provider profiles state that the provider acts
+  as a trader. Anyone can report content at `/melden`; reports land in the admin
+  queue, where the decision and its reasons are recorded.
 
+### Before launch — things only the company can do
 
-Built with:### 2. Doelgroep
+These are not code tasks and are **not done**:
 
-- [Next.js](https://nextjs.org/)- **Gebruikers (Consumenten)**  
+1. **Rotate the database password and `NEXTAUTH_SECRET`.** Both were committed in
+   `.env` on `main` and are in the git history. Treat them as compromised.
+   Consider removing the file from history as well.
+2. **Fill in the company details** in `src/config/site.ts`: legal name and form,
+   KBO and VAT numbers, registered address. Belgian law requires them on the
+   site; the legal pages and the footer read them from there.
+3. **Create the mailboxes** used in the texts: `info@`, `privacy@`, `legal@`,
+   `support@eventiphy.be` (or change them in `site.ts`).
+4. **Have a Belgian lawyer review the legal texts** (`/privacy`, `/cookies`,
+   `/voorwaarden/klanten`, `/voorwaarden/dienstverleners`). They were written
+   carefully against the GDPR, the Belgian Code of Economic Law, the P2B
+   Regulation and the Digital Services Act, but they are a starting point, not
+   legal advice. Check in particular the liability clauses and whether the
+   withdrawal-right exemption fits every category you list.
+5. **Sign data-processing agreements** with your hosting, database and file
+   storage providers, and check where they store data. The privacy statement
+   says transfers outside the EEA rely on an adequacy decision or standard
+   contractual clauses — make that true.
+6. **Keep a record of processing activities** (GDPR art. 30) and decide who
+   handles privacy requests and reported content, and within what time.
+7. **Processes the texts promise but the software does not automate:**
+   - notifying users by e-mail 15 days (30 for fees) before terms change — there
+     is no e-mail sending yet;
+   - telling a user why their account was restricted, and telling a reporter the
+     outcome of a report — the admin screens remind you, the e-mail is manual;
+   - deleting waitlist entries after two years and consent/acceptance proof after
+     five years — no scheduled clean-up exists yet;
+   - confirming your host keeps access logs no longer than 30 days.
+8. **Google Calendar:** the app now requests the narrower free/busy permission.
+   Update the OAuth consent screen in Google Cloud accordingly.
 
-- [Prisma](https://www.prisma.io/)  Mensen (25-45 jaar) die bruiloften, verjaardagen of bedrijfsfeesten plannen.  
+---
 
-- [Tailwind CSS](https://tailwindcss.com/)  Doel: Snel betrouwbare leveranciers vinden, prijzen vergelijken, veilig boeken.  
+## Deployment
 
-- [Shadcn/ui](https://ui.shadcn.com/)
+Environment variables are documented in [`.env.example`](./.env.example). At
+minimum set `DATABASE_URL`, `NEXTAUTH_SECRET` and `NEXT_PUBLIC_APP_URL`.
 
-- **Dienstverleners (Aanbieders)**  
+**File uploads.** Without configuration, uploads are written to `public/uploads`
+on the server's disk. That is fine for a host with a persistent disk (mount a
+volume there), but **not for serverless hosts**, where the disk is temporary.
+There, set `BLOB_READ_WRITE_TOKEN` and uploads go to Vercel Blob automatically.
+Files already uploaded by v1 (`/uploads/...`) must exist on the new host too.
 
----  DJ's, cateraars, decorateurs, fotografen, eventlocaties.  
+**Vercel:** the `vercel-build` script generates the Prisma client, applies
+migrations and builds. Set a Blob token for uploads.
 
-  Doel: Klantenwerving, reviews opbouwen, eenvoudig factureren.  
+**Docker:** `docker build -t eventiphy .` produces a standalone server on port
+3000 with a health check at `/api/health`. Run migrations from the same image
+(`npx prisma migrate deploy`) before starting a new version.
 
-**Made with ❤️ for the event planning community**
+**Going back to v1:** deploy `main`. The v2 migration only adds things, so v1
+runs against the migrated database unchanged.
 
-- **Admin (Eventiphy-team)**  
-  Beheerders van het platform.  
-  Doel: Overzicht, moderatie, betalingen beheren, support.  
+---
 
-### 3. Doelstellingen & KPI's
-| Doelstelling | KPI |
-|--------------|-----|
-| Snelle matching tussen klant en aanbieder | 80% binnen 24u beantwoord |
-| Hoge conversie van aanvraag → boeking | >20% |
-| Gebruikerstevredenheid | Gem. rating >
+## Not included (deliberately)
+
+The rebuild keeps v1's scope. These came up along the way and are natural next
+steps: transactional e-mail (confirmations, password reset, the notifications
+listed above), online payments, e-mail verification at sign-up, more languages,
+dark mode, and automated tests beyond the smoke test.

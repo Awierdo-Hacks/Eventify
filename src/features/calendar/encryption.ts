@@ -36,7 +36,9 @@ export function decryptToken(encrypted: string): string {
   if (!ivHex || !dataHex) throw new Error('Malformed encrypted token');
   const attempt = (key: Buffer) => {
     const decipher = crypto.createDecipheriv(ALGORITHM, key, Buffer.from(ivHex, 'hex'));
-    return Buffer.concat([decipher.update(Buffer.from(dataHex, 'hex')), decipher.final()]).toString('utf8');
+    return Buffer.concat([decipher.update(Buffer.from(dataHex, 'hex')), decipher.final()]).toString(
+      'utf8'
+    );
   };
   const key = configuredKey();
   if (key) {

@@ -11,7 +11,9 @@ const messageSelect = {
   message_type: true,
   sender_id: true,
   created_at: true,
-  attachments: { select: { id: true, url: true, file_name: true, file_type: true, file_size: true } },
+  attachments: {
+    select: { id: true, url: true, file_name: true, file_type: true, file_size: true },
+  },
   quote: { select: quoteSelect },
 } satisfies Prisma.MessageSelect;
 
@@ -23,7 +25,13 @@ export interface MessageView {
   type: 'TEXT' | 'IMAGE' | 'QUOTE' | 'SYSTEM';
   senderId: string;
   createdAt: string;
-  attachments: Array<{ id: string; url: string; fileName: string; fileType: string; fileSize: number }>;
+  attachments: Array<{
+    id: string;
+    url: string;
+    fileName: string;
+    fileType: string;
+    fileSize: number;
+  }>;
   quote: QuoteView | null;
 }
 
@@ -55,7 +63,11 @@ export interface ConversationSummary {
   lastMessage: { preview: string; createdAt: string; own: boolean } | null;
 }
 
-function preview(message: { content: string; message_type: string; attachments: unknown[] }): string {
+function preview(message: {
+  content: string;
+  message_type: string;
+  attachments: unknown[];
+}): string {
   if (message.message_type === 'QUOTE') return 'Offerte';
   if (!message.content && message.attachments.length > 0) return 'Bijlage';
   return message.content.slice(0, 120);
@@ -86,7 +98,13 @@ export async function listConversations(userId: string): Promise<ConversationSum
         messages: {
           orderBy: { created_at: 'desc' },
           take: 1,
-          select: { content: true, message_type: true, sender_id: true, created_at: true, attachments: { select: { id: true } } },
+          select: {
+            content: true,
+            message_type: true,
+            sender_id: true,
+            created_at: true,
+            attachments: { select: { id: true } },
+          },
         },
       },
       orderBy: { updated_at: 'desc' },
@@ -113,12 +131,23 @@ export async function listConversations(userId: string): Promise<ConversationSum
       other: other
         ? {
             id: other.id,
-            name: other.deleted_at ? 'Verwijderde gebruiker' : (other.provider?.business_name ?? other.name),
-            subtitle: other.provider && !other.deleted_at && other.name !== other.provider.business_name ? other.name : null,
+            name: other.deleted_at
+              ? 'Verwijderde gebruiker'
+              : (other.provider?.business_name ?? other.name),
+            subtitle:
+              other.provider && !other.deleted_at && other.name !== other.provider.business_name
+                ? other.name
+                : null,
             image: other.provider?.images[0] ?? null,
           }
         : null,
-      lastMessage: last ? { preview: preview(last), createdAt: last.created_at.toISOString(), own: last.sender_id === userId } : null,
+      lastMessage: last
+        ? {
+            preview: preview(last),
+            createdAt: last.created_at.toISOString(),
+            own: last.sender_id === userId,
+          }
+        : null,
     };
   });
 }
@@ -165,7 +194,10 @@ export async function getThread(userId: string, conversationId: string, before?:
   if (!conversation) return null;
 
   const rows = await db.message.findMany({
-    where: { conversation_id: conversationId, ...(before ? { created_at: { lt: new Date(before) } } : {}) },
+    where: {
+      conversation_id: conversationId,
+      ...(before ? { created_at: { lt: new Date(before) } } : {}),
+    },
     select: messageSelect,
     orderBy: { created_at: 'desc' },
     take: THREAD_PAGE_SIZE + 1,
@@ -181,8 +213,13 @@ export async function getThread(userId: string, conversationId: string, before?:
     other: other
       ? {
           id: other.id,
-          name: other.deleted_at ? 'Verwijderde gebruiker' : (other.provider?.business_name ?? other.name),
-          contactName: other.provider && !other.deleted_at && other.name !== other.provider.business_name ? other.name : null,
+          name: other.deleted_at
+            ? 'Verwijderde gebruiker'
+            : (other.provider?.business_name ?? other.name),
+          contactName:
+            other.provider && !other.deleted_at && other.name !== other.provider.business_name
+              ? other.name
+              : null,
           role: other.role as string,
           providerId: other.provider?.id ?? null,
           image: other.provider?.images[0] ?? null,
@@ -194,7 +231,10 @@ export async function getThread(userId: string, conversationId: string, before?:
 
 export type Thread = NonNullable<Awaited<ReturnType<typeof getThread>>>;
 
-export async function getMessagesAfter(conversationId: string, after: string): Promise<MessageView[]> {
+export async function getMessagesAfter(
+  conversationId: string,
+  after: string
+): Promise<MessageView[]> {
   const date = new Date(after);
   if (Number.isNaN(date.getTime())) return [];
   const rows = await db.message.findMany({

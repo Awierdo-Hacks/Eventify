@@ -28,10 +28,24 @@ interface MonthCalendarProps {
 }
 
 const WEEKDAYS = ['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo'];
-const MONTHS = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
+const MONTHS = [
+  'januari',
+  'februari',
+  'maart',
+  'april',
+  'mei',
+  'juni',
+  'juli',
+  'augustus',
+  'september',
+  'oktober',
+  'november',
+  'december',
+];
 
 const pad = (value: number) => String(value).padStart(2, '0');
-export const dayKey = (year: number, month: number, day: number) => `${year}-${pad(month + 1)}-${pad(day)}`;
+export const dayKey = (year: number, month: number, day: number) =>
+  `${year}-${pad(month + 1)}-${pad(day)}`;
 
 export function todayKey(): string {
   const now = new Date();
@@ -47,7 +61,15 @@ const toneClass: Record<DayTone, string> = {
 };
 
 /** A plain month grid (weeks start on Monday) with selectable days. */
-function MonthCalendar({ selected, onSelect, dayInfo, minKey, onMonthChange, initialMonth, className }: MonthCalendarProps) {
+function MonthCalendar({
+  selected,
+  onSelect,
+  dayInfo,
+  minKey,
+  onMonthChange,
+  initialMonth,
+  className,
+}: MonthCalendarProps) {
   const [view, setView] = React.useState(() => {
     const base = initialMonth ? new Date(`${initialMonth}T00:00:00`) : new Date();
     return { year: base.getFullYear(), month: base.getMonth() };
@@ -91,9 +113,17 @@ function MonthCalendar({ selected, onSelect, dayInfo, minKey, onMonthChange, ini
         </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 text-center" role="grid" aria-label={`${MONTHS[view.month]} ${view.year}`}>
+      <div
+        className="grid grid-cols-7 gap-1 text-center"
+        role="grid"
+        aria-label={`${MONTHS[view.month]} ${view.year}`}
+      >
         {WEEKDAYS.map((weekday) => (
-          <div key={weekday} className="pb-1 text-xs font-semibold uppercase text-ink-500" role="columnheader">
+          <div
+            key={weekday}
+            className="pb-1 text-xs font-semibold uppercase text-ink-500"
+            role="columnheader"
+          >
             {weekday}
           </div>
         ))}
@@ -123,7 +153,7 @@ function MonthCalendar({ selected, onSelect, dayInfo, minKey, onMonthChange, ini
                   disabled && 'cursor-not-allowed hover:bg-transparent',
                   disabled && tone !== 'default' && tone !== 'unavailable' && 'opacity-80',
                   isSelected && 'bg-brand-600 text-white hover:bg-brand-700',
-                  key === today && !isSelected && 'ring-2 ring-inset ring-brand-400',
+                  key === today && !isSelected && 'ring-2 ring-inset ring-brand-400'
                 )}
               >
                 {day}

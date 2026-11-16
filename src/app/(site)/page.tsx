@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { CategoryIcon } from '@/components/ui/category-icon';
 import { Select } from '@/components/ui/input';
 import { site } from '@/config/site';
+import { jsonLd } from '@/lib/json-ld';
 import { ProviderCard } from '@/features/providers/components/provider-card';
 import { getCategoryCounts, getFeaturedProviders } from '@/features/providers/queries';
 import { CATEGORIES, FEATURED_CATEGORY_SLUGS, categoryStoredValues } from '@/lib/catalog';
@@ -106,13 +107,16 @@ const websiteJsonLd = {
 
 export default async function HomePage() {
   const [featured, counts] = await Promise.all([getFeaturedProviders(6), getCategoryCounts()]);
-  const categories = FEATURED_CATEGORY_SLUGS.map((slug) => CATEGORIES.find((category) => category.slug === slug)!);
-  const countFor = (slug: string) => categoryStoredValues(slug).reduce((sum, value) => sum + (counts[value] ?? 0), 0);
+  const categories = FEATURED_CATEGORY_SLUGS.map((slug) =>
+    CATEGORIES.find((category) => category.slug === slug)!
+  );
+  const countFor = (slug: string) =>
+    categoryStoredValues(slug).reduce((sum, value) => sum + (counts[value] ?? 0), 0);
 
   return (
     <>
       {[organizationJsonLd, websiteJsonLd, faqJsonLd].map((data, index) => (
-        <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
+        <script key={index} type="application/ld+json" dangerouslySetInnerHTML={jsonLd(data)} />
       ))}
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
@@ -125,12 +129,14 @@ export default async function HomePage() {
             </p>
             <h1 className="mt-5 text-[2.625rem] font-extrabold leading-[1.05] text-ink-950 sm:text-6xl lg:text-[4.25rem]">
               Jouw{' '}
-              <span className="text-brand-gradient pr-1 font-serif font-normal italic tracking-normal">droomfeest</span>{' '}
+              <span className="text-brand-gradient pr-1 font-serif font-normal italic tracking-normal">
+                droomfeest
+              </span>{' '}
               begint hier
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-600 sm:text-xl">
-              Vind geverifieerde fotografen, dj’s, cateraars en locaties. Vergelijk offertes en regel je hele event op
-              één plek.
+              Vind geverifieerde fotografen, dj’s, cateraars en locaties. Vergelijk offertes en
+              regel je hele event op één plek.
             </p>
 
             <form
@@ -172,7 +178,11 @@ export default async function HomePage() {
             </form>
 
             <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium text-ink-700">
-              {['Gecontroleerde dienstverleners', 'Gratis en vrijblijvend offertes', 'Alles op één plek'].map((item) => (
+              {[
+                'Gecontroleerde dienstverleners',
+                'Gratis en vrijblijvend offertes',
+                'Alles op één plek',
+              ].map((item) => (
                 <li key={item} className="flex items-center gap-1.5">
                   <Check className="size-4 text-success-600" aria-hidden />
                   {item}
@@ -217,7 +227,9 @@ export default async function HomePage() {
                   <span>
                     <span className="block font-bold text-ink-950">{category.label}</span>
                     <span className="mt-0.5 block text-sm text-ink-600">
-                      {count > 0 ? pluralize(count, 'dienstverlener', 'dienstverleners') : category.description}
+                      {count > 0
+                        ? pluralize(count, 'dienstverlener', 'dienstverleners')
+                        : category.description}
                     </span>
                   </span>
                 </Link>
@@ -228,17 +240,26 @@ export default async function HomePage() {
       </section>
 
       {/* ── How it works ─────────────────────────────────────────────────── */}
-      <section id="hoe-het-werkt" className="scroll-mt-20 border-y border-ink-200/70 bg-surface" aria-labelledby="how-title">
+      <section
+        id="hoe-het-werkt"
+        className="scroll-mt-20 border-y border-ink-200/70 bg-surface"
+        aria-labelledby="how-title"
+      >
         <div className="container-page py-16 sm:py-20">
           <div className="max-w-2xl">
-            <p className="text-sm font-bold uppercase tracking-wider text-brand-700">Hoe het werkt</p>
+            <p className="text-sm font-bold uppercase tracking-wider text-brand-700">
+              Hoe het werkt
+            </p>
             <h2 id="how-title" className="mt-2 text-3xl font-extrabold text-ink-950 sm:text-4xl">
               Van idee tot feest in drie stappen
             </h2>
           </div>
           <ol className="mt-10 grid gap-6 md:grid-cols-3">
             {STEPS.map((step, index) => (
-              <li key={step.title} className="relative rounded-2xl bg-canvas p-6 ring-1 ring-ink-200">
+              <li
+                key={step.title}
+                className="relative rounded-2xl bg-canvas p-6 ring-1 ring-ink-200"
+              >
                 <div className="flex items-center gap-3">
                   <span className="flex size-11 items-center justify-center rounded-xl bg-ink-950 text-white">
                     <step.icon className="size-5" aria-hidden />
@@ -263,7 +284,9 @@ export default async function HomePage() {
               <h2 id="featured-title" className="text-3xl font-extrabold text-ink-950 sm:text-4xl">
                 Goed beoordeeld door klanten
               </h2>
-              <p className="mt-2 text-lg text-ink-600">Een greep uit de dienstverleners op Eventiphy.</p>
+              <p className="mt-2 text-lg text-ink-600">
+                Een greep uit de dienstverleners op Eventiphy.
+              </p>
             </div>
             <Button asChild variant="ghost">
               <Link href="/browse">
@@ -285,17 +308,25 @@ export default async function HomePage() {
       <section className="container-page pb-16 sm:pb-20" aria-labelledby="planner-title">
         <div className="grid items-center gap-10 rounded-3xl border border-ink-200 bg-surface p-6 shadow-xs sm:p-10 lg:grid-cols-2 lg:gap-16 lg:p-14">
           <div>
-            <p className="text-sm font-bold uppercase tracking-wider text-brand-700">Eventplanner</p>
-            <h2 id="planner-title" className="mt-2 text-3xl font-extrabold text-ink-950 sm:text-4xl">
+            <p className="text-sm font-bold uppercase tracking-wider text-brand-700">
+              Eventplanner
+            </p>
+            <h2
+              id="planner-title"
+              className="mt-2 text-3xl font-extrabold text-ink-950 sm:text-4xl"
+            >
               Eén overzicht voor je hele event
             </h2>
             <p className="mt-4 text-lg leading-relaxed text-ink-600">
-              Een bruiloft is meer dan één boeking. Maak je event aan, kies wat je nodig hebt en volg per onderdeel waar
-              je staat.
+              Een bruiloft is meer dan één boeking. Maak je event aan, kies wat je nodig hebt en
+              volg per onderdeel waar je staat.
             </p>
             <ul className="mt-6 space-y-3">
               {[
-                { icon: Check, text: 'Kant-en-klare sjablonen voor bruiloft, verjaardag, bedrijfsfeest en festival' },
+                {
+                  icon: Check,
+                  text: 'Kant-en-klare sjablonen voor bruiloft, verjaardag, bedrijfsfeest en festival',
+                },
                 { icon: Wallet, text: 'Zie wat al vastligt en hoeveel budget er nog over is' },
                 { icon: MessageSquare, text: 'Overleg met dienstverleners in één inbox' },
               ].map((item) => (
@@ -330,13 +361,15 @@ export default async function HomePage() {
           />
           <div className="relative grid items-center gap-10 lg:grid-cols-[1.2fr_0.8fr]">
             <div>
-              <p className="text-sm font-bold uppercase tracking-wider text-sun-300">Voor dienstverleners</p>
+              <p className="text-sm font-bold uppercase tracking-wider text-sun-300">
+                Voor dienstverleners
+              </p>
               <h2 id="providers-title" className="mt-2 text-3xl font-extrabold sm:text-4xl">
                 Meer aanvragen, minder heen-en-weer
               </h2>
               <p className="mt-4 max-w-xl text-lg leading-relaxed text-ink-300">
-                Ontvang gerichte aanvragen van klanten in jouw regio, stuur offertes in een paar klikken en houd je
-                agenda automatisch bij.
+                Ontvang gerichte aanvragen van klanten in jouw regio, stuur offertes in een paar
+                klikken en houd je agenda automatisch bij.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Button asChild size="lg" variant="gradient">
@@ -374,7 +407,10 @@ export default async function HomePage() {
       {/* ── FAQ ──────────────────────────────────────────────────────────── */}
       <section className="container-page py-16 sm:py-20" aria-labelledby="faq-title">
         <div className="mx-auto max-w-3xl">
-          <h2 id="faq-title" className="text-center text-3xl font-extrabold text-ink-950 sm:text-4xl">
+          <h2
+            id="faq-title"
+            className="text-center text-3xl font-extrabold text-ink-950 sm:text-4xl"
+          >
             Veelgestelde vragen
           </h2>
           <div className="mt-8 divide-y divide-ink-200 rounded-2xl border border-ink-200 bg-surface">
@@ -397,9 +433,14 @@ export default async function HomePage() {
       {/* ── Closing CTA ──────────────────────────────────────────────────── */}
       <section className="container-page" aria-labelledby="cta-title">
         <div className="rounded-3xl bg-gradient-to-br from-brand-50 via-surface to-sun-50 px-6 py-14 text-center ring-1 ring-ink-200 sm:py-20">
-          <h2 id="cta-title" className="mx-auto max-w-2xl text-3xl font-extrabold text-ink-950 sm:text-5xl">
+          <h2
+            id="cta-title"
+            className="mx-auto max-w-2xl text-3xl font-extrabold text-ink-950 sm:text-5xl"
+          >
             Klaar om je event{' '}
-            <span className="text-brand-gradient pr-1 font-serif font-normal italic tracking-normal">onvergetelijk</span>{' '}
+            <span className="text-brand-gradient pr-1 font-serif font-normal italic tracking-normal">
+              onvergetelijk
+            </span>{' '}
             te maken?
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-lg text-ink-600">
@@ -422,17 +463,43 @@ export default async function HomePage() {
 /** Product preview built from markup, so it stays sharp and loads instantly. */
 function HeroPreview() {
   const slots = [
-    { category: 'venues', label: 'Locatie', name: 'Loft Zuiderdok', price: '€ 2.400', state: 'Vastgelegd', done: true },
-    { category: 'catering', label: 'Catering', name: 'Atelier Smaak', price: '€ 3.150', state: 'Vastgelegd', done: true },
-    { category: 'dj', label: 'DJ & muziek', name: '3 offertes ontvangen', price: 'vanaf € 650', state: 'Kiezen', done: false },
+    {
+      category: 'venues',
+      label: 'Locatie',
+      name: 'Loft Zuiderdok',
+      price: '€ 2.400',
+      state: 'Vastgelegd',
+      done: true,
+    },
+    {
+      category: 'catering',
+      label: 'Catering',
+      name: 'Atelier Smaak',
+      price: '€ 3.150',
+      state: 'Vastgelegd',
+      done: true,
+    },
+    {
+      category: 'dj',
+      label: 'DJ & muziek',
+      name: '3 offertes ontvangen',
+      price: 'vanaf € 650',
+      state: 'Kiezen',
+      done: false,
+    },
   ];
   return (
-    <div className="relative mx-auto mb-10 w-full max-w-md animate-rise [animation-delay:120ms] sm:mb-14 lg:max-w-none" aria-hidden>
+    <div
+      className="relative mx-auto mb-10 w-full max-w-md animate-rise [animation-delay:120ms] sm:mb-14 lg:max-w-none"
+      aria-hidden
+    >
       <div className="absolute -inset-4 -z-10 rounded-[2.5rem] bg-gradient-to-br from-brand-200/50 to-sun-200/50 blur-2xl" />
       <div className="rounded-3xl border border-ink-200 bg-surface p-5 shadow-lg sm:p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-ink-500">Bruiloft · 14 juni</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-ink-500">
+              Bruiloft · 14 juni
+            </p>
             <p className="mt-1 text-xl font-extrabold text-ink-950">Emma &amp; Lars</p>
           </div>
           <span className="rounded-full bg-success-100 px-2.5 py-1 text-xs font-semibold text-success-800">
@@ -450,7 +517,10 @@ function HeroPreview() {
         </div>
         <ul className="mt-5 space-y-2.5">
           {slots.map((slot) => (
-            <li key={slot.label} className="flex items-center gap-3 rounded-xl border border-ink-200 p-3">
+            <li
+              key={slot.label}
+              className="flex items-center gap-3 rounded-xl border border-ink-200 p-3"
+            >
               <CategoryIcon category={slot.category} />
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-medium text-ink-500">{slot.label}</p>
@@ -458,7 +528,9 @@ function HeroPreview() {
               </div>
               <div className="text-right">
                 <p className="text-sm font-bold text-ink-950">{slot.price}</p>
-                <p className={`text-xs font-semibold ${slot.done ? 'text-success-700' : 'text-brand-700'}`}>
+                <p
+                  className={`text-xs font-semibold ${slot.done ? 'text-success-700' : 'text-brand-700'}`}
+                >
                   {slot.state}
                 </p>
               </div>
@@ -480,13 +552,36 @@ function HeroPreview() {
 
 function PlannerPreview() {
   const rows = [
-    { category: 'venues', label: 'Locatie', tone: 'bg-success-100 text-success-800', state: 'Vastgelegd' },
-    { category: 'catering', label: 'Catering', tone: 'bg-brand-100 text-brand-800', state: '2 offertes' },
-    { category: 'photography', label: 'Fotografie', tone: 'bg-sun-100 text-sun-800', state: 'Aangevraagd' },
-    { category: 'flowers', label: 'Bloemen', tone: 'bg-ink-100 text-ink-700', state: 'Nog te regelen' },
+    {
+      category: 'venues',
+      label: 'Locatie',
+      tone: 'bg-success-100 text-success-800',
+      state: 'Vastgelegd',
+    },
+    {
+      category: 'catering',
+      label: 'Catering',
+      tone: 'bg-brand-100 text-brand-800',
+      state: '2 offertes',
+    },
+    {
+      category: 'photography',
+      label: 'Fotografie',
+      tone: 'bg-sun-100 text-sun-800',
+      state: 'Aangevraagd',
+    },
+    {
+      category: 'flowers',
+      label: 'Bloemen',
+      tone: 'bg-ink-100 text-ink-700',
+      state: 'Nog te regelen',
+    },
   ];
   return (
-    <div className="rounded-2xl bg-gradient-to-br from-brand-50 to-sun-50 p-4 ring-1 ring-ink-200 sm:p-6" aria-hidden>
+    <div
+      className="rounded-2xl bg-gradient-to-br from-brand-50 to-sun-50 p-4 ring-1 ring-ink-200 sm:p-6"
+      aria-hidden
+    >
       <div className="rounded-xl bg-surface p-4 shadow-sm ring-1 ring-ink-200">
         <div className="flex items-center justify-between">
           <p className="text-sm font-bold text-ink-950">Wat heb je nodig?</p>
@@ -497,7 +592,9 @@ function PlannerPreview() {
             <li key={row.label} className="flex items-center gap-3 py-2.5">
               <CategoryIcon category={row.category} size="sm" />
               <span className="flex-1 text-sm font-semibold text-ink-900">{row.label}</span>
-              <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${row.tone}`}>{row.state}</span>
+              <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${row.tone}`}>
+                {row.state}
+              </span>
             </li>
           ))}
         </ul>

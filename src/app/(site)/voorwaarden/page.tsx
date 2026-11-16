@@ -5,7 +5,8 @@ import { COOKIE_POLICY, LEGAL_DOCUMENTS } from '@/features/legal/documents';
 
 export const metadata: Metadata = {
   title: 'Voorwaarden',
-  description: 'De voorwaarden, de privacyverklaring en het cookiebeleid van Eventiphy op één plek.',
+  description:
+    'De voorwaarden, de privacyverklaring en het cookiebeleid van Eventiphy op één plek.',
   alternates: { canonical: '/voorwaarden' },
 };
 
@@ -52,10 +53,12 @@ export default function TermsHubPage() {
     <div className="container-page py-10 sm:py-14">
       <header className="max-w-3xl">
         <p className="text-sm font-bold uppercase tracking-wider text-brand-700">Juridisch</p>
-        <h1 className="mt-2 text-4xl font-extrabold text-ink-950 sm:text-5xl">Voorwaarden en privacy</h1>
+        <h1 className="mt-2 text-4xl font-extrabold text-ink-950 sm:text-5xl">
+          Voorwaarden en privacy
+        </h1>
         <p className="mt-4 text-lg leading-relaxed text-ink-600">
-          Duidelijke afspraken horen bij een betrouwbaar platform. Hier vind je alles wat geldt wanneer je Eventiphy
-          gebruikt, in gewone taal.
+          Duidelijke afspraken horen bij een betrouwbaar platform. Hier vind je alles wat geldt
+          wanneer je Eventiphy gebruikt, in gewone taal.
         </p>
       </header>
 
@@ -72,10 +75,17 @@ export default function TermsHubPage() {
               <span className="min-w-0">
                 <span className="flex items-center gap-1.5 text-lg font-bold text-ink-950">
                   {document.title}
-                  <ArrowRight className="size-4 text-brand-600 transition-transform group-hover:translate-x-0.5" aria-hidden />
+                  <ArrowRight
+                    className="size-4 text-brand-600 transition-transform group-hover:translate-x-0.5"
+                    aria-hidden
+                  />
                 </span>
                 <span className="mt-1 block leading-relaxed text-ink-600">{document.text}</span>
-                {document.updated && <span className="mt-2 block text-xs text-ink-500">Bijgewerkt op {document.updated}</span>}
+                {document.updated && (
+                  <span className="mt-2 block text-xs text-ink-500">
+                    Bijgewerkt op {document.updated}
+                  </span>
+                )}
               </span>
             </Link>
           </li>

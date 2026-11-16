@@ -19,7 +19,11 @@ function targetHref(type: string, id: string): string | null {
   return null;
 }
 
-export default async function AdminReportsPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
+export default async function AdminReportsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
   await requireAdmin();
   const { status } = await searchParams;
   const showHandled = status === 'handled';
@@ -49,29 +53,50 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
 
   return (
     <>
-      <PageHeader title="Meldingen" description="Meldingen van inhoud die mogelijk onwettig is of tegen de voorwaarden ingaat." />
+      <PageHeader
+        title="Meldingen"
+        description="Meldingen van inhoud die mogelijk onwettig is of tegen de voorwaarden ingaat."
+      />
       <FilterTabs
         label="Filter meldingen"
         tabs={[
           { href: '/admin/reports', label: 'Open', count: open, active: !showHandled },
-          { href: '/admin/reports?status=handled', label: 'Afgehandeld', count: handled, active: showHandled },
+          {
+            href: '/admin/reports?status=handled',
+            label: 'Afgehandeld',
+            count: handled,
+            active: showHandled,
+          },
         ]}
       />
 
       {reports.length === 0 ? (
-        <EmptyState icon={Flag} title={showHandled ? 'Nog niets afgehandeld' : 'Geen open meldingen'} description={showHandled ? undefined : 'Alles is bijgewerkt.'} />
+        <EmptyState
+          icon={Flag}
+          title={showHandled ? 'Nog niets afgehandeld' : 'Geen open meldingen'}
+          description={showHandled ? undefined : 'Alles is bijgewerkt.'}
+        />
       ) : (
         <ul className="space-y-4">
           {reports.map((report) => {
             const href = targetHref(report.target_type, report.target_id);
-            const reporter = report.reporter ? `${report.reporter.name} (${report.reporter.email})` : (report.reporter_email ?? 'Anoniem');
+            const reporter = report.reporter
+              ? `${report.reporter.name} (${report.reporter.email})`
+              : (report.reporter_email ?? 'Anoniem');
             return (
-              <li key={report.id} className="rounded-xl border border-ink-200 bg-surface p-5 shadow-xs">
+              <li
+                key={report.id}
+                className="rounded-xl border border-ink-200 bg-surface p-5 shadow-xs"
+              >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <Badge tone="brand">{REPORT_TARGETS[report.target_type] ?? report.target_type}</Badge>
-                      <span className="font-bold text-ink-950">{REPORT_REASONS[report.reason] ?? report.reason}</span>
+                      <Badge tone="brand">
+                        {REPORT_TARGETS[report.target_type] ?? report.target_type}
+                      </Badge>
+                      <span className="font-bold text-ink-950">
+                        {REPORT_REASONS[report.reason] ?? report.reason}
+                      </span>
                     </div>
                     <p className="mt-1 text-sm text-ink-500">
                       Gemeld {formatRelative(report.created_at)} door {reporter}
@@ -85,21 +110,34 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
                     </Badge>
                   )}
                 </div>
-                {report.details && <p className="mt-3 whitespace-pre-line rounded-lg bg-ink-50 px-4 py-3 text-sm leading-relaxed text-ink-700">{report.details}</p>}
+                {report.details && (
+                  <p className="mt-3 whitespace-pre-line rounded-lg bg-ink-50 px-4 py-3 text-sm leading-relaxed text-ink-700">
+                    {report.details}
+                  </p>
+                )}
                 <p className="mt-3 text-sm text-ink-600">
                   {href ? (
-                    <Link href={href} className="inline-flex items-center gap-1.5 font-semibold text-brand-700 hover:underline">
+                    <Link
+                      href={href}
+                      className="inline-flex items-center gap-1.5 font-semibold text-brand-700 hover:underline"
+                    >
                       Gemelde inhoud bekijken <ExternalLink className="size-3.5" aria-hidden />
                     </Link>
                   ) : (
                     <span>
-                      Referentie: <code className="rounded bg-ink-100 px-1.5 py-0.5 text-xs">{report.target_id}</code>
+                      Referentie:{' '}
+                      <code className="rounded bg-ink-100 px-1.5 py-0.5 text-xs">
+                        {report.target_id}
+                      </code>
                     </span>
                   )}
                 </p>
                 {report.resolution && (
                   <p className="mt-3 border-t border-ink-100 pt-3 text-sm text-ink-700">
-                    <span className="font-semibold">Beslissing{report.resolved_at ? ` (${formatDate(report.resolved_at)})` : ''}:</span> {report.resolution}
+                    <span className="font-semibold">
+                      Beslissing{report.resolved_at ? ` (${formatDate(report.resolved_at)})` : ''}:
+                    </span>{' '}
+                    {report.resolution}
                   </p>
                 )}
               </li>

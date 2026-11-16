@@ -25,7 +25,9 @@ export async function updateBookingStatusAction(input: {
       where: { id: input.bookingId },
       select: { id: true, provider_id: true, status: true, event_date: true, request_id: true },
     });
-    const allowed = booking && (user.role === 'ADMIN' || (user.providerId && booking.provider_id === user.providerId));
+    const allowed =
+      booking &&
+      (user.role === 'ADMIN' || (user.providerId && booking.provider_id === user.providerId));
     if (!booking || !allowed) return fail('Deze boeking bestaat niet (meer).');
     if (!TRANSITIONS[booking.status]?.includes(input.status)) {
       return fail('Deze statuswijziging is niet mogelijk.');
@@ -50,7 +52,10 @@ export async function updateBookingStatusAction(input: {
             });
           }
         }
-        await tx.serviceRequest.update({ where: { id: booking.request_id }, data: { status: 'CANCELLED' } });
+        await tx.serviceRequest.update({
+          where: { id: booking.request_id },
+          data: { status: 'CANCELLED' },
+        });
       }
     });
   } catch (error) {
@@ -59,6 +64,10 @@ export async function updateBookingStatusAction(input: {
   }
 
   revalidateApp();
-  const messages = { CONFIRMED: 'Boeking bevestigd.', COMPLETED: 'Boeking afgerond.', CANCELLED: 'Boeking geannuleerd.' };
+  const messages = {
+    CONFIRMED: 'Boeking bevestigd.',
+    COMPLETED: 'Boeking afgerond.',
+    CANCELLED: 'Boeking geannuleerd.',
+  };
   return ok(undefined, messages[input.status]);
 }

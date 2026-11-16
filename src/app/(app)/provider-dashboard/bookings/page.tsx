@@ -3,7 +3,12 @@ import { CalendarCheck, CalendarDays, Check, Mail, MapPin, Phone, Users } from '
 import { PageHeader } from '@/components/layout/page-header';
 import { StatusBadge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
-import { getProviderBookings, hasPassed, splitByDate, type ProviderBooking } from '@/features/bookings/queries';
+import {
+  getProviderBookings,
+  hasPassed,
+  splitByDate,
+  type ProviderBooking,
+} from '@/features/bookings/queries';
 import { ChatButton } from '@/features/messaging/chat-button';
 import { BookingActions } from '@/features/provider-area/components/booking-actions';
 import { BOOKING_STATUS, eventTypeLabel } from '@/lib/catalog';
@@ -28,7 +33,9 @@ function BookingItem({ booking }: { booking: ProviderBooking }) {
           </p>
         </div>
         <div className="text-right">
-          <p className="text-xl font-extrabold tabular-nums text-ink-950">{formatPrice(booking.final_price)}</p>
+          <p className="text-xl font-extrabold tabular-nums text-ink-950">
+            {formatPrice(booking.final_price)}
+          </p>
           <StatusBadge status={booking.status} map={BOOKING_STATUS} className="mt-1" />
         </div>
       </div>
@@ -62,13 +69,19 @@ function BookingItem({ booking }: { booking: ProviderBooking }) {
         {!deleted && (
           <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-sm">
             {email && (
-              <a href={`mailto:${email}`} className="inline-flex items-center gap-1.5 font-medium text-ink-700 hover:text-brand-700">
+              <a
+                href={`mailto:${email}`}
+                className="inline-flex items-center gap-1.5 font-medium text-ink-700 hover:text-brand-700"
+              >
                 <Mail className="size-4 text-ink-400" aria-hidden />
                 {email}
               </a>
             )}
             {phone && (
-              <a href={`tel:${phone.replace(/\s/g, '')}`} className="inline-flex items-center gap-1.5 font-medium text-ink-700 hover:text-brand-700">
+              <a
+                href={`tel:${phone.replace(/\s/g, '')}`}
+                className="inline-flex items-center gap-1.5 font-medium text-ink-700 hover:text-brand-700"
+              >
                 <Phone className="size-4 text-ink-400" aria-hidden />
                 {phone}
               </a>
@@ -97,7 +110,12 @@ export default async function ProviderBookingsPage() {
   const history = past.filter((booking) => booking.status !== 'CONFIRMED');
 
   const sections = [
-    { id: 'to-complete', title: 'Af te ronden', items: toComplete, hint: 'Het event is voorbij. Rond de boeking af zodat de klant je kan beoordelen.' },
+    {
+      id: 'to-complete',
+      title: 'Af te ronden',
+      items: toComplete,
+      hint: 'Het event is voorbij. Rond de boeking af zodat de klant je kan beoordelen.',
+    },
     { id: 'upcoming', title: 'Komend', items: upcoming },
     { id: 'history', title: 'Geschiedenis', items: history },
   ];
@@ -127,7 +145,7 @@ export default async function ProviderBookingsPage() {
                     ))}
                   </ul>
                 </section>
-              ),
+              )
           )}
         </div>
       )}

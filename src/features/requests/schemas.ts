@@ -8,7 +8,10 @@ export const createRequestSchema = z.object({
     .string()
     .min(1, 'Kies een datum.')
     .refine((value) => !Number.isNaN(new Date(value).getTime()), 'Vul een geldige datum in.')
-    .refine((value) => new Date(`${value}T23:59:59`).getTime() >= Date.now(), 'Kies een datum in de toekomst.'),
+    .refine(
+      (value) => new Date(`${value}T23:59:59`).getTime() >= Date.now(),
+      'Kies een datum in de toekomst.'
+    ),
   eventLocation: z.string().trim().min(2, 'Vul de plaats of het adres van je event in.').max(200),
   guestCount: z.coerce
     .number({ message: 'Vul het aantal gasten in.' })

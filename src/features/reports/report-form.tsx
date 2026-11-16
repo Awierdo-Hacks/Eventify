@@ -18,7 +18,10 @@ interface ReportFormProps {
 
 function ReportForm({ defaultType, defaultTargetId, signedInEmail }: ReportFormProps) {
   const [done, setDone] = React.useState(false);
-  const { run, pending, error, fieldErrors } = useAction(submitReportAction, { onSuccess: () => setDone(true), toastError: false });
+  const { run, pending, error, fieldErrors } = useAction(submitReportAction, {
+    onSuccess: () => setDone(true),
+    toastError: false,
+  });
 
   if (done) {
     return (
@@ -51,7 +54,10 @@ function ReportForm({ defaultType, defaultTargetId, signedInEmail }: ReportFormP
     <form onSubmit={onSubmit} className="space-y-5" noValidate>
       <div className="grid gap-5 sm:grid-cols-2">
         <Field label="Wat wil je melden?" htmlFor="targetType" error={fieldErrors.targetType}>
-          <Select {...fieldProps('targetType', fieldErrors.targetType)} defaultValue={defaultType && defaultType in REPORT_TARGETS ? defaultType : ''}>
+          <Select
+            {...fieldProps('targetType', fieldErrors.targetType)}
+            defaultValue={defaultType && defaultType in REPORT_TARGETS ? defaultType : ''}
+          >
             <option value="" disabled>
               Maak een keuze
             </option>
@@ -78,7 +84,12 @@ function ReportForm({ defaultType, defaultTargetId, signedInEmail }: ReportFormP
       {defaultTargetId ? (
         <input type="hidden" name="targetId" value={defaultTargetId} />
       ) : (
-        <Field label="Waar staat het?" htmlFor="targetId" optional hint="De link naar de pagina, of de naam van het profiel.">
+        <Field
+          label="Waar staat het?"
+          htmlFor="targetId"
+          optional
+          hint="De link naar de pagina, of de naam van het profiel."
+        >
           <Input {...fieldProps('targetId', undefined, true)} maxLength={200} />
         </Field>
       )}
@@ -91,13 +102,27 @@ function ReportForm({ defaultType, defaultTargetId, signedInEmail }: ReportFormP
         <Textarea {...fieldProps('details', fieldErrors.details, true)} rows={6} maxLength={3000} />
       </Field>
       {!signedInEmail && (
-        <Field label="Je e-mailadres" htmlFor="email" error={fieldErrors.email} hint="We gebruiken het alleen om je over deze melding te informeren.">
-          <Input {...fieldProps('email', fieldErrors.email, true)} type="email" autoComplete="email" />
+        <Field
+          label="Je e-mailadres"
+          htmlFor="email"
+          error={fieldErrors.email}
+          hint="We gebruiken het alleen om je over deze melding te informeren."
+        >
+          <Input
+            {...fieldProps('email', fieldErrors.email, true)}
+            type="email"
+            autoComplete="email"
+          />
         </Field>
       )}
       <div>
         <div className="flex items-start gap-3">
-          <Checkbox id="goodFaith" name="goodFaith" className="mt-0.5" aria-invalid={fieldErrors.goodFaith ? true : undefined} />
+          <Checkbox
+            id="goodFaith"
+            name="goodFaith"
+            className="mt-0.5"
+            aria-invalid={fieldErrors.goodFaith ? true : undefined}
+          />
           <label htmlFor="goodFaith" className="text-sm leading-relaxed text-ink-700">
             Ik verklaar te goeder trouw dat de informatie in deze melding juist en volledig is.
           </label>

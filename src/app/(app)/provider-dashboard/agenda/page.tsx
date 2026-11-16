@@ -9,13 +9,23 @@ import { requireProvider } from '@/lib/session';
 export const metadata: Metadata = { title: 'Agenda' };
 
 const SYNC_MESSAGES: Record<string, { tone: 'success' | 'warning' | 'danger'; text: string }> = {
-  connected: { tone: 'success', text: 'Google Calendar is gekoppeld. Je bezette dagen zijn overgenomen.' },
+  connected: {
+    tone: 'success',
+    text: 'Google Calendar is gekoppeld. Je bezette dagen zijn overgenomen.',
+  },
   cancelled: { tone: 'warning', text: 'De koppeling met Google Calendar is niet voltooid.' },
-  error: { tone: 'danger', text: 'De koppeling met Google Calendar is mislukt. Probeer het opnieuw.' },
+  error: {
+    tone: 'danger',
+    text: 'De koppeling met Google Calendar is mislukt. Probeer het opnieuw.',
+  },
   unavailable: { tone: 'warning', text: 'Koppelen met Google Calendar is nog niet beschikbaar.' },
 };
 
-export default async function AgendaPage({ searchParams }: { searchParams: Promise<{ sync?: string }> }) {
+export default async function AgendaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ sync?: string }>;
+}) {
   const user = await requireProvider('/provider-dashboard/agenda');
   const { sync } = await searchParams;
 
@@ -27,7 +37,10 @@ export default async function AgendaPage({ searchParams }: { searchParams: Promi
 
   return (
     <>
-      <PageHeader title="Agenda" description="Klanten zien alleen op welke dagen je niet beschikbaar bent." />
+      <PageHeader
+        title="Agenda"
+        description="Klanten zien alleen op welke dagen je niet beschikbaar bent."
+      />
       {message && (
         <Alert tone={message.tone} className="mb-6">
           {message.text}

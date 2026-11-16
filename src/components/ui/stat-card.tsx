@@ -20,7 +20,7 @@ function StatCard({ label, value, icon: Icon, hint, href, highlight }: StatCardP
         <span
           className={cn(
             'flex size-9 items-center justify-center rounded-lg',
-            highlight ? 'bg-brand-600 text-white' : 'bg-ink-100 text-ink-600',
+            highlight ? 'bg-brand-600 text-white' : 'bg-ink-100 text-ink-600'
           )}
         >
           <Icon className="size-[1.125rem]" aria-hidden />
@@ -33,7 +33,7 @@ function StatCard({ label, value, icon: Icon, hint, href, highlight }: StatCardP
   const className = cn(
     'block rounded-xl border bg-surface p-5 shadow-xs',
     highlight ? 'border-brand-300 ring-1 ring-brand-200' : 'border-ink-200',
-    href && 'transition-[box-shadow,border-color] hover:border-ink-300 hover:shadow-sm',
+    href && 'transition-[box-shadow,border-color] hover:border-ink-300 hover:shadow-sm'
   );
   return href ? (
     <Link href={href} className={className}>

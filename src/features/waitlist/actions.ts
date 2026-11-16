@@ -44,7 +44,10 @@ export async function joinWaitlistAction(input: WaitlistInput): Promise<ActionRe
         name: data.name,
         email: data.email,
         phone: data.phone || null,
-        categories: data.type === 'PROVIDER' ? data.categories.filter((value) => categoryValues.includes(value)) : [],
+        categories:
+          data.type === 'PROVIDER'
+            ? data.categories.filter((value) => categoryValues.includes(value))
+            : [],
         message: data.message || null,
       },
     });

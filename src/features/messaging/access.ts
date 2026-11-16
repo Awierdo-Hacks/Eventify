@@ -9,7 +9,10 @@ import type { CurrentUser } from '@/lib/session';
  * - admins may contact anyone.
  * v1 allowed any signed-in user to message any user id.
  */
-export async function canStartConversation(sender: CurrentUser, recipientId: string): Promise<boolean> {
+export async function canStartConversation(
+  sender: CurrentUser,
+  recipientId: string
+): Promise<boolean> {
   if (sender.id === recipientId) return false;
   const recipient = await db.user.findUnique({
     where: { id: recipientId },
@@ -45,10 +48,16 @@ export async function canStartConversation(sender: CurrentUser, recipientId: str
 }
 
 /** Find the conversation between two users, or create it. */
-export async function findOrCreateConversation(userId: string, otherUserId: string): Promise<string> {
+export async function findOrCreateConversation(
+  userId: string,
+  otherUserId: string
+): Promise<string> {
   const existing = await db.conversation.findFirst({
     where: {
-      AND: [{ participants: { some: { user_id: userId } } }, { participants: { some: { user_id: otherUserId } } }],
+      AND: [
+        { participants: { some: { user_id: userId } } },
+        { participants: { some: { user_id: otherUserId } } },
+      ],
     },
     select: { id: true },
   });

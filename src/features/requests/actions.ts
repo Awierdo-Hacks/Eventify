@@ -60,7 +60,11 @@ export async function createRequestAction(input: CreateRequestInput): Promise<Ac
       if (data.slotId) {
         // Only touch a slot that belongs to this customer and is still open.
         await tx.eventSlot.updateMany({
-          where: { id: data.slotId, status: { in: ['EMPTY', 'SEARCHING'] }, event: { customer_id: user.id } },
+          where: {
+            id: data.slotId,
+            status: { in: ['EMPTY', 'SEARCHING'] },
+            event: { customer_id: user.id },
+          },
           data: { status: 'QUOTES_REQUESTED' },
         });
       }

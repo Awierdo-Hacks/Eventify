@@ -12,7 +12,9 @@ const USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
 const SCOPE = 'https://www.googleapis.com/auth/calendar.freebusy openid email';
 
 export function googleCalendarConfigured(): boolean {
-  return Boolean(env.google.clientId && env.google.clientSecret && env.google.redirectUri && canEncryptTokens());
+  return Boolean(
+    env.google.clientId && env.google.clientSecret && env.google.redirectUri && canEncryptTokens()
+  );
 }
 
 const stateKey = () => new TextEncoder().encode(`${env.sessionSecret}:google-calendar-state`);
@@ -63,7 +65,11 @@ export async function connectGoogleCalendar(code: string, providerId: string): P
     signal: AbortSignal.timeout(10_000),
   });
   if (!response.ok) throw new Error('Google token exchange failed');
-  const tokens = (await response.json()) as { access_token: string; refresh_token?: string; expires_in: number };
+  const tokens = (await response.json()) as {
+    access_token: string;
+    refresh_token?: string;
+    expires_in: number;
+  };
 
   const profile = await fetch(USERINFO_URL, {
     headers: { Authorization: `Bearer ${tokens.access_token}` },

@@ -23,10 +23,18 @@ export class ErasureBlockedError extends Error {}
 export async function eraseAccount(userId: string): Promise<void> {
   const user = await db.user.findUnique({
     where: { id: userId },
-    select: { id: true, role: true, deleted_at: true, provider: { select: { id: true, images: true, portfolio_images: true } } },
+    select: {
+      id: true,
+      role: true,
+      deleted_at: true,
+      provider: { select: { id: true, images: true, portfolio_images: true } },
+    },
   });
   if (!user || user.deleted_at) return;
-  if (user.role === 'ADMIN') throw new ErasureBlockedError('Een beheerdersaccount kan niet op deze manier verwijderd worden.');
+  if (user.role === 'ADMIN')
+    throw new ErasureBlockedError(
+      'Een beheerdersaccount kan niet op deze manier verwijderd worden.'
+    );
 
   const providerId = user.provider?.id ?? null;
   const upcoming = await db.booking.count({
@@ -38,12 +46,19 @@ export async function eraseAccount(userId: string): Promise<void> {
   });
   if (upcoming > 0) {
     throw new ErasureBlockedError(
-      'Er staan nog boekingen gepland. Rond ze af of annuleer ze in overleg met de andere partij, daarna kun je je account verwijderen.',
+      'Er staan nog boekingen gepland. Rond ze af of annuleer ze in overleg met de andere partij, daarna kun je je account verwijderen.'
     );
   }
 
-  const attachments = await db.messageAttachment.findMany({ where: { message: { sender_id: userId } }, select: { url: true } });
-  const files = [...attachments.map((attachment) => attachment.url), ...(user.provider?.images ?? []), ...(user.provider?.portfolio_images ?? [])];
+  const attachments = await db.messageAttachment.findMany({
+    where: { message: { sender_id: userId } },
+    select: { url: true },
+  });
+  const files = [
+    ...attachments.map((attachment) => attachment.url),
+    ...(user.provider?.images ?? []),
+    ...(user.provider?.portfolio_images ?? []),
+  ];
 
   if (providerId) await disconnectGoogleCalendar(providerId).catch(() => undefined);
 
@@ -68,7 +83,13 @@ export async function eraseAccount(userId: string): Promise<void> {
     // Contact details copied onto requests, and free text that may describe the person.
     await tx.serviceRequest.updateMany({
       where: { customer_id: userId },
-      data: { customer_name: ERASED_NAME, customer_email: '', customer_phone: '', description: '', preferred_contact: null },
+      data: {
+        customer_name: ERASED_NAME,
+        customer_email: '',
+        customer_phone: '',
+        description: '',
+        preferred_contact: null,
+      },
     });
     await tx.serviceRequest.updateMany({
       where: { customer_id: userId, status: { in: ['PENDING', 'QUOTED'] } },
@@ -86,7 +107,10 @@ export async function eraseAccount(userId: string): Promise<void> {
     });
 
     await tx.consentRecord.updateMany({ where: { user_id: userId }, data: { user_id: null } });
-    await tx.contentReport.updateMany({ where: { reporter_id: userId }, data: { reporter_id: null, reporter_email: null } });
+    await tx.contentReport.updateMany({
+      where: { reporter_id: userId },
+      data: { reporter_id: null, reporter_email: null },
+    });
 
     if (providerId) {
       await tx.serviceProvider.update({

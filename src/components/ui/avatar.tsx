@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { SmartImage as Image } from '@/components/ui/smart-image';
 import { cn, initials } from '@/lib/utils';
 
 const sizes = {
@@ -24,12 +24,18 @@ function Avatar({ name, src, size = 'md', className }: AvatarProps) {
       className={cn(
         'relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-brand-100 to-sun-100 font-bold text-brand-800',
         sizes[size],
-        className,
+        className
       )}
       aria-hidden
     >
       {src ? (
-        <Image src={src} alt="" width={pixels[size]} height={pixels[size]} className="size-full object-cover" />
+        <Image
+          src={src}
+          alt=""
+          width={pixels[size]}
+          height={pixels[size]}
+          className="size-full object-cover"
+        />
       ) : (
         initials(name)
       )}
