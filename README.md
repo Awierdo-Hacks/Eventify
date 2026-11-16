@@ -254,14 +254,22 @@ Files already uploaded by v1 (`/uploads/...`) must exist on the new host too.
    Variables_, for **Production and Preview** (v1 read them from a committed
    `.env`; v2 does not): `DATABASE_URL`, `NEXTAUTH_SECRET`,
    `NEXT_PUBLIC_APP_URL`, and `BLOB_READ_WRITE_TOKEN` for uploads.
-2. Deploy. The `vercel-build` script checks those variables (and stops with a
-   clear message if one is missing), generates the Prisma client, **applies
-   pending migrations to the database in `DATABASE_URL`**, and builds. That
-   includes preview deployments, so back up the database before the first v2
-   deploy.
+2. Deploy. Before building, the deploy checks those variables (and stops with a
+   clear message if one is missing) and **applies pending migrations to the
+   database in `DATABASE_URL`**. That includes preview deployments, so back up
+   the database before the first v2 deploy.
+
+   The variable must be named exactly `DATABASE_URL`. A storage integration
+   added with a prefix creates names like `DATABASE_URL_POSTGRES_URL`, which
+   the app does not read.
+
 3. Functions run in Frankfurt (`vercel.json` → `fra1`), next to the database.
    If the database moves, change the region to match: every query from a
    far-away region costs a round trip across the distance.
+
+**Is a deployment healthy?** Open `/api/health`. It answers `ok`, or says which
+of three things is wrong: `DATABASE_URL_NOT_SET`, `DATABASE_UNREACHABLE` or
+`MIGRATIONS_NOT_APPLIED`.
 
 **Docker:** `docker build -t eventiphy .` produces a standalone server on port
 3000 with a health check at `/api/health`. Run migrations from the same image

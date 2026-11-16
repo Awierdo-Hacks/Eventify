@@ -106,7 +106,18 @@ const websiteJsonLd = {
 };
 
 export default async function HomePage() {
-  const [featured, counts] = await Promise.all([getFeaturedProviders(6), getCategoryCounts()]);
+  // Featured providers and counts are a bonus: if the database is briefly
+  // unavailable the page still renders, without them.
+  const [featured, counts] = await Promise.all([
+    getFeaturedProviders(6).catch((error) => {
+      console.error('[home] featured providers unavailable', error);
+      return [];
+    }),
+    getCategoryCounts().catch((error): Record<string, number> => {
+      console.error('[home] category counts unavailable', error);
+      return {};
+    }),
+  ]);
   const categories = FEATURED_CATEGORY_SLUGS.map((slug) =>
     CATEGORIES.find((category) => category.slug === slug)!
   );

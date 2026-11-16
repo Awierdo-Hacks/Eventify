@@ -6,6 +6,7 @@
   "description": "Eventiphy — marketplace voor evenementdienstverleners",
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/check-deploy-env.mjs && node scripts/migrate-on-deploy.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -16,7 +17,7 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
-    "vercel-build": "node scripts/check-deploy-env.mjs && prisma generate && prisma migrate deploy && next build"
+    "vercel-build": "prisma generate && npm run build"
   },
   "dependencies": {
     "@prisma/adapter-pg": "7.10.1",
