@@ -2,6 +2,7 @@ import 'server-only';
 import { unstable_cache } from 'next/cache';
 import { db } from '@/lib/db';
 import { TAGS } from '@/lib/cache';
+import { DEMO_EMAIL_SUFFIX, isDemoEnabled } from '@/features/demo/config';
 import { categoryStoredValues, PRICE_RANGES, type PriceRangeKey } from '@/lib/catalog';
 import type { Prisma } from '@/generated/prisma/client';
 
@@ -58,11 +59,22 @@ function toCard(row: CardRow): ProviderCardData {
   };
 }
 
-/** Only verified, visible providers of non-deleted accounts are public. */
+/** Cached results are kept apart per mode, so switching demo mode off takes effect at once. */
+const CACHE_SCOPE = isDemoEnabled() ? 'demo' : 'live';
+
+/**
+ * Only verified, visible providers of non-deleted accounts are public. Demo
+ * providers are public only while demo mode is on, so sample businesses never
+ * show up on the real site.
+ */
 const PUBLIC_WHERE = {
   verified: true,
   is_active: true,
-  user: { status: 'ACTIVE', deleted_at: null },
+  user: {
+    status: 'ACTIVE',
+    deleted_at: null,
+    ...(isDemoEnabled() ? {} : { NOT: { email: { endsWith: DEMO_EMAIL_SUFFIX } } }),
+  },
 } satisfies Prisma.ServiceProviderWhereInput;
 
 /**
@@ -121,7 +133,7 @@ const searchCached = unstable_cache(
 
     return { items: rows.map(toCard), total };
   },
-  ['providers-search'],
+  ['providers-search', CACHE_SCOPE],
   { tags: [TAGS.providers], revalidate: 300 }
 );
 
@@ -145,7 +157,7 @@ export const getFeaturedProviders = unstable_cache(
     });
     return rows.map(toCard);
   },
-  ['providers-featured'],
+  ['providers-featured', CACHE_SCOPE],
   { tags: [TAGS.providers], revalidate: 600 }
 );
 
@@ -159,7 +171,7 @@ export const getCategoryCounts = unstable_cache(
     });
     return Object.fromEntries(groups.map((group) => [group.category, group._count._all]));
   },
-  ['providers-category-counts'],
+  ['providers-category-counts', CACHE_SCOPE],
   { tags: [TAGS.providers], revalidate: 600 }
 );
 
@@ -171,7 +183,7 @@ export const getPublicProviderIds = unstable_cache(
       orderBy: { updated_at: 'desc' },
       take: 5000,
     }),
-  ['providers-ids'],
+  ['providers-ids', CACHE_SCOPE],
   { tags: [TAGS.providers], revalidate: 3600 }
 );
 
@@ -201,7 +213,7 @@ const profileCached = unstable_cache(
         rating_avg: true,
         review_count: true,
         created_at: true,
-        user: { select: { status: true, deleted_at: true } },
+        user: { select: { status: true, deleted_at: true, email: true } },
         provider_services: {
           select: { id: true, name: true, description: true, price_from: true, price_to: true },
           orderBy: { created_at: 'asc' },
@@ -251,7 +263,8 @@ const profileCached = unstable_cache(
         provider.verified &&
         provider.is_active &&
         provider.user.status === 'ACTIVE' &&
-        !provider.user.deleted_at,
+        !provider.user.deleted_at &&
+        (isDemoEnabled() || !provider.user.email.endsWith(DEMO_EMAIL_SUFFIX)),
       verified: provider.verified,
       hasEnterpriseNumber: Boolean(provider.btw_number),
       rating: Math.round(provider.rating_avg * 10) / 10,
@@ -283,7 +296,7 @@ const profileCached = unstable_cache(
       })),
     };
   },
-  ['provider-profile'],
+  ['provider-profile', CACHE_SCOPE],
   { tags: [TAGS.providers], revalidate: 300 }
 );
 

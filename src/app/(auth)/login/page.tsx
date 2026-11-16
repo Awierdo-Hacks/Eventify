@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Alert } from '@/components/ui/alert';
 import { LoginForm } from '@/features/auth/components/login-form';
+import { isDemoEnabled } from '@/features/demo/config';
+import { DemoSwitcher } from '@/features/demo/demo-switcher';
 import { safeRedirectPath } from '@/lib/utils';
 
 export const metadata: Metadata = {
@@ -19,6 +21,7 @@ export default async function LoginPage({
 
   return (
     <>
+      {isDemoEnabled() && <DemoSwitcher variant="floating" />}
       <h1 className="text-3xl font-extrabold text-ink-950">Welkom terug</h1>
       <p className="mt-2 text-ink-600">
         {redirectTo

@@ -5,6 +5,7 @@ import { MobileTabBar, SidebarNav, UnreadProvider } from '@/components/layout/ap
 import { NAVIGATION } from '@/components/layout/nav-config';
 import { UserMenu } from '@/components/layout/user-menu';
 import { Avatar } from '@/components/ui/avatar';
+import { DemoSwitcher } from '@/features/demo/demo-switcher';
 import { ROLE_LABELS } from '@/lib/catalog';
 import type { CurrentUser } from '@/lib/session';
 import { dashboardPathFor } from '@/lib/session-token';
@@ -12,6 +13,8 @@ import { dashboardPathFor } from '@/lib/session-token';
 interface AppShellProps {
   user: CurrentUser;
   unread: number;
+  /** Show the demo-account switcher (only in a demo/test deployment). */
+  demo?: boolean;
   children: React.ReactNode;
 }
 
@@ -19,7 +22,7 @@ interface AppShellProps {
  * Signed-in layout: fixed sidebar on desktop, top bar plus tab bar on phones.
  * It renders once and stays mounted while the pages inside it change.
  */
-function AppShell({ user, unread, children }: AppShellProps) {
+function AppShell({ user, unread, demo, children }: AppShellProps) {
   const items = NAVIGATION[user.role];
   const home = dashboardPathFor(user.role);
 
@@ -36,10 +39,10 @@ function AppShell({ user, unread, children }: AppShellProps) {
           <div className="flex-1 overflow-y-auto px-3 py-2">
             <SidebarNav items={items} />
           </div>
-          <div className="border-t border-ink-100 p-3">
+          <div className="flex items-center gap-1 border-t border-ink-100 p-3">
             <Link
               href="/account"
-              className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-ink-100"
+              className="flex min-w-0 flex-1 items-center gap-3 rounded-lg p-2 transition-colors hover:bg-ink-100"
             >
               <Avatar name={user.name} />
               <span className="min-w-0 flex-1">
@@ -51,6 +54,7 @@ function AppShell({ user, unread, children }: AppShellProps) {
               <Settings className="size-4 shrink-0 text-ink-400" aria-hidden />
               <span className="sr-only">Account & privacy</span>
             </Link>
+            {demo && <DemoSwitcher variant="inline" currentEmail={user.email} />}
           </div>
         </aside>
 
@@ -59,7 +63,10 @@ function AppShell({ user, unread, children }: AppShellProps) {
           <Link href={home} aria-label="Eventiphy, naar je overzicht" className="rounded-lg">
             <Logo />
           </Link>
-          <UserMenu user={user} dashboardHref={home} />
+          <div className="flex items-center gap-2">
+            {demo && <DemoSwitcher variant="inline" currentEmail={user.email} />}
+            <UserMenu user={user} dashboardHref={home} />
+          </div>
         </header>
 
         <main

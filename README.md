@@ -278,6 +278,21 @@ Files already uploaded by v1 (`/uploads/...`) must exist on the new host too.
    It prints which database it is talking to. Running it for an existing
    account promotes that account instead.
 
+**Demo accounts (test environments only).** With `DEMO_ACCOUNTS=1`, the login
+page shows a small button (bottom right) that signs you in as a demo customer,
+provider or administrator with one click, and the sidebar gets the same
+switcher so you can change role without logging out. The accounts and a set of
+sample data (an event, quotes at different stages, a booking, a review, a
+conversation) are created the first time it is used; nothing existing is
+touched. It is on by default in `npm run dev`.
+
+> **Never enable it on the live site.** Anyone who opens the login page could
+> sign in as an administrator. On Vercel, add the variable to the _Preview_
+> environment only. With the switch off the button is gone, the login endpoint
+> refuses, and the sample providers disappear from the public pages. The demo
+> accounts have no usable password; remove them for good under _Beheer →
+> Gebruikers_ (search for `demo.eventiphy.local`).
+
 **Is a deployment healthy?** Open `/api/health`. It answers `ok`, or says which
 of three things is wrong: `DATABASE_URL_NOT_SET`, `DATABASE_UNREACHABLE` or
 `MIGRATIONS_NOT_APPLIED`.

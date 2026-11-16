@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { AppShell } from '@/components/layout/app-shell';
+import { isDemoEnabled } from '@/features/demo/config';
 import { pendingTermsFor } from '@/features/legal/acceptance';
 import { TermsGate } from '@/features/legal/terms-gate';
 import { getUnreadCount } from '@/features/messaging/unread';
@@ -17,7 +18,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   ]);
 
   return (
-    <AppShell user={user} unread={unread}>
+    <AppShell user={user} unread={unread} demo={isDemoEnabled()}>
       {children}
       {pendingTerms && (
         <TermsGate

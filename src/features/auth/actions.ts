@@ -10,6 +10,7 @@ import { createSession, destroySession } from '@/lib/session';
 import { dashboardPathFor } from '@/lib/session-token';
 import { safeRedirectPath } from '@/lib/utils';
 import { site } from '@/config/site';
+import { isDemoEnabled } from '@/features/demo/config';
 import { LEGAL_DOCUMENTS } from '@/features/legal/documents';
 import {
   loginSchema,
@@ -85,7 +86,7 @@ export async function loginAction(input: LoginInput): Promise<ActionResult> {
 
 export async function logoutAction(): Promise<void> {
   await destroySession();
-  redirect('/');
+  redirect(isDemoEnabled() ? '/login' : '/');
 }
 
 const EMAIL_TAKEN =
