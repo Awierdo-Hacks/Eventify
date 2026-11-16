@@ -6,7 +6,7 @@
   "description": "Eventiphy — marketplace voor evenementdienstverleners",
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/check-deploy-env.mjs && node scripts/migrate-on-deploy.mjs",
+    "prebuild": "node scripts/check-no-committed-secrets.mjs && node scripts/check-deploy-env.mjs && node scripts/migrate-on-deploy.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
