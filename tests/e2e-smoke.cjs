@@ -77,13 +77,13 @@ async function goMonths(page) {
 }
 async function freeDays(page) {
   return page
-    .locator('[role=gridcell] button:not([disabled])')
+    .locator('[role=group] button[aria-pressed]:not([disabled])')
     .evaluateAll((nodes) =>
       nodes.map((n) => n.textContent.trim()).filter((d) => Number(d) >= 8 && Number(d) <= 24)
     );
 }
 const dayButton = (page, day) =>
-  page.locator('[role=gridcell] button').filter({ hasText: new RegExp(`^${day}$`) });
+  page.locator('[role=group] button[aria-pressed]').filter({ hasText: new RegExp(`^${day}$`) });
 const step = async (name, fn) => {
   try {
     await fn();

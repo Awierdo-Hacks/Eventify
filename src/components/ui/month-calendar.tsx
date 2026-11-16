@@ -115,20 +115,20 @@ function MonthCalendar({
 
       <div
         className="grid grid-cols-7 gap-1 text-center"
-        role="grid"
+        role="group"
         aria-label={`${MONTHS[view.month]} ${view.year}`}
       >
         {WEEKDAYS.map((weekday) => (
           <div
             key={weekday}
             className="pb-1 text-xs font-semibold uppercase text-ink-500"
-            role="columnheader"
+            aria-hidden
           >
             {weekday}
           </div>
         ))}
         {Array.from({ length: leading }, (_, index) => (
-          <div key={`empty-${index}`} role="gridcell" />
+          <div key={`empty-${index}`} />
         ))}
         {Array.from({ length: daysInMonth }, (_, index) => {
           const day = index + 1;
@@ -139,7 +139,7 @@ function MonthCalendar({
           const isSelected = selectedSet.has(key);
           const tone = info?.tone ?? 'default';
           return (
-            <div key={key} role="gridcell">
+            <div key={key}>
               <button
                 type="button"
                 disabled={disabled}

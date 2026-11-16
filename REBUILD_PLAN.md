@@ -173,6 +173,9 @@ prisma/                schema + migrations (shared with v1)
   deletion guard, access control, waitlist, report, cookie consent, admin).
 - Migration applied cleanly to an empty database and to a simulation of the
   production drift (existing `waitlist_entries` / `btw_number`), keeping data.
+- Automated WCAG 2.1 AA scan (axe-core) on 17 key pages: no violations. Automated
+  scans catch only part of what matters; a manual keyboard and screen-reader pass
+  is still worth doing before launch.
 - Local production timings: pages 30–60 ms, in-app navigation 30–75 ms.
 
 Not verified here (needs real credentials or infrastructure): Google Calendar

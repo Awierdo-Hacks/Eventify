@@ -179,43 +179,43 @@ function Agenda({ data }: { data: AgendaData }) {
 
       <aside className="space-y-4">
         <dl className="divide-y divide-ink-100 rounded-xl border border-ink-200 bg-surface px-5 shadow-xs">
-          <div className="flex items-start gap-3 py-4">
-            <CalendarCheck className="mt-0.5 size-5 shrink-0 text-success-600" aria-hidden />
-            <div>
-              <dt className="text-xs font-medium text-ink-500">Volgende boeking</dt>
-              <dd className="text-sm font-semibold text-ink-900">
-                {data.nextBooking ? (
-                  <>
-                    {formatDateWeekday(data.nextBooking.date)}
-                    <span className="block font-normal text-ink-600">
-                      {data.nextBooking.customer} · {eventTypeLabel(data.nextBooking.eventType)}
-                    </span>
-                  </>
-                ) : (
-                  'Nog geen'
-                )}
-              </dd>
-            </div>
+          <div className="py-4">
+            <dt className="flex items-center gap-2 text-xs font-medium text-ink-500">
+              <CalendarCheck className="size-4 shrink-0 text-success-600" aria-hidden />
+              Volgende boeking
+            </dt>
+            <dd className="mt-0.5 pl-6 text-sm font-semibold text-ink-900">
+              {data.nextBooking ? (
+                <>
+                  {formatDateWeekday(data.nextBooking.date)}
+                  <span className="block font-normal text-ink-600">
+                    {data.nextBooking.customer} · {eventTypeLabel(data.nextBooking.eventType)}
+                  </span>
+                </>
+              ) : (
+                'Nog geen'
+              )}
+            </dd>
           </div>
-          <div className="flex items-start gap-3 py-4">
-            <TrendingUp className="mt-0.5 size-5 shrink-0 text-brand-600" aria-hidden />
-            <div>
-              <dt className="text-xs font-medium text-ink-500">Drukste maand</dt>
-              <dd className="text-sm font-semibold capitalize text-ink-900">
-                {data.busiestMonth
-                  ? `${formatMonthYear(`${data.busiestMonth.month}-15`)} (${data.busiestMonth.count})`
-                  : '–'}
-              </dd>
-            </div>
+          <div className="py-4">
+            <dt className="flex items-center gap-2 text-xs font-medium text-ink-500">
+              <TrendingUp className="size-4 shrink-0 text-brand-600" aria-hidden />
+              Drukste maand
+            </dt>
+            <dd className="mt-0.5 pl-6 text-sm font-semibold capitalize text-ink-900">
+              {data.busiestMonth
+                ? `${formatMonthYear(`${data.busiestMonth.month}-15`)} (${data.busiestMonth.count})`
+                : '–'}
+            </dd>
           </div>
-          <div className="flex items-start gap-3 py-4">
-            <CalendarOff className="mt-0.5 size-5 shrink-0 text-ink-400" aria-hidden />
-            <div>
-              <dt className="text-xs font-medium text-ink-500">Geblokkeerde dagen</dt>
-              <dd className="text-sm font-semibold text-ink-900">
-                {data.blocked.filter((row) => row.date >= todayKey()).length}
-              </dd>
-            </div>
+          <div className="py-4">
+            <dt className="flex items-center gap-2 text-xs font-medium text-ink-500">
+              <CalendarOff className="size-4 shrink-0 text-ink-400" aria-hidden />
+              Geblokkeerde dagen
+            </dt>
+            <dd className="mt-0.5 pl-6 text-sm font-semibold text-ink-900">
+              {data.blocked.filter((row) => row.date >= todayKey()).length}
+            </dd>
           </div>
         </dl>
 

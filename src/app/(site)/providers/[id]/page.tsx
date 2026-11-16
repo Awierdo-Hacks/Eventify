@@ -386,32 +386,33 @@ export default async function ProviderPage({
             </div>
           </div>
 
+          {/* Each group is a <div> holding only its <dt> and <dd>, as the HTML spec requires. */}
           <dl className="divide-y divide-ink-100 rounded-2xl border border-ink-200 bg-surface px-5 sm:px-6">
             {facts.map((fact) => (
-              <div key={fact.label} className="flex items-start gap-3 py-4">
-                <fact.icon className="mt-0.5 size-5 shrink-0 text-ink-400" aria-hidden />
-                <div className="min-w-0">
-                  <dt className="text-xs font-medium text-ink-500">{fact.label}</dt>
-                  <dd className="text-sm font-semibold text-ink-900">{fact.value}</dd>
-                </div>
+              <div key={fact.label} className="py-4">
+                <dt className="flex items-center gap-2 text-xs font-medium text-ink-500">
+                  <fact.icon className="size-4 shrink-0 text-ink-400" aria-hidden />
+                  {fact.label}
+                </dt>
+                <dd className="mt-0.5 pl-6 text-sm font-semibold text-ink-900">{fact.value}</dd>
               </div>
             ))}
             {website && (
-              <div className="flex items-start gap-3 py-4">
-                <Globe className="mt-0.5 size-5 shrink-0 text-ink-400" aria-hidden />
-                <div className="min-w-0">
-                  <dt className="text-xs font-medium text-ink-500">Website</dt>
-                  <dd className="truncate text-sm font-semibold">
-                    <a
-                      href={website}
-                      target="_blank"
-                      rel="noopener noreferrer nofollow"
-                      className="text-brand-700 hover:underline"
-                    >
-                      {new URL(website).hostname.replace(/^www\./, '')}
-                    </a>
-                  </dd>
-                </div>
+              <div className="py-4">
+                <dt className="flex items-center gap-2 text-xs font-medium text-ink-500">
+                  <Globe className="size-4 shrink-0 text-ink-400" aria-hidden />
+                  Website
+                </dt>
+                <dd className="mt-0.5 truncate pl-6 text-sm font-semibold">
+                  <a
+                    href={website}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="text-brand-700 hover:underline"
+                  >
+                    {new URL(website).hostname.replace(/^www\./, '')}
+                  </a>
+                </dd>
               </div>
             )}
           </dl>
