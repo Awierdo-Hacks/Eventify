@@ -1,4 +1,5 @@
 import 'server-only';
+import { DATABASE_URL_VARIABLES, resolveDatabaseUrl } from '../../scripts/database-url.mjs';
 
 /**
  * Server-side environment access. Values are read lazily so that `next build`
@@ -8,16 +9,19 @@ import 'server-only';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-function required(name: string, devFallback?: string): string {
-  const value = process.env[name];
-  if (value) return value;
-  if (!isProduction && devFallback !== undefined) return devFallback;
-  throw new Error(`Missing required environment variable ${name}`);
-}
-
 export const env = {
   get databaseUrl() {
-    return required('DATABASE_URL');
+    const resolved = resolveDatabaseUrl();
+    if (!resolved) {
+      throw new Error(
+        `No database connection string found. Set one of: ${DATABASE_URL_VARIABLES.join(', ')}`
+      );
+    }
+    return resolved.url;
+  },
+  /** True when a database connection string is configured. */
+  get hasDatabaseUrl() {
+    return resolveDatabaseUrl() !== null;
   },
   get sessionSecret() {
     const secret = process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET;
@@ -34,7 +38,10 @@ export const env = {
   },
   get poolMax() {
     const parsed = Number(process.env.DATABASE_POOL_MAX);
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : 5;
+    if (Number.isFinite(parsed) && parsed > 0) return parsed;
+    // Serverless hosts run many small instances; keep each one's share low so
+    // together they stay under the database's connection limit.
+    return process.env.VERCEL ? 3 : 5;
   },
   get calendarEncryptionKey() {
     return process.env.CALENDAR_ENCRYPTION_KEY || null;

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { env } from '@/lib/env';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,8 +8,9 @@ type Reason = 'DATABASE_URL_NOT_SET' | 'DATABASE_UNREACHABLE' | 'MIGRATIONS_NOT_
 
 const HINTS: Record<Reason, string> = {
   DATABASE_URL_NOT_SET:
-    'Set the DATABASE_URL environment variable (exactly that name) and redeploy.',
-  DATABASE_UNREACHABLE: 'DATABASE_URL is set but the database did not accept the connection.',
+    'No database connection string is configured. Set DATABASE_URL and redeploy.',
+  DATABASE_UNREACHABLE:
+    'A connection string is set but the database did not accept the connection.',
   MIGRATIONS_NOT_APPLIED:
     'The database is reachable but misses the latest tables. Run "prisma migrate deploy".',
 };
@@ -25,7 +27,7 @@ const unavailable = (reason: Reason) =>
  * returns connection details or error text.
  */
 export async function GET() {
-  if (!process.env.DATABASE_URL) return unavailable('DATABASE_URL_NOT_SET');
+  if (!env.hasDatabaseUrl) return unavailable('DATABASE_URL_NOT_SET');
 
   try {
     await db.$queryRaw`SELECT 1`;

@@ -250,22 +250,33 @@ Files already uploaded by v1 (`/uploads/...`) must exist on the new host too.
 
 **Vercel:**
 
-1. Set the environment variables under _Project → Settings → Environment
-   Variables_, for **Production and Preview** (v1 read them from a committed
-   `.env`; v2 does not): `DATABASE_URL`, `NEXTAUTH_SECRET`,
-   `NEXT_PUBLIC_APP_URL`, and `BLOB_READ_WRITE_TOKEN` for uploads.
-2. Deploy. Before building, the deploy checks those variables (and stops with a
-   clear message if one is missing) and **applies pending migrations to the
-   database in `DATABASE_URL`**. That includes preview deployments, so back up
-   the database before the first v2 deploy.
+1. **Database.** Either connect a Postgres store to the project (Storage tab) or
+   set `DATABASE_URL` yourself. The app reads, in this order: `DATABASE_URL`,
+   `DATABASE_URL_POSTGRES_URL`, `DATABASE_URL_DATABASE_URL`, `POSTGRES_URL` —
+   the last three are the names Vercel's database integrations create, so a
+   connected store works without copying its URL. The build log prints which
+   variable was used. It must be a direct `postgres://` URL; a
+   `prisma+postgres://` (Accelerate) URL is ignored.
+2. **Other variables**, under _Project → Settings → Environment Variables_, for
+   Production and Preview: `NEXTAUTH_SECRET`, `NEXT_PUBLIC_APP_URL`, and
+   `BLOB_READ_WRITE_TOKEN` for uploads.
+3. **Deploy.** Before building, the deploy checks the configuration (and stops
+   with a clear message if something is missing) and **applies pending
+   migrations to that database** — on preview deployments too. Back up a
+   database that holds data before the first v2 deploy.
+4. **Region.** Run the functions in the same region as the database (_Project →
+   Settings → Functions → Region_). A far-away region adds a round trip across
+   that distance to every query, which is the most common cause of a slow site.
+5. **First administrator.** A new database has no accounts and nobody can
+   register as admin, so create one from your own machine, with the database
+   URL in your environment:
 
-   The variable must be named exactly `DATABASE_URL`. A storage integration
-   added with a prefix creates names like `DATABASE_URL_POSTGRES_URL`, which
-   the app does not read.
+   ```bash
+   ADMIN_EMAIL=you@example.com ADMIN_PASSWORD='a long password' npm run create-admin
+   ```
 
-3. Functions run in Frankfurt (`vercel.json` → `fra1`), next to the database.
-   If the database moves, change the region to match: every query from a
-   far-away region costs a round trip across the distance.
+   It prints which database it is talking to. Running it for an existing
+   account promotes that account instead.
 
 **Is a deployment healthy?** Open `/api/health`. It answers `ok`, or says which
 of three things is wrong: `DATABASE_URL_NOT_SET`, `DATABASE_UNREACHABLE` or
