@@ -29,3 +29,30 @@ export function resolveDatabaseUrl(source = process.env) {
   }
   return null;
 }
+
+/**
+ * The connection string as handed to the `pg` driver. Hosted Postgres URLs
+ * (Vercel, Neon, Supabase) usually carry `sslmode=require`; `pg` already
+ * treats require/prefer/verify-ca as `verify-full`, but warns on every build
+ * that pg v9 will change that meaning. Spelling out `verify-full` keeps today's
+ * behaviour (full certificate check), silences the warning and stays correct
+ * after the upgrade. A URL that opts into libpq semantics is left untouched.
+ *
+ * Only for the driver: Prisma's own CLI (migrate) reads the URL unchanged.
+ *
+ * @param {string} url
+ * @returns {string}
+ */
+export function toDriverConnectionString(url) {
+  let parsed;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return url;
+  }
+  const sslMode = parsed.searchParams.get('sslmode')?.toLowerCase();
+  if (parsed.searchParams.has('uselibpqcompat')) return url;
+  if (sslMode !== 'prefer' && sslMode !== 'require' && sslMode !== 'verify-ca') return url;
+  parsed.searchParams.set('sslmode', 'verify-full');
+  return parsed.toString();
+}

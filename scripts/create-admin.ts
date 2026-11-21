@@ -14,7 +14,7 @@ import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '../src/generated/prisma/client';
-import { resolveDatabaseUrl } from './database-url.mjs';
+import { resolveDatabaseUrl, toDriverConnectionString } from './database-url.mjs';
 
 async function main() {
   const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
@@ -33,7 +33,7 @@ async function main() {
   console.log(`Database connection: ${database.variable} → ${host}`);
 
   const adapter = new PrismaPg({
-    connectionString: database.url,
+    connectionString: toDriverConnectionString(database.url),
     ...(isLocal ? {} : { ssl: { rejectUnauthorized: false } }),
   });
   const prisma = new PrismaClient({ adapter });

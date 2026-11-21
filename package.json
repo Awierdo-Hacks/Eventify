@@ -46,7 +46,7 @@
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "dotenv": "^17.4.0",
-    "eslint": "^9.39.1",
+    "eslint": "^10.15.0",
     "eslint-config-next": "16.4.6",
     "prettier": "^3.6.2",
     "prisma": "7.10.1",
@@ -56,5 +56,10 @@
   },
   "engines": {
     "node": "22.x"
+  },
+  "overrides": {
+    "eslint-config-next": {
+      "eslint": "$eslint"
+    }
   }
 }

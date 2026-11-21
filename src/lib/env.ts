@@ -1,5 +1,9 @@
 import 'server-only';
-import { DATABASE_URL_VARIABLES, resolveDatabaseUrl } from '../../scripts/database-url.mjs';
+import {
+  DATABASE_URL_VARIABLES,
+  resolveDatabaseUrl,
+  toDriverConnectionString,
+} from '../../scripts/database-url.mjs';
 
 /**
  * Server-side environment access. Values are read lazily so that `next build`
@@ -17,7 +21,7 @@ export const env = {
         `No database connection string found. Set one of: ${DATABASE_URL_VARIABLES.join(', ')}`
       );
     }
-    return resolved.url;
+    return toDriverConnectionString(resolved.url);
   },
   /** True when a database connection string is configured. */
   get hasDatabaseUrl() {
